@@ -11,8 +11,8 @@
 
 本项目基于 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 提供的项目模板进行开发，面向游戏 **《交错战线》** 的自动化助手（开发中）。
 
-仓库地址：[Yanghongfe/MAA_CrossCore](https://github.com/Yanghongfe/MAA_CrossCore)  
-（旧名 `MAA_Practice` 会自动跳转到此仓。）
+仓库地址：[MAACrossCore/MCC_Framework](https://github.com/MAACrossCore/MCC_Framework)
+（自个人仓 `Yanghongfe/MAA_CrossCore` 迁入组织；旧链接一般会重定向。）
 
 > [!IMPORTANT]
 > **当前主线任务流依赖 / 参考了 [MCCA](https://github.com/MaaXYZ/MCCA)（交错战线社区助手）。**  
@@ -25,7 +25,7 @@
 
 ## 使用方式
 
-0. 从 [Releases](https://github.com/Yanghongfe/MAA_CrossCore/releases) 下载 Windows 包（当前主线约 **v0.5.x**，以 Releases 页最新 tag 为准），例如：  
+0. 从 [Releases](https://github.com/MAACrossCore/MCC_Framework/releases) 下载 Windows 包（当前主线约 **v0.5.x**，以 Releases 页最新 tag 为准），例如：  
    `MaaXXX-win-x86_64-v0.x.x.zip`
 1. 解压压缩包
 2. **Windows / macOS 正式包已内置便携 Python**（解压目录下的 `python/`）和离线依赖包（`deps/`）。首次运行带 Agent 的任务时，`agent/bootstrap.py` 会从 `deps/` 自动安装 `maafw` 等依赖，**一般无需本机安装 Python**。  
@@ -114,8 +114,8 @@
 
 感谢以下开发者对本项目作出的贡献：
 
-<a href="https://github.com/Yanghongfe/MAA_CrossCore/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Yanghongfe/MAA_CrossCore" alt="贡献者" />
+<a href="https://github.com/MAACrossCore/MCC_Framework/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=MAACrossCore/MCC_Framework" alt="贡献者" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks)

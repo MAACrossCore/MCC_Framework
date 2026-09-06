@@ -43,7 +43,7 @@ Win10 或者 Win11 系统自带了一份 "Python"，但它其实只是一个安�
 
 ## 7. Release 包提示找不到 Python、pretask 路径错误、或 Agent Custom 不工作
 
-1. 确认下载的是 [Releases](https://github.com/Yanghongfe/MAA_CrossCore/releases) 完整 zip，而不是 GitHub 源码。
+1. 确认下载的是 [Releases](https://github.com/MAACrossCore/MCC_Framework/releases) 完整 zip，而不是 GitHub 源码。
 2. 解压后根目录应同时存在 `MFAAvalonia.exe`（或同类启动文件）、`python/`、`deps/`、`agent/`。
 3. 打开包内 `interface.json`，Windows 上 `agent.child_exec` 与 `pretask.exec` 应为 `./python/python.exe`；若仍是 `"python"`，说明包过旧，请下最新版。
 4. Agent 首次运行会从 `deps/` 安装依赖，稍等片刻；仍失败时 Windows 可双击 `Install-Agent-Deps.bat`。
