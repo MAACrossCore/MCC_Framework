@@ -4,7 +4,7 @@
             "prefix": "",
             "coordinateMode": "absolute-v1",
             "filename": "竞技场-Agent流程总览",
-            "version": "v1.9.2",
+            "version": "v1.10.0",
             "savedViewport": { "x": 40, "y": 40, "zoom": 0.72 }
         }
     },
@@ -39,23 +39,28 @@
     },
     "MPE竞技场_点击顶部第一位并确认挑战": {
         "recognition": "DirectHit", "action": "DoNothing",
-        "next": "MPE竞技场_等待胜利奖励和跳过",
+        "next": "MPE竞技场_等待胜负奖励和跳过",
         "$__mpe_code": { "position": { "x": 1800, "y": 60 } }
     },
-    "MPE竞技场_等待胜利奖励和跳过": {
+    "MPE竞技场_等待胜负奖励和跳过": {
         "recognition": "DirectHit", "action": "DoNothing",
-        "next": ["MPE竞技场_跳过后继续等待", "MPE竞技场_胜利后继续", "MPE竞技场_领取奖励并确认返回列表"],
+        "next": ["MPE竞技场_跳过后继续等待", "MPE竞技场_胜利记成功", "MPE竞技场_失败记失败并继续", "MPE竞技场_领取奖励并确认返回列表"],
         "$__mpe_code": { "position": { "x": 2140, "y": 60 } }
     },
     "MPE竞技场_跳过后继续等待": {
         "recognition": "DirectHit", "action": "DoNothing",
-        "next": "MPE竞技场_等待胜利奖励和跳过",
+        "next": "MPE竞技场_等待胜负奖励和跳过",
         "$__mpe_code": { "position": { "x": 2480, "y": -180 } }
     },
-    "MPE竞技场_胜利后继续": {
+    "MPE竞技场_胜利记成功": {
         "recognition": "DirectHit", "action": "DoNothing",
-        "next": "MPE竞技场_等待胜利奖励和跳过",
+        "next": "MPE竞技场_等待胜负奖励和跳过",
         "$__mpe_code": { "position": { "x": 2480, "y": 60 } }
+    },
+    "MPE竞技场_失败记失败并继续": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE竞技场_读取模拟刷新和顶部对手",
+        "$__mpe_code": { "position": { "x": 2480, "y": 180 } }
     },
     "MPE竞技场_领取奖励并确认返回列表": {
         "recognition": "DirectHit", "action": "DoNothing",
