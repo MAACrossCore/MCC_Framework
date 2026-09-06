@@ -121,10 +121,15 @@ def configure_interface_agent(interface: dict):
     for item in pretasks:
         item["exec"] = python_exec
         args = item.get("args") or []
-        item["args"] = [
-            "./agent/ensure_mumu.py" if isinstance(arg, str) and "ensure_mumu.py" in arg else arg
+        mapped = [
+            "./agent/ensure_mumu.py"
+            if isinstance(arg, str) and "ensure_mumu" in arg
+            else arg
             for arg in args
         ]
+        if not any(isinstance(arg, str) and "ensure_mumu.py" in arg for arg in mapped):
+            mapped = ["./agent/ensure_mumu.py"]
+        item["args"] = mapped
 
 
 def install_python_runtime():

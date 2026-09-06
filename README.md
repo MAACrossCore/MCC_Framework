@@ -19,7 +19,7 @@
 > `assets/interface.json` 任务列表、`assets/resource/pipeline/base/` 日常/周本/基建/扫荡等 pipeline，均在 MCCA 思路与资源基础上迁移、汉化与改造。  
 > **非常感谢 MCCA 作者与贡献者**——没有该项目，本仓库很难在短时间内搭起可用的任务骨架。本项目仍为独立练习仓，问题请优先在本仓库提 Issues，勿直接打扰上游。
 
-目前主要以 GitHub Issues / 同学协作沟通为主。若后续建立 QQ 交流群，会补充到此处。
+目前主要以 GitHub Issues / 成员沟通为主。若后续建立 QQ 交流群，会补充到此处。
 
 开发笔记见：[开发专用.md](./开发专用.md)
 
