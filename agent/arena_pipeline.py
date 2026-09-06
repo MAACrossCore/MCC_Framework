@@ -48,7 +48,8 @@ class ArenaPipelineAction(CustomAction):
     """Perform one arena calculation/state mutation; Pipeline owns navigation."""
 
     def run(self, context, argv) -> bool:
-        operation = str(_param(argv.custom_action_param).get("operation", ""))
+        params = _param(argv.custom_action_param)
+        operation = str(params.get("operation", ""))
         try:
             ensure_running(context)
             if operation == "init":
@@ -67,6 +68,9 @@ class ArenaPipelineAction(CustomAction):
                     "target": options["target"],
                     "power_gap": options["power_gap"],
                     "challenged": 0,
+                    "succeeded": 0,
+                    "failed": 0,
+                    "pending_result": None,
                     "decision": "navigate",
                     "completion_reason": None,
                     "victory_seen": False,
@@ -149,6 +153,9 @@ class ArenaPipelineAction(CustomAction):
                 if decision == ACTION_CHALLENGE:
                     _SESSION["confirm_attempts"] = 1
                     _SESSION["battle_deadline"] = time.monotonic() + 70
+                    _SESSION["pending_result"] = None
+                    _SESSION["victory_seen"] = False
+                    _SESSION["reward_seen"] = False
                 if decision in (
                     ACTION_STOP_SIM_EMPTY, ACTION_STOP_REFRESH_EMPTY,
                     ACTION_STOP_CUSTOM_TARGET,
@@ -166,12 +173,51 @@ class ArenaPipelineAction(CustomAction):
                     return False
                 return True
 
+            if operation == "mark_result":
+                result = str(params.get("result", ""))
+                if result not in ("success", "failure"):
+                    log.error("竞技场结算结果参数无效：%s", result)
+                    return False
+                previous = _SESSION.get("pending_result")
+                if previous is not None and previous != result:
+                    log.error("竞技场同一轮出现冲突结算：%s -> %s", previous, result)
+                    return False
+                _SESSION["pending_result"] = result
+                if result == "success":
+                    _SESSION["victory_seen"] = True
+                    log.info("识别到竞技场战斗胜利，记录本次成功")
+                else:
+                    log.info("识别到竞技场战斗失败，记录本次失败并继续后续挑战")
+                return True
+
+            if operation == "mark_reward":
+                _SESSION["reward_seen"] = True
+                if _SESSION.get("pending_result") is None:
+                    # 部分设备的胜利标题动画很短；获得物品仍是可靠的成功结算证据。
+                    _SESSION["pending_result"] = "success"
+                    _SESSION["victory_seen"] = True
+                    log.info("未捕获胜利标题，但已由竞技场奖励页确认本次成功")
+                return True
+
             if operation == "mark_challenge":
+                result = _SESSION.get("pending_result")
+                if result not in ("success", "failure"):
+                    log.error("竞技场返回列表但缺少本轮胜负结果，拒绝生成错误统计")
+                    return False
                 _SESSION["challenged"] += 1
+                if result == "success":
+                    _SESSION["succeeded"] += 1
+                else:
+                    _SESSION["failed"] += 1
+                _SESSION["pending_result"] = None
                 _SESSION["victory_seen"] = False
                 _SESSION["reward_seen"] = False
                 _SESSION["decision"] = "evaluate"
-                log.info("Pipeline确认单次挑战结算完成，累计挑战=%d", _SESSION["challenged"])
+                log.info(
+                    "Pipeline确认单次挑战%s，累计挑战=%d、成功=%d、失败=%d",
+                    "成功" if result == "success" else "失败",
+                    _SESSION["challenged"], _SESSION["succeeded"], _SESSION["failed"],
+                )
                 return True
 
             if operation == "finish":
@@ -182,9 +228,10 @@ class ArenaPipelineAction(CustomAction):
                         _SESSION.get("simulations", "未知"),
                     )
                 log.info(
-                    "竞技场Pipeline完成：挑战=%d，结束原因=%s",
-                    _SESSION["challenged"], reason,
+                    "竞技场共挑战%d次，成功%d次，失败%d次",
+                    _SESSION["challenged"], _SESSION["succeeded"], _SESSION["failed"],
                 )
+                log.info("竞技场Pipeline结束原因=%s", reason)
                 return reason is not None
 
             if operation == "fail":
@@ -223,19 +270,21 @@ class ArenaPipelineRecognition(CustomRecognition):
         if expected == "page:confirm" and engine._is_challenge_confirm(context, image):
             return _hit({"page": "confirm"})
         if expected == "page:victory" and engine._is_victory_page(context, image):
-            _SESSION["victory_seen"] = True
             return _hit({"page": "victory"})
+        if expected == "page:defeat" and engine._is_defeat_page(context, image):
+            return _hit({"page": "defeat"})
         if expected == "page:reward" and engine._is_reward_page(
             context, image, allow_color_fallback=_SESSION.get("victory_seen", False)
         ):
-            _SESSION["reward_seen"] = True
             return _hit({"page": "reward"})
         if expected == "page:battle_complete":
-            if _SESSION.get("reward_seen") and engine._is_arena_list(context, image):
-                return _hit({"page": "arena", "settled": True})
+            result = _SESSION.get("pending_result")
+            settled = _SESSION.get("reward_seen") or result == "failure"
+            if settled and engine._is_arena_list(context, image):
+                return _hit({"page": "arena", "settled": True, "result": result})
             return None
         if expected == "page:settlement_confirm":
-            if (_SESSION.get("victory_seen") or _SESSION.get("reward_seen")) and engine._is_challenge_confirm(context, image):
+            if _SESSION.get("pending_result") and engine._is_challenge_confirm(context, image):
                 return _hit({"page": "confirm"})
             return None
         if expected == "page:confirm_retry":

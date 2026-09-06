@@ -27,6 +27,7 @@ ROI_OWN_DEPLOYMENT = [61, 211, 157, 41]
 ROI_CONFIRM_BUTTON = [1120, 920, 280, 100]
 ROI_CONFIRM_VS = [820, 330, 300, 230]
 BLANK_CLOSE = (960, 700)
+BTN_DEFEAT_CONTINUE = (766, 981)  # 复用角斗场“战斗失败”页按钮，换算为1920x1080坐标。
 BTN_BACK = BACK_BUTTON
 BTN_TOP_CHALLENGE = (720, 335)      # 实测：点击第一行左侧卡片，稳定进入顶部对手挑战确认页。
 BTN_CONFIRM_CHALLENGE = (1258, 970) # 标注：record\20260825-134310-d222d2 step_000 挑战按钮
@@ -37,6 +38,7 @@ BTN_SIM = (465, 540)
 ARENA_ENTER_CARD = (759, 648)   # 模拟军演页 中间「进入竞技场/镜像竞技」卡
 NODE_REFRESH  = "ArenaRefresh"
 NODE_RESULT   = "ArenaResult"
+NODE_DEFEAT   = "ArenaDefeat"
 NODE_REWARD   = "ArenaReward"
 STRAT_HIGH    = "尽量刷取高分"
 STRAT_COMPLETE= "尽量完成挑战"
@@ -313,6 +315,7 @@ class ArenaLoop(CustomAction):
         """Finish only after settlement evidence and a verified return to the list."""
         deadline = time.time() + 55
         victory_seen = False
+        defeat_seen = False
         reward_seen = False
         victory_clicked_at = None
         while time.time() < deadline:
@@ -321,7 +324,10 @@ class ArenaLoop(CustomAction):
             img = self._shot(ctx)
             if reward_seen and self._is_arena_list(ctx, img):
                 log.info("竞技场奖励处理完成，已确认返回对手列表")
-                return True
+                return "failure" if defeat_seen else "success"
+            if defeat_seen and self._is_arena_list(ctx, img):
+                log.info("竞技场战败页处理完成，已确认返回对手列表")
+                return "failure"
             if victory_seen and self._is_arena_list(ctx, img):
                 # 胜利页与奖励弹窗之间会短暂露出竞技场列表。
                 # 必须继续等待并实际关闭奖励弹窗，不能把这一帧当成结算完成。
@@ -342,6 +348,13 @@ class ArenaLoop(CustomAction):
                 victory_seen = True
                 victory_clicked_at = time.time()
                 if not self._sleep(ctx, 0.6):
+                    return False
+                continue
+            if self._is_defeat_page(ctx, img):
+                log.info("识别到竞技场战斗失败，记录本次失败并点击继续")
+                self._click(ctx, *BTN_DEFEAT_CONTINUE)
+                defeat_seen = True
+                if not self._sleep(ctx, 0.8):
                     return False
                 continue
             # 结算点击后若页面跳得过快，空白坐标可能落到对手卡片并重新打开准备页。
@@ -379,19 +392,35 @@ class ArenaLoop(CustomAction):
             or self._soft_hit(ctx, NODE_RESULT, img, roi=[0, 0, 1100, 340], threshold=0.15)
         )
 
+    def _is_defeat_page(self, ctx, img):
+        # 复用既有角斗场流程中“战斗失败”的实测 OCR 区域与阈值。
+        return self._soft_hit(ctx, NODE_DEFEAT, img)
+
     def _dismiss_post_battle_overlay(self, ctx):
         """Recover when a previous run was stopped on victory/reward pages."""
         for _ in range(6):
             if self._cancelled(ctx):
                 return False
             img = self._shot(ctx)
-            if not (self._is_reward_page(ctx, img) or self._is_victory_page(ctx, img)):
+            if not (
+                self._is_reward_page(ctx, img)
+                or self._is_victory_page(ctx, img)
+                or self._is_defeat_page(ctx, img)
+            ):
                 return True
             log.info("启动竞技场时检测到遗留结算页面，点击空白处清理")
-            self._click(ctx, *BLANK_CLOSE)
+            self._click(
+                ctx,
+                *(BTN_DEFEAT_CONTINUE if self._is_defeat_page(ctx, img) else BLANK_CLOSE),
+            )
             if not self._sleep(ctx, 0.8):
                 return False
-        return not self._is_reward_page(ctx, self._shot(ctx))
+        img = self._shot(ctx)
+        return not (
+            self._is_reward_page(ctx, img)
+            or self._is_victory_page(ctx, img)
+            or self._is_defeat_page(ctx, img)
+        )
 
     def _soft_hit(self, ctx, node, img=None, roi=None, threshold=None):
         override = None
@@ -431,7 +460,11 @@ class ArenaLoop(CustomAction):
             return 0.0
 
     def _is_arena_list(self, ctx, img):
-        if self._is_reward_page(ctx, img) or self._is_victory_page(ctx, img):
+        if (
+            self._is_reward_page(ctx, img)
+            or self._is_victory_page(ctx, img)
+            or self._is_defeat_page(ctx, img)
+        ):
             return False
         page_title = self._soft_hit(ctx, "ArenaPageTitle", img)
         deploy_button = self._soft_hit(ctx, "ArenaDeployButton", img)
@@ -625,6 +658,8 @@ class ArenaLoop(CustomAction):
                 return False
 
         challenged = 0
+        succeeded = 0
+        failed = 0
         completion_reason = None
         deadline = time.monotonic() + 1200
         try:
@@ -723,12 +758,20 @@ class ArenaLoop(CustomAction):
                 if not self._click_confirm_challenge(context):
                     return False
                 log.info("等待胜利与奖励关键页面，不再固定等待26秒")
-                success = self._wait_battle_result(context)
+                outcome = self._wait_battle_result(context)
                 ensure_running(context)
-                if not success:
+                if not outcome:
                     return False
                 challenged += 1
-                log.info("已挑战=%s 剩余模拟=%s 对方战力=%s 挑战%s", challenged, sim_cur, opp, "成功/已提交" if success else "失败/未知")
+                if outcome == "failure":
+                    failed += 1
+                else:
+                    succeeded += 1
+                log.info(
+                    "本次竞技场挑战%s，累计挑战=%s、成功=%s、失败=%s",
+                    "失败" if outcome == "failure" else "成功",
+                    challenged, succeeded, failed,
+                )
         except ActionStopped:
             log.info("检测到MFA停止状态，竞技场立即停止且不再执行点击")
             return False
@@ -740,6 +783,6 @@ class ArenaLoop(CustomAction):
             log.error("竞技场未满足明确结束条件（主循环超时），任务失败并停止后续队列")
             return False
 
-        log.info("竞技场结束，共挑战 %s 次，结束原因=%s", challenged, completion_reason)
+        log.info("竞技场共挑战%d次，成功%d次，失败%d次", challenged, succeeded, failed)
+        log.info("竞技场结束原因=%s", completion_reason)
         return True
-

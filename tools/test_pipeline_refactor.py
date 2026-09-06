@@ -84,8 +84,13 @@ def test_pipeline_exposes_required_control_flow_branches():
     chip = load_pipeline("chip.json")
     assert all(name in arena for name in (
         "竞技场_决策挑战", "竞技场_决策刷新", "竞技场_决策完成模拟归零",
-        "竞技场_决策完成刷新归零", "竞技场_结算奖励", "竞技场_结算超时",
+        "竞技场_决策完成刷新归零", "竞技场_结算奖励", "竞技场_结算失败",
+        "竞技场_关闭结算失败", "竞技场_结算超时", "ArenaDefeat",
     ))
+    assert arena["ArenaDefeat"]["expected"] == ["战斗失败"]
+    assert arena["竞技场_结算失败"]["custom_action_param"] == {
+        "operation": "mark_result", "result": "failure",
+    }
     arena_agent = (ROOT / "agent" / "arena_pipeline.py").read_text(encoding="utf-8-sig")
     assert "小于自定目标" not in arena_agent
     assert all(name in chip for name in (

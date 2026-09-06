@@ -79,7 +79,10 @@ def main():
     assert loop._is_arena_list(counter_only, object()) is False
     confirm = _RecognitionContext({"ConfirmStart": True})
     assert loop._is_arena_list(confirm, object()) is False
-    print("ARENA_LOGIC_OK (14 tests)")
+    defeat = _RecognitionContext({"ArenaDefeat": True})
+    assert loop._is_defeat_page(defeat, object()) is True
+    assert loop._is_arena_list(defeat, object()) is False
+    print("ARENA_LOGIC_OK (16 tests)")
 
 
 if __name__ == "__main__":
