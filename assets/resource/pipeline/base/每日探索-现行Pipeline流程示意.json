@@ -41,7 +41,7 @@
     "MPE每日探索_接续点B_每日探索分类页": {
         "recognition": "DirectHit",
         "action": "DoNothing",
-        "next": ["MPE每日探索_选择资源采集", "MPE每日探索_选择跃升行动"],
+        "next": ["MPE每日探索_选择资源采集", "MPE每日探索_选择芯片嵌合", "MPE每日探索_选择跃升行动"],
         "$__mpe_code": { "position": { "x": 1200, "y": 120 } }
     },
     "MPE每日探索_选择资源采集": {
@@ -50,11 +50,35 @@
         "next": "MPE每日探索_接续点C_具体关卡选择页",
         "$__mpe_code": { "position": { "x": 1480, "y": 20 } }
     },
+    "MPE每日探索_选择芯片嵌合": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_芯片列表归顶",
+        "$__mpe_code": { "position": { "x": 1480, "y": 220 } }
+    },
+    "MPE每日探索_芯片列表归顶": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_芯片关卡文字查找",
+        "$__mpe_code": { "position": { "x": 1760, "y": 320 } }
+    },
+    "MPE每日探索_芯片关卡文字查找": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["MPE每日探索_接续点D_层数选择页", "MPE每日探索_芯片列表向下滚动"],
+        "$__mpe_code": { "position": { "x": 2040, "y": 320 } }
+    },
+    "MPE每日探索_芯片列表向下滚动": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_芯片关卡文字查找",
+        "$__mpe_code": { "position": { "x": 2320, "y": 360 } }
+    },
     "MPE每日探索_选择跃升行动": {
         "recognition": "DirectHit",
         "action": "DoNothing",
         "next": "MPE每日探索_接续点C_具体关卡选择页",
-        "$__mpe_code": { "position": { "x": 1480, "y": 220 } }
+        "$__mpe_code": { "position": { "x": 1480, "y": 420 } }
     },
     "MPE每日探索_接续点C_具体关卡选择页": {
         "recognition": "DirectHit",
@@ -113,7 +137,7 @@
     "MPE每日探索_体力足够开始战斗": {
         "recognition": "DirectHit",
         "action": "DoNothing",
-        "next": ["MPE每日探索_燃料补给弹窗", "MPE每日探索_开启加成", "MPE每日探索_扫荡成功"],
+        "next": ["MPE每日探索_燃料补给弹窗", "MPE每日探索_双倍选择", "MPE每日探索_扫荡成功"],
         "$__mpe_code": { "position": { "x": 3720, "y": 120 } }
     },
     "MPE每日探索_燃料补给弹窗": {
@@ -128,9 +152,10 @@
         "next": "MPE每日探索_体力足够开始战斗",
         "$__mpe_code": { "position": { "x": 4280, "y": -100 } }
     },
-    "MPE每日探索_开启加成": {
+    "MPE每日探索_双倍选择": {
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "text_doc": "Interface 的“是否使用双倍”覆盖开启加成节点：Yes 点击使用，No 点击不使用；无弹窗时直接识别扫荡成功。",
         "next": "MPE每日探索_扫荡成功",
         "$__mpe_code": { "position": { "x": 4000, "y": 120 } }
     },
@@ -149,7 +174,19 @@
     "MPE每日探索_关闭扫荡奖励": {
         "recognition": "DirectHit",
         "action": "DoNothing",
-        "next": "MPE每日探索_接续点E_关卡详情扫荡页",
+        "next": ["MPE每日探索_芯片本停留上级页面结束", "MPE每日探索_普通关卡按原流程结束"],
         "$__mpe_code": { "position": { "x": 4560, "y": 220 } }
+    },
+    "MPE每日探索_芯片本停留上级页面结束": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "text_doc": "芯片本通过 Interface 将扫荡结束的 next 覆盖为空；识别回到关卡详情扫荡页后直接成功结束。",
+        "$__mpe_code": { "position": { "x": 4840, "y": 160 } }
+    },
+    "MPE每日探索_普通关卡按原流程结束": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "text_doc": "未覆盖扫荡结束的每日探索关卡继续使用公共结束流程。",
+        "$__mpe_code": { "position": { "x": 4840, "y": 300 } }
     }
 }

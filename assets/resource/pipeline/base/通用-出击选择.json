@@ -96,6 +96,43 @@
         },
         "timeout": 30000
     },
+    "每日探索_芯片列表归顶": {
+        "recognition": "DirectHit",
+        "action": "Swipe",
+        "begin": [965, 210, 20, 20],
+        "end": [965, 590, 20, 20],
+        "duration": 600,
+        "post_delay": 800,
+        "next": [
+            "每日探索_芯片关卡查找",
+            "每日探索_芯片列表下滑"
+        ]
+    },
+    "每日探索_芯片关卡查找": {
+        "recognition": "OCR",
+        "roi": [790, 90, 350, 535],
+        "action": "Click",
+        "pre_wait_freezes": {
+            "time": 500,
+            "threshold": 0.95
+        },
+        "next": [
+            "每日探索_第几层"
+        ],
+        "timeout": 1800
+    },
+    "每日探索_芯片列表下滑": {
+        "recognition": "DirectHit",
+        "action": "Swipe",
+        "begin": [965, 555, 20, 20],
+        "end": [965, 250, 20, 20],
+        "duration": 600,
+        "post_delay": 700,
+        "next": [
+            "每日探索_芯片关卡查找",
+            "每日探索_芯片列表下滑"
+        ]
+    },
     "每日探索_第几层": {
         "recognition": "OCR",
         "roi": [

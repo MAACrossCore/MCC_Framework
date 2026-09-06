@@ -468,47 +468,11 @@
             }
         },
         "post_delay": 1000,
-        "next": [
-            "基建_制作素材_材料充足_最大",
-            "基建_制作素材_材料充足_合成"
-        ],
+        "next": "基建_制作素材_材料充足_确定",
         "$__mpe_code": {
             "position": {
                 "x": 10582,
                 "y": 305
-            }
-        }
-    },
-    "基建_制作素材_材料充足_最大": {
-        "recognition": {
-            "type": "ColorMatch",
-            "param": {
-                "roi": [
-                    414,
-                    308,
-                    405,
-                    107
-                ],
-                "lower": [
-                    33,
-                    20,
-                    33
-                ],
-                "upper": [
-                    57,
-                    32,
-                    49
-                ]
-            }
-        },
-        "post_delay": 1000,
-        "next": [
-            "基建_制作素材_材料充足_确定"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 10902,
-                "y": 290
             }
         }
     },
@@ -1545,7 +1509,7 @@
                                 "template": [
                                     "Infrastructures/星币.png"
                                 ],
-                                "threshold": 0.98
+                                "threshold": 0.85
                             },
                             "type": "TemplateMatch"
                         },
@@ -1557,54 +1521,35 @@
                                 "roi": "icon",
                                 "roi_offset": [
                                     -130,
-                                    168,
+                                    -60,
                                     150,
-                                    30
+                                    70
+                                ],
+                                "template": "Infrastructures/稀有星币.png",
+                                "threshold": 0.5
+                            },
+                            "type": "TemplateMatch"
+                        },
+                        "sub_name": "rare_order"
+                    },
+                    {
+                        "recognition": {
+                            "param": {
+                                "roi": "rare_order",
+                                "roi_offset": [
+                                    -10,
+                                    190,
+                                    20,
+                                    -30
                                 ],
                                 "template": "Infrastructures/可交付订单.png",
                                 "threshold": 0.9
                             },
                             "type": "TemplateMatch"
                         }
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "count": 80,
-                                "lower": [
-                                    160,
-                                    140,
-                                    40
-                                ],
-                                "roi": "icon",
-                                "upper": [
-                                    255,
-                                    230,
-                                    160
-                                ]
-                            },
-                            "type": "ColorMatch"
-                        }
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "expected": [
-                                    "10"
-                                ],
-                                "roi": "icon",
-                                "roi_offset": [
-                                    -117,
-                                    133,
-                                    119,
-                                    -29
-                                ]
-                            },
-                            "type": "OCR"
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 2
             }
         },
         "action": {
@@ -1627,7 +1572,7 @@
         }
     },
     "基建_构建票10_可交付": {
-        "enabled": true,
+        "enabled": false,
         "recognition": {
             "type": "And",
             "param": {
@@ -1656,36 +1601,38 @@
                             "param": {
                                 "roi": "icon",
                                 "roi_offset": [
-                                    -130,
-                                    168,
-                                    150,
-                                    30
+                                    -117,
+                                    133,
+                                    119,
+                                    -29
+                                ],
+                                "expected": [
+                                    "^[xX×]?[ ]*10$"
+                                ],
+                                "only_rec": true
+                            },
+                            "type": "OCR"
+                        },
+                        "sub_name": "target_amount"
+                    },
+                    {
+                        "recognition": {
+                            "param": {
+                                "roi": "target_amount",
+                                "roi_offset": [
+                                    -13,
+                                    35,
+                                    31,
+                                    59
                                 ],
                                 "template": "Infrastructures/可交付订单.png",
                                 "threshold": 0.9
                             },
                             "type": "TemplateMatch"
                         }
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "expected": [
-                                    "10"
-                                ],
-                                "roi": "icon",
-                                "roi_offset": [
-                                    -117,
-                                    133,
-                                    119,
-                                    -29
-                                ]
-                            },
-                            "type": "OCR"
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 2
             }
         },
         "action": {
@@ -1737,36 +1684,38 @@
                             "param": {
                                 "roi": "icon",
                                 "roi_offset": [
-                                    -130,
-                                    168,
-                                    150,
-                                    30
+                                    -117,
+                                    133,
+                                    119,
+                                    -29
+                                ],
+                                "expected": [
+                                    "^[xX×]?[ ]*16$"
+                                ],
+                                "only_rec": true
+                            },
+                            "type": "OCR"
+                        },
+                        "sub_name": "target_amount"
+                    },
+                    {
+                        "recognition": {
+                            "param": {
+                                "roi": "target_amount",
+                                "roi_offset": [
+                                    -13,
+                                    35,
+                                    31,
+                                    59
                                 ],
                                 "template": "Infrastructures/可交付订单.png",
                                 "threshold": 0.9
                             },
                             "type": "TemplateMatch"
                         }
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "expected": [
-                                    "16"
-                                ],
-                                "roi": "icon",
-                                "roi_offset": [
-                                    -117,
-                                    133,
-                                    119,
-                                    -29
-                                ]
-                            },
-                            "type": "OCR"
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 2
             }
         },
         "action": {
@@ -1818,36 +1767,38 @@
                             "param": {
                                 "roi": "icon",
                                 "roi_offset": [
-                                    -130,
-                                    168,
-                                    150,
-                                    30
+                                    -117,
+                                    133,
+                                    119,
+                                    -29
+                                ],
+                                "expected": [
+                                    "^[xX×]?[ ]*18$"
+                                ],
+                                "only_rec": true
+                            },
+                            "type": "OCR"
+                        },
+                        "sub_name": "target_amount"
+                    },
+                    {
+                        "recognition": {
+                            "param": {
+                                "roi": "target_amount",
+                                "roi_offset": [
+                                    -13,
+                                    35,
+                                    31,
+                                    59
                                 ],
                                 "template": "Infrastructures/可交付订单.png",
                                 "threshold": 0.9
                             },
                             "type": "TemplateMatch"
                         }
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "expected": [
-                                    "18"
-                                ],
-                                "roi": "icon",
-                                "roi_offset": [
-                                    -117,
-                                    133,
-                                    119,
-                                    -29
-                                ]
-                            },
-                            "type": "OCR"
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 2
             }
         },
         "action": {
@@ -1899,36 +1850,38 @@
                             "param": {
                                 "roi": "icon",
                                 "roi_offset": [
-                                    -130,
-                                    168,
-                                    150,
-                                    30
+                                    -117,
+                                    133,
+                                    119,
+                                    -29
+                                ],
+                                "expected": [
+                                    "^[xX×]?[ ]*6$"
+                                ],
+                                "only_rec": true
+                            },
+                            "type": "OCR"
+                        },
+                        "sub_name": "target_amount"
+                    },
+                    {
+                        "recognition": {
+                            "param": {
+                                "roi": "target_amount",
+                                "roi_offset": [
+                                    -13,
+                                    35,
+                                    31,
+                                    59
                                 ],
                                 "template": "Infrastructures/可交付订单.png",
                                 "threshold": 0.9
                             },
                             "type": "TemplateMatch"
                         }
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "expected": [
-                                    "6"
-                                ],
-                                "roi": "icon",
-                                "roi_offset": [
-                                    -117,
-                                    133,
-                                    119,
-                                    -29
-                                ]
-                            },
-                            "type": "OCR"
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 2
             }
         },
         "action": {
@@ -1980,36 +1933,38 @@
                             "param": {
                                 "roi": "icon",
                                 "roi_offset": [
-                                    -130,
-                                    168,
-                                    150,
-                                    30
+                                    -117,
+                                    133,
+                                    119,
+                                    -29
+                                ],
+                                "expected": [
+                                    "^[xX×]?[ ]*8$"
+                                ],
+                                "only_rec": true
+                            },
+                            "type": "OCR"
+                        },
+                        "sub_name": "target_amount"
+                    },
+                    {
+                        "recognition": {
+                            "param": {
+                                "roi": "target_amount",
+                                "roi_offset": [
+                                    -13,
+                                    35,
+                                    31,
+                                    59
                                 ],
                                 "template": "Infrastructures/可交付订单.png",
                                 "threshold": 0.9
                             },
                             "type": "TemplateMatch"
                         }
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "expected": [
-                                    "8"
-                                ],
-                                "roi": "icon",
-                                "roi_offset": [
-                                    -117,
-                                    133,
-                                    119,
-                                    -29
-                                ]
-                            },
-                            "type": "OCR"
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 2
             }
         },
         "action": {
@@ -2049,7 +2004,7 @@
                                 "template": [
                                     "Infrastructures/经验.png"
                                 ],
-                                "threshold": 0.98
+                                "threshold": 0.85
                             },
                             "type": "TemplateMatch"
                         },
@@ -2061,9 +2016,26 @@
                                 "roi": "icon",
                                 "roi_offset": [
                                     -130,
-                                    168,
+                                    -60,
                                     150,
-                                    30
+                                    70
+                                ],
+                                "template": "Infrastructures/稀有经验.png",
+                                "threshold": 0.85
+                            },
+                            "type": "TemplateMatch"
+                        },
+                        "sub_name": "rare_order"
+                    },
+                    {
+                        "recognition": {
+                            "param": {
+                                "roi": "rare_order",
+                                "roi_offset": [
+                                    -10,
+                                    190,
+                                    20,
+                                    -30
                                 ],
                                 "template": "Infrastructures/可交付订单.png",
                                 "threshold": 0.9
@@ -2071,45 +2043,9 @@
                             "type": "TemplateMatch"
                         },
                         "sub_name": "判断是否可交付"
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "count": 80,
-                                "lower": [
-                                    160,
-                                    140,
-                                    40
-                                ],
-                                "roi": "icon",
-                                "upper": [
-                                    255,
-                                    230,
-                                    160
-                                ]
-                            },
-                            "type": "ColorMatch"
-                        }
-                    },
-                    {
-                        "recognition": {
-                            "param": {
-                                "expected": [
-                                    "10"
-                                ],
-                                "roi": "icon",
-                                "roi_offset": [
-                                    -117,
-                                    133,
-                                    119,
-                                    -29
-                                ]
-                            },
-                            "type": "OCR"
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 2
             }
         },
         "action": {

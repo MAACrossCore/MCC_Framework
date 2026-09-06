@@ -34,8 +34,9 @@
 
   "活动_进入困难关": { "recognition": "OCR", "expected": "开始探索", "roi": [160, 320, 240, 120], "action": "Click", "target": [230, 390, 4, 4], "post_delay": 1500, "next": "活动_确认困难模式", "$__mpe_code": { "position": { "x": 1220, "y": 360 } } },
   "活动_确认困难模式": { "next": ["活动_困难关页面已到", "活动_点击困难模式线条"], "$__mpe_code": { "position": { "x": 1500, "y": 360 } } },
-  "活动_困难关页面已到": { "recognition": "OCR", "expected": "困难模式", "roi": [80, 330, 180, 80], "threshold": 0.2, "action": "DoNothing", "next": "活动_选择困难关卡", "$__mpe_code": { "position": { "x": 1780, "y": 300 } } },
+  "活动_困难关页面已到": { "recognition": "OCR", "expected": "困难模式", "roi": [80, 330, 180, 80], "threshold": 0.2, "action": "DoNothing", "next": "活动_困难关卡列表向右拖动", "$__mpe_code": { "position": { "x": 1780, "y": 300 } } },
   "活动_点击困难模式线条": { "recognition": "DirectHit", "action": "Click", "target": [100, 363, 4, 4], "post_delay": 900, "next": "活动_困难关页面已到", "$__mpe_code": { "position": { "x": 1780, "y": 440 } } },
+  "活动_困难关卡列表向右拖动": { "recognition": "DirectHit", "action": "Swipe", "begin": [215, 635, 10, 10], "end": [1095, 635, 10, 10], "duration": 650, "post_delay": 800, "next": "活动_选择困难关卡", "$__mpe_code": { "position": { "x": 2060, "y": 300 } } },
   "活动_选择困难关卡": { "recognition": "DirectHit", "action": "Click", "target": [215, 635, 4, 4], "post_delay": 1200, "next": "活动_困难关战斗选择页", "$__mpe_code": { "position": { "x": 2060, "y": 360 } } },
   "活动_困难关战斗选择页": { "recognition": "OCR", "expected": "扫荡", "roi": [800, 520, 130, 100], "action": "Click", "target": [850, 572, 16, 16], "post_delay": 1000, "next": "活动_扫荡弹窗已打开", "$__mpe_code": { "position": { "x": 2340, "y": 360 } } },
   "活动_扫荡弹窗已打开": { "recognition": "OCR", "expected": ["现在", "扫荡后"], "roi": [580, 470, 270, 150], "action": "DoNothing", "next": ["通用_队伍选择", "通用_队伍下拉", "通用_扫荡读取票数"], "$__mpe_code": { "position": { "x": 2620, "y": 360 } } },
