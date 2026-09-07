@@ -5,6 +5,7 @@ from pathlib import Path
 import ast
 import json
 import sys
+from types import SimpleNamespace
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -97,6 +98,92 @@ def test_pipeline_exposes_required_control_flow_branches():
         "芯片_阶段清理", "芯片_阶段筛选", "芯片_清理确认分解",
         "芯片_筛选单枚", "芯片_筛选滑动", "芯片_筛选完成",
     ))
+
+
+def test_activity_returns_home_and_stops_before_exchange_without_stamina():
+    activity = load_pipeline("活动.json")
+    assert activity["活动_任务"]["next"] == "活动_开始前返回主页"
+    assert activity["活动_开始前返回主页"]["next"] == [
+        "活动_开始前确认主界面",
+        "[JumpBack]子任务_进入首页",
+    ]
+    assert activity["活动_开始前确认主界面"]["next"] == "活动_主界面已到"
+
+    dispatch = activity["活动_活动页分派"]["next"]
+    assert dispatch.index("通用_体力药入口") < dispatch.index("活动_待检查兑换体力")
+    assert dispatch.index("活动_待检查兑换体力") < dispatch.index("活动_待兑换刷关票")
+    assert dispatch.index("活动_体力不足结束") < dispatch.index("活动_待兑换刷关票")
+    assert activity["活动_待检查兑换体力"]["custom_action_param"] == {
+        "operation": "check_exchange_stamina",
+    }
+    assert activity["活动_体力不足结束"]["next"] == "活动_体力不足返回主页"
+    assert activity["活动_体力不足返回主页"]["next"] == "活动_体力不足确认主界面"
+
+    confirm = activity["活动_确认购买刷关票"]["next"]
+    assert confirm[0] == "活动_购买货币不足取消"
+    assert activity["活动_购买货币不足取消"]["expected"] == "取消"
+    assert activity["活动_购买货币不足取消"]["next"] == "活动_弹窗标记体力不足"
+    assert activity["活动_弹窗标记体力不足"]["custom_action_param"] == {
+        "operation": "finish_insufficient_stamina",
+    }
+    assert activity["活动_弹窗标记体力不足"]["next"] == "活动_体力不足返回主页"
+
+    source = (ROOT / "agent" / "activity_pipeline.py").read_text(encoding="utf-8-sig")
+    assert 'operation == "check_exchange_stamina"' in source
+    assert 'stamina < stamina_cost' in source
+    assert '_SESSION["status"] = "insufficient_stamina"' in source
+    assert 'expected == "exchange:stamina_check_pending"' in source
+
+
+def test_activity_exchange_stamina_boundary():
+    sys.path.insert(0, str(ROOT / "agent"))
+    import activity_pipeline
+
+    class ScreenshotRequest:
+        def wait(self):
+            return self
+
+        def get(self):
+            return object()
+
+    context = SimpleNamespace(
+        tasker=SimpleNamespace(
+            controller=SimpleNamespace(post_screencap=lambda: ScreenshotRequest())
+        )
+    )
+    argv = SimpleNamespace(
+        custom_action_param=json.dumps({"operation": "check_exchange_stamina"})
+    )
+    original_ocr = activity_pipeline._ocr_digits
+    original_guard = activity_pipeline.ensure_running
+    try:
+        activity_pipeline.ensure_running = lambda _context: None
+        cases = (
+            (14, 0, "insufficient_stamina", True),
+            (14, 1, "insufficient_stamina", True),
+            (14, 2, "ready", True),
+            (15, 0, "ready", False),
+        )
+        for stamina, tickets, expected_status, exchange_done in cases:
+            activity_pipeline._SESSION.clear()
+            activity_pipeline._SESSION.update({
+                "stamina_cost_per_ticket": 15,
+                "ticket_cost_per_run": 2,
+                "activity_tickets": tickets,
+                "exchange_done": False,
+                "stamina_checked": False,
+                "status": "ready",
+            })
+            activity_pipeline._ocr_digits = (
+                lambda _context, _node, _image, _roi, value=stamina: value
+            )
+            assert activity_pipeline.ActivityPipelineAction().run(context, argv)
+            assert activity_pipeline._SESSION["stamina_checked"] is True
+            assert activity_pipeline._SESSION["status"] == expected_status
+            assert activity_pipeline._SESSION["exchange_done"] is exchange_done
+    finally:
+        activity_pipeline._ocr_digits = original_ocr
+        activity_pipeline.ensure_running = original_guard
 
 
 if __name__ == "__main__":

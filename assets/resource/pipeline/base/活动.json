@@ -8,12 +8,15 @@
   "$__mpe_external_通用_掉落加成使用_活动": { "$__mpe_code": { "position": { "x": 4200, "y": 0 } } },
   "$__mpe_external_通用_掉落加成不使用_活动": { "$__mpe_code": { "position": { "x": 4200, "y": 200 } } },
   "$__mpe_external_通用_体力药入口_活动": { "$__mpe_code": { "position": { "x": 1220, "y": 20 } } },
+  "$__mpe_external_子任务_进入首页_活动": { "$__mpe_code": { "position": { "x": 360, "y": -160 } } },
 
-  "活动_任务": { "recognition": "DirectHit", "action": "Custom", "custom_action": "activity_atomic", "custom_action_param": { "operation": "init" }, "next": "活动_识别起点", "$__mpe_code": { "position": { "x": 80, "y": 100 } } },
+  "活动_任务": { "recognition": "DirectHit", "action": "Custom", "custom_action": "activity_atomic", "custom_action_param": { "operation": "init" }, "next": "活动_开始前返回主页", "$__mpe_code": { "position": { "x": 80, "y": 100 } } },
+  "活动_开始前返回主页": { "next": ["活动_开始前确认主界面", "[JumpBack]子任务_进入首页"], "$__mpe_code": { "position": { "x": 360, "y": -40 } } },
+  "活动_开始前确认主界面": { "recognition": "OCR", "expected": ["基地", "任务", "编队"], "roi": [560, 570, 440, 145], "threshold": 0.2, "action": "DoNothing", "next": "活动_主界面已到", "$__mpe_code": { "position": { "x": 660, "y": -40 } } },
   "活动_识别起点": { "next": ["活动_扫荡弹窗已打开", "活动_任务奖励页", "活动_困难关战斗选择页", "活动_困难关页面已到", "活动_活动页已到", "活动_主界面已到"], "$__mpe_code": { "position": { "x": 360, "y": 100 } } },
   "活动_主界面已到": { "recognition": "OCR", "expected": ["基地", "任务", "编队"], "roi": [560, 570, 440, 145], "threshold": 0.2, "action": "Click", "target": [1160, 455, 4, 4], "post_delay": 1500, "next": "活动_活动页已到", "$__mpe_code": { "position": { "x": 360, "y": 300 } } },
   "活动_活动页已到": { "recognition": "OCR", "expected": ["开始探索", "挑战列表", "奖励内容"], "roi": [120, 250, 420, 430], "threshold": 0.2, "action": "DoNothing", "next": "活动_活动页分派", "$__mpe_code": { "position": { "x": 660, "y": 100 } } },
-  "活动_活动页分派": { "next": ["活动_待领取每日票", "活动_待规划资源", "通用_体力药入口", "活动_待兑换刷关票", "活动_进入困难关"], "$__mpe_code": { "position": { "x": 940, "y": 100 } } },
+  "活动_活动页分派": { "next": ["活动_待领取每日票", "活动_待规划资源", "通用_体力药入口", "活动_待检查兑换体力", "活动_体力不足结束", "活动_待兑换刷关票", "活动_进入困难关"], "$__mpe_code": { "position": { "x": 940, "y": 100 } } },
 
   "活动_待领取每日票": { "recognition": "Custom", "custom_recognition": "activity_state", "custom_recognition_param": { "expected": "daily:pending" }, "action": "Click", "target": [276, 493, 4, 4], "post_delay": 1200, "next": "活动_任务奖励页", "$__mpe_code": { "position": { "x": 1220, "y": -140 } } },
   "活动_任务奖励页": { "recognition": "OCR", "expected": "任务奖励", "roi": [40, 60, 320, 120], "action": "Click", "target": [1113, 112, 4, 4], "post_delay": 900, "next": ["活动_每日奖励弹窗", "活动_任务奖励返回"], "$__mpe_code": { "position": { "x": 1500, "y": -140 } } },
@@ -23,11 +26,18 @@
 
   "活动_待规划资源": { "recognition": "Custom", "custom_recognition": "activity_state", "custom_recognition_param": { "expected": "plan:pending" }, "action": "Custom", "custom_action": "activity_atomic", "custom_action_param": { "operation": "plan_resources", "stamina_cost_per_ticket": 15, "ticket_cost_per_run": 2 }, "next": "活动_活动页分派", "$__mpe_code": { "position": { "x": 1220, "y": 20 } } },
 
+  "活动_待检查兑换体力": { "recognition": "Custom", "custom_recognition": "activity_state", "custom_recognition_param": { "expected": "exchange:stamina_check_pending" }, "action": "Custom", "custom_action": "activity_atomic", "custom_action_param": { "operation": "check_exchange_stamina" }, "next": "活动_活动页分派", "$__mpe_code": { "position": { "x": 1220, "y": 80 } } },
+  "活动_体力不足结束": { "recognition": "Custom", "custom_recognition": "activity_state", "custom_recognition_param": { "expected": "status:insufficient_stamina" }, "action": "Custom", "custom_action": "activity_atomic", "custom_action_param": { "operation": "finish_insufficient_stamina" }, "next": "活动_体力不足返回主页", "$__mpe_code": { "position": { "x": 1500, "y": 20 } } },
+  "活动_体力不足返回主页": { "recognition": "TemplateMatch", "template": "返回主页.png", "roi": [164, 21, 112, 51], "action": "Click", "post_delay": 1500, "next": "活动_体力不足确认主界面", "$__mpe_code": { "position": { "x": 1780, "y": 20 } } },
+  "活动_体力不足确认主界面": { "recognition": "OCR", "expected": ["基地", "任务", "编队"], "roi": [560, 570, 440, 145], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 2060, "y": 20 } } },
+
   "活动_待兑换刷关票": { "recognition": "Custom", "custom_recognition": "activity_state", "custom_recognition_param": { "expected": "exchange:pending" }, "action": "Click", "target": [1185, 45, 4, 4], "post_delay": 1200, "next": "活动_兑换站已到", "$__mpe_code": { "position": { "x": 1220, "y": 100 } } },
   "活动_兑换站已到": { "recognition": "OCR", "expected": "兑换站点", "roi": [20, 80, 300, 120], "action": "DoNothing", "next": "活动_选择认证权限卡", "$__mpe_code": { "position": { "x": 1500, "y": 100 } } },
   "活动_选择认证权限卡": { "recognition": "OCR", "expected": "认证权限卡", "roi": [35, 170, 210, 240], "action": "Click", "target": [143, 274, 4, 4], "post_delay": 1000, "next": "活动_购买刷关票", "$__mpe_code": { "position": { "x": 1780, "y": 100 } } },
   "活动_购买刷关票": { "recognition": "OCR", "expected": ["售价", "购买内容"], "roi": [700, 180, 360, 400], "action": "Custom", "custom_action": "activity_atomic", "custom_action_param": { "operation": "adjust_exchange_count" }, "post_delay": 600, "next": "活动_确认购买刷关票", "$__mpe_code": { "position": { "x": 2060, "y": 100 } } },
-  "活动_确认购买刷关票": { "recognition": "OCR", "expected": "购买", "roi": [760, 500, 260, 120], "action": "Click", "target": [932, 540, 4, 4], "post_delay": 1200, "next": "活动_兑换奖励", "$__mpe_code": { "position": { "x": 2340, "y": 100 } } },
+  "活动_确认购买刷关票": { "recognition": "OCR", "expected": "购买", "roi": [760, 500, 260, 120], "action": "Click", "target": [932, 540, 4, 4], "post_delay": 1200, "next": ["活动_购买货币不足取消", "活动_兑换奖励"], "$__mpe_code": { "position": { "x": 2340, "y": 100 } } },
+  "活动_购买货币不足取消": { "recognition": "OCR", "expected": "取消", "roi": [390, 390, 240, 120], "action": "Click", "post_delay": 800, "next": "活动_弹窗标记体力不足", "$__mpe_code": { "position": { "x": 2620, "y": -20 } } },
+  "活动_弹窗标记体力不足": { "recognition": "DirectHit", "action": "Custom", "custom_action": "activity_atomic", "custom_action_param": { "operation": "finish_insufficient_stamina" }, "next": "活动_体力不足返回主页", "$__mpe_code": { "position": { "x": 2900, "y": -20 } } },
   "活动_兑换奖励": { "recognition": "OCR", "expected": "获得物品", "roi": [380, 100, 520, 180], "action": "Click", "target": [753, 660, 4, 4], "post_delay": 800, "next": "活动_标记兑换完成", "$__mpe_code": { "position": { "x": 2620, "y": 100 } } },
   "活动_标记兑换完成": { "recognition": "DirectHit", "action": "Custom", "custom_action": "activity_atomic", "custom_action_param": { "operation": "mark_exchange_done" }, "next": "活动_兑换站返回", "$__mpe_code": { "position": { "x": 2900, "y": 100 } } },
   "活动_兑换站返回": { "recognition": "OCR", "expected": "兑换站点", "roi": [20, 80, 300, 120], "action": "Click", "target": [111, 47, 4, 4], "post_delay": 1200, "next": "活动_活动页已到", "$__mpe_code": { "position": { "x": 3180, "y": 100 } } },

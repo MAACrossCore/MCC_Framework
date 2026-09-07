@@ -228,6 +228,7 @@ class ActivityPipelineAction(CustomAction):
                     "stamina_cost_per_ticket": DEFAULT_STAMINA_COST_PER_TICKET,
                     "ticket_cost_per_run": TICKET_COST_PER_RUN,
                     "resource_planned": False,
+                    "stamina_checked": False,
                     "batch_runs": 0,
                     "exchange_count": 0,
                     "daily_done": False,
@@ -240,6 +241,54 @@ class ActivityPipelineAction(CustomAction):
                     _SESSION["use_potion"], _SESSION["potion_type"], _SESSION["potion_count"],
                     _SESSION["team"], _SESSION["use_bonus"],
                 )
+                return True
+
+            if operation == "check_exchange_stamina":
+                image = context.tasker.controller.post_screencap().wait().get()
+                stamina = _ocr_digits(context, "活动_兑换前读取当前体力", image, ROI_ACTIVITY_STAMINA)
+                if stamina is None:
+                    log.error("活动任务兑换前无法读取当前体力")
+                    return False
+
+                stamina_cost = max(
+                    1,
+                    int(_SESSION.get("stamina_cost_per_ticket") or DEFAULT_STAMINA_COST_PER_TICKET),
+                )
+                _SESSION["current_stamina"] = stamina
+                _SESSION["stamina_checked"] = True
+                if stamina < stamina_cost:
+                    _SESSION["exchange_done"] = True
+                    tickets = max(0, int(_SESSION.get("activity_tickets") or 0))
+                    ticket_cost = max(
+                        1,
+                        int(_SESSION.get("ticket_cost_per_run") or TICKET_COST_PER_RUN),
+                    )
+                    if tickets >= ticket_cost:
+                        _SESSION["status"] = "ready"
+                        log.info(
+                            "活动任务当前体力=%d，不足兑换一张刷关票所需的%d点体力；"
+                            "跳过换票，现有刷关票=%d，仍可扫荡%d次，继续后续刷票",
+                            stamina,
+                            stamina_cost,
+                            tickets,
+                            tickets // ticket_cost,
+                        )
+                    else:
+                        _SESSION["status"] = "insufficient_stamina"
+                        log.info(
+                            "活动任务当前体力=%d，不足兑换一张刷关票所需的%d点体力，"
+                            "且现有刷关票=%d不足一次扫荡所需的%d张，跳过换票、困难关与扫荡",
+                            stamina,
+                            stamina_cost,
+                            tickets,
+                            ticket_cost,
+                        )
+                else:
+                    log.info(
+                        "活动任务兑换前体力检查通过：当前=%d，一张票需要=%d",
+                        stamina,
+                        stamina_cost,
+                    )
                 return True
 
             if operation == "plan_resources":
@@ -392,6 +441,12 @@ class ActivityPipelineAction(CustomAction):
                 _SESSION["exchange_done"] = True
                 count = int(_SESSION.get("exchange_count") or 0)
                 log.info("活动任务体力兑换刷关票完成：兑换数量=%d", count)
+                return True
+
+            if operation == "finish_insufficient_stamina":
+                _SESSION["exchange_done"] = True
+                _SESSION["status"] = "insufficient_stamina"
+                log.info("活动任务因体力不足正常结束，正在返回主界面")
                 return True
 
             if operation == "adjust_exchange_count":
@@ -575,6 +630,13 @@ class ActivityPipelineRecognition(CustomRecognition):
             return _hit({"resource_planned": False}) if not _SESSION.get("resource_planned") else None
         if expected == "exchange:pending":
             return _hit({"exchange_done": False}) if not _SESSION.get("exchange_done") else None
+        if expected == "exchange:stamina_check_pending":
+            pending = (
+                bool(_SESSION.get("resource_planned"))
+                and bool(_SESSION.get("potion_done"))
+                and not bool(_SESSION.get("stamina_checked"))
+            )
+            return _hit({"stamina_check_pending": True}) if pending else None
         if expected == "potion:pending":
             return _hit({"potion_pending": True}) if not _SESSION.get("potion_done") else None
         if expected == "potion:small":
