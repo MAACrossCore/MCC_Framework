@@ -1,0 +1,24 @@
+diff --git a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs b/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
+index 2412f2f..8c23bc8 100644
+--- a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
++++ b/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
+@@ -22,0 +23 @@ using Newtonsoft.Json.Linq;
++using SukiUI.Controls;
+@@ -23,0 +25 @@ using SukiUI.Dialogs;
++using SukiUI.MessageBox;
+@@ -1110 +1112 @@ public partial class TaskQueueViewModel : ViewModelBase, IDisposable
+-    private void ResetTasks()
++    private async Task ResetTasks()
+@@ -1112,0 +1115,12 @@ public partial class TaskQueueViewModel : ViewModelBase, IDisposable
++        var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
++        {
++            Content = "当前操作会重置任务列表中所有已有设置，是否继续？",
++            ActionButtonsPreset = SukiMessageBoxButtons.YesNo,
++            IconPreset = SukiMessageBoxIcons.Warning
++        }, new SukiMessageBoxOptions
++        {
++            Title = "确认重置任务列表"
++        });
++        if (result is not SukiMessageBoxResult.Yes)
++            return;
++

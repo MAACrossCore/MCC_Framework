@@ -88,6 +88,25 @@ def test_creation_particle_pipeline_uses_maa_720p_coordinate_space():
     assert_pipeline_geometry_in_bounds(path)
 
 
+def test_creation_particle_count_is_image_located_and_verified_as_three():
+    path = ROOT / "assets" / "resource" / "pipeline" / "base" / "创生微粒刷取.json"
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    calibrate = data["创生微粒_次数校准为3"]
+    verify = data["创生微粒_确认次数为3"]
+    increment = data["创生微粒_识别并点击加号"]
+    assert calibrate["next"] == ["创生微粒_确认次数为3", "创生微粒_识别并点击加号"]
+    assert verify["recognition"] == "OCR"
+    assert verify["expected"] == ["^3$"]
+    assert verify["only_rec"] is True
+    assert verify["next"] == ["开始战斗"]
+    assert increment["recognition"] == "TemplateMatch"
+    assert increment["template"] == "选择次数.png"
+    assert (ROOT / "assets" / "resource" / "image" / increment["template"]).is_file()
+    assert increment["roi"] == [503, 531, 84, 59]
+    assert "target" not in increment
+    assert increment["next"] == ["创生微粒_次数校准为3"]
+
+
 if __name__ == "__main__":
     tests = [value for name, value in globals().items() if name.startswith("test_")]
     for test in tests:

@@ -4,7 +4,7 @@
             "prefix": "",
             "coordinateMode": "absolute-v1",
             "filename": "创生微粒刷取-Pipeline流程示意",
-            "version": "v1.9.2",
+            "version": "v1.10.0",
             "savedViewport": { "x": 40, "y": 40, "zoom": 0.72 }
         }
     },
@@ -80,18 +80,23 @@
     },
     "MPE创生微粒_扫荡次数弹窗": {
         "recognition": "DirectHit", "action": "DoNothing",
-        "next": "MPE创生微粒_黄色加号第一次",
+        "next": "MPE创生微粒_校准次数为3",
         "$__mpe_code": { "position": { "x": 3160, "y": 160 } }
     },
-    "MPE创生微粒_黄色加号第一次": {
+    "MPE创生微粒_校准次数为3": {
         "recognition": "DirectHit", "action": "DoNothing",
-        "next": "MPE创生微粒_黄色加号第二次",
+        "next": ["MPE创生微粒_OCR确认次数3", "MPE创生微粒_识别黄色加号并点击"],
         "$__mpe_code": { "position": { "x": 3440, "y": 160 } }
     },
-    "MPE创生微粒_黄色加号第二次": {
+    "MPE创生微粒_识别黄色加号并点击": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_校准次数为3",
+        "$__mpe_code": { "position": { "x": 3720, "y": 280 } }
+    },
+    "MPE创生微粒_OCR确认次数3": {
         "recognition": "DirectHit", "action": "DoNothing",
         "next": "MPE创生微粒_开始战斗",
-        "$__mpe_code": { "position": { "x": 3720, "y": 160 } }
+        "$__mpe_code": { "position": { "x": 3720, "y": 40 } }
     },
     "MPE创生微粒_开始战斗": {
         "recognition": "DirectHit", "action": "DoNothing",

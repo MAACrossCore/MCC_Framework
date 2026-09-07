@@ -1,6 +1,10 @@
 {
     "关闭游戏": {
         "action": "StopApp",
-        "package": "com.megagame.crosscore.bilibili"
+        "package": "com.megagame.crosscore.bilibili",
+        "next": [
+            "关闭游戏_并关闭模拟器",
+            "关闭游戏_仅关闭游戏"
+        ]
     }
 }

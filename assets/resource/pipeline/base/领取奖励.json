@@ -3,8 +3,19 @@
         "next": [
             "[JumpBack]子任务_点击取消",
             "[JumpBack]子任务_关闭公告",
+            "领取奖励_跳过邮箱",
             "邮件",
             "无邮件",
+            "[JumpBack]子任务_进入首页"
+        ]
+    },
+    "领取奖励_跳过邮箱": {
+        "recognition": "DirectHit",
+        "enabled": false,
+        "next": [
+            "每日任务",
+            "无每日任务",
+            "通行证",
             "[JumpBack]子任务_进入首页"
         ]
     },

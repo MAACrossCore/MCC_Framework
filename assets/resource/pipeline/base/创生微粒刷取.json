@@ -104,7 +104,7 @@
         "action": "Click",
         "post_delay": 1000,
         "next": [
-            "创生微粒_点击加号第一次"
+            "创生微粒_次数校准为3"
         ]
     },
     "创生微粒_次数弹窗接续": {
@@ -113,29 +113,36 @@
         "roi": [785, 475, 330, 90],
         "action": "DoNothing",
         "next": [
-            "创生微粒_点击加号第一次"
+            "创生微粒_次数校准为3"
         ]
     },
-    "创生微粒_点击加号第一次": {
-        "recognition": "OCR",
-        "expected": "无限制次数",
-        "roi": [785, 475, 330, 90],
-        "action": "Click",
-        "target": [530, 535, 35, 45],
-        "post_delay": 500,
+    "创生微粒_次数校准为3": {
         "next": [
-            "创生微粒_点击加号第二次"
+            "创生微粒_确认次数为3",
+            "创生微粒_识别并点击加号"
         ]
     },
-    "创生微粒_点击加号第二次": {
+    "创生微粒_确认次数为3": {
         "recognition": "OCR",
-        "expected": "无限制次数",
-        "roi": [785, 475, 330, 90],
-        "action": "Click",
-        "target": [530, 535, 35, 45],
-        "post_delay": 500,
+        "expected": [
+            "^3$"
+        ],
+        "only_rec": true,
+        "roi": [433, 506, 59, 24],
+        "threshold": 0.2,
+        "action": "DoNothing",
         "next": [
             "开始战斗"
+        ]
+    },
+    "创生微粒_识别并点击加号": {
+        "recognition": "TemplateMatch",
+        "template": "选择次数.png",
+        "roi": [503, 531, 84, 59],
+        "action": "Click",
+        "post_delay": 500,
+        "next": [
+            "创生微粒_次数校准为3"
         ]
     },
     "创生微粒_完成后返回主界面": {

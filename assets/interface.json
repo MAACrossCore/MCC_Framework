@@ -125,7 +125,10 @@
         {
             "name": "领取奖励(邮箱+每日+通行证)",
             "entry": "领取奖励",
-            "doc": "无"
+            "doc": "依次处理邮箱、每日任务和通行证奖励；可单独跳过邮箱内容。",
+            "option": [
+                "是否领取邮箱内容"
+            ]
         },
         {
             "name": "芯片筛选-仓库",
@@ -170,7 +173,10 @@
         },
         {
             "name": "关闭游戏",
-            "entry": "关闭游戏"
+            "entry": "关闭游戏",
+            "option": [
+                "并关闭模拟器"
+            ]
         },
         {
             "name": "历战试炼",
@@ -437,6 +443,58 @@
             ],
             "type": "switch"
         },
+        "是否领取邮箱内容": {
+            "type": "switch",
+            "label": "是否领取邮箱内容",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "领取奖励_跳过邮箱": {
+                            "enabled": false
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "领取奖励_跳过邮箱": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        },
+        "并关闭模拟器": {
+            "type": "switch",
+            "label": "并关闭模拟器",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "关闭游戏_并关闭模拟器": {
+                            "enabled": true
+                        },
+                        "关闭游戏_仅关闭游戏": {
+                            "enabled": false
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "关闭游戏_并关闭模拟器": {
+                            "enabled": false
+                        },
+                        "关闭游戏_仅关闭游戏": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        },
         "基建_构建票订单数额6-10": {
             "type": "checkbox",
             "label": "构建票订单（6-10）",
@@ -503,7 +561,7 @@
         },
         "兑换经验订单": {
             "type": "switch",
-            "label": "兑换经验订单",
+            "label": "兑换稀有经验订单",
             "default_case": "Yes",
             "cases": [
                 {
@@ -526,7 +584,7 @@
         },
         "兑换星币订单": {
             "type": "switch",
-            "label": "兑换星币订单",
+            "label": "兑换稀有星币订单",
             "default_case": "Yes",
             "cases": [
                 {

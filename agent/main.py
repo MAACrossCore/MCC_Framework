@@ -25,6 +25,7 @@ import order_fetch  # noqa: F401  # 注册 取下一单、输入当前UID
 from arena_pipeline import ArenaPipelineAction, ArenaPipelineRecognition
 from chip_pipeline import ChipPipelineAction, ChipPipelineRecognition
 from activity_pipeline import ActivityPipelineAction, ActivityPipelineRecognition
+from shutdown_mumu import ShutdownMumuAction
 from jdc_select_character import JdcSelectCharacter
 from jdc_build_team import JdcBuildTeam
 from jdc_route_push import JdcRoutePush
@@ -37,6 +38,7 @@ AgentServer.custom_action("chip_atomic")(ChipPipelineAction)
 AgentServer.custom_recognition("chip_state")(ChipPipelineRecognition)
 AgentServer.custom_action("activity_atomic")(ActivityPipelineAction)
 AgentServer.custom_recognition("activity_state")(ActivityPipelineRecognition)
+AgentServer.custom_action("shutdown_mumu")(ShutdownMumuAction)
 AgentServer.custom_action("jdc_select_character")(JdcSelectCharacter)
 AgentServer.custom_action("jdc_build_team")(JdcBuildTeam)
 AgentServer.custom_action("jdc_route_push")(JdcRoutePush)

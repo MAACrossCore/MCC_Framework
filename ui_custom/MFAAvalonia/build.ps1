@@ -19,19 +19,26 @@ if (($env:Path -split ';') -notcontains $gitRuntimeDir) {
     $env:Path = "$gitRuntimeDir;$env:Path"
 }
 $patches = @(
-    (Join-Path $PSScriptRoot 'laa-chip-filter.patch'),
-    (Join-Path $PSScriptRoot 'laa-chip-filter-total-level.patch'),
-    (Join-Path $PSScriptRoot 'laa-chip-task-checkbox.patch'),
-    (Join-Path $PSScriptRoot 'laa-pretask-path-resolution.patch'),
-    (Join-Path $PSScriptRoot 'laa-stop-on-task-failure.patch'),
-    (Join-Path $PSScriptRoot 'laa-no-autostart.patch')
+    @{ File = 'laa-chip-filter.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'ChipFilterCatalog' },
+    @{ File = 'laa-chip-filter-total-level.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'MinimumTotalLevel' },
+    @{ File = 'laa-chip-task-checkbox.patch'; MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'UseChipTaskCheckBox' },
+    @{ File = 'laa-pretask-path-resolution.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'localPythonCandidates' },
+    @{ File = 'laa-stop-on-task-failure.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'ContinueOnError = false' },
+    @{ File = 'laa-no-autostart.patch'; MarkerFile = 'MFAAvalonia\Views\Windows\RootView.axaml.cs'; Marker = 'if \(!noAutoStart\)' },
+    @{ File = 'laa-reset-task-confirmation.patch'; MarkerFile = 'MFAAvalonia\ViewModels\Pages\TaskQueueViewModel.cs'; Marker = '当前操作会重置任务列表中所有已有设置' }
 )
 
-foreach ($patch in $patches) {
+foreach ($patchSpec in $patches) {
+    $patch = Join-Path $PSScriptRoot $patchSpec.File
     & $git -C $source apply --check $patch 2>$null
     if ($LASTEXITCODE -eq 0) {
         & $git -C $source apply $patch
     } else {
+        $markerPath = Join-Path $source $patchSpec.MarkerFile
+        if ((Test-Path -LiteralPath $markerPath) -and
+            (Select-String -LiteralPath $markerPath -Pattern $patchSpec.Marker -Quiet)) {
+            continue
+        }
         & $git -C $source apply --reverse --check $patch 2>$null
         if ($LASTEXITCODE -ne 0) {
             throw "MFAAvalonia source does not match patch: $patch"

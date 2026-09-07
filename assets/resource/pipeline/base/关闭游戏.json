@@ -1,6 +1,20 @@
 {
     "关闭游戏": {
         "action": "StopApp",
-        "package": "com.megagame.crosscore"
+        "package": "com.megagame.crosscore",
+        "next": [
+            "关闭游戏_并关闭模拟器",
+            "关闭游戏_仅关闭游戏"
+        ]
+    },
+    "关闭游戏_并关闭模拟器": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "shutdown_mumu",
+        "enabled": true
+    },
+    "关闭游戏_仅关闭游戏": {
+        "recognition": "DirectHit",
+        "enabled": false
     }
 }

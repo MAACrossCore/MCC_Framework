@@ -12,6 +12,9 @@ The no-autostart patch keeps normal window startup passive. Controller
 connection and project pretasks begin only after the user starts a task, so
 the MuMu launcher cannot run merely because MFA was opened.
 
+The task-list reset button asks for confirmation before replacing the current
+task order and all saved task settings with interface defaults.
+
 The three lock-mode labels remain visible at all times. The current main skill
 is shown as a solid green button: click to select it and double-click to edit.
 The editor can copy its conditions to selected unconfigured skills, or clear
