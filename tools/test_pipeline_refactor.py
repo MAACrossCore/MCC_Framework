@@ -100,6 +100,37 @@ def test_pipeline_exposes_required_control_flow_branches():
     ))
 
 
+def test_weekly_and_arena_battle_loops_prioritize_skip_button():
+    weekly = load_pipeline("周本.json")
+    arena = load_pipeline("模拟军演.json")
+    common = load_pipeline("通用.json")
+
+    skip = "[JumpBack]跳过首领演出动画"
+    skip_ocr = "[JumpBack]跳过首领演出动画_OCR"
+    for node_name in ("活动探索_战斗中1", "活动探索_战斗中2", "活动探索_战斗中3"):
+        assert weekly[node_name]["next"][0] == skip
+        assert weekly[node_name]["next"][1] == skip_ocr
+    assert arena["竞技场_确认挑战"]["next"] == "竞技场_等待结算"
+    assert arena["竞技场_等待结算"]["next"][0] == skip
+    assert arena["竞技场_等待结算"]["next"][1] == skip_ocr
+    assert common["跳过首领演出动画"]["recognition"]["type"] == "TemplateMatch"
+    assert common["跳过首领演出动画"]["recognition"]["param"] == {
+        "roi": [1067, 10, 187, 90],
+        "template": "weekly_skip_720.png",
+        "threshold": 0.52,
+    }
+    assert common["跳过首领演出动画"]["action"]["type"] == "Click"
+    assert common["跳过首领演出动画_OCR"]["recognition"]["param"]["expected"] == "跳过"
+
+    reward_limit = "[JumpBack]活动探索_奖励上限确认"
+    assert weekly["活动探索_开始"]["next"][0] == reward_limit
+    assert weekly["活动探索_第五关开始"]["next"][0] == reward_limit
+    assert weekly["活动探索_奖励上限确认"]["recognition"]["param"]["expected"] == [
+        "本周可领取的上限已满",
+        "是否确认进入",
+    ]
+
+
 def test_activity_returns_home_and_stops_before_exchange_without_stamina():
     activity = load_pipeline("活动.json")
     assert activity["活动_任务"]["next"] == "活动_开始前返回主页"

@@ -201,6 +201,7 @@
         },
         "post_delay": 2000,
         "next": [
+            "[JumpBack]活动探索_奖励上限确认",
             "[JumpBack]活动探索_确认",
             "[JumpBack]活动探索_关闭第二队",
             "活动探索_开始行动",
@@ -289,6 +290,8 @@
             }
         },
         "next": [
+            "[JumpBack]跳过首领演出动画",
+            "[JumpBack]跳过首领演出动画_OCR",
             "[JumpBack]战斗_自动战斗",
             "[JumpBack]战斗_启用二倍速",
             "活动探索_战斗结束1",
@@ -315,6 +318,8 @@
             }
         },
         "next": [
+            "[JumpBack]跳过首领演出动画",
+            "[JumpBack]跳过首领演出动画_OCR",
             "[JumpBack]战斗_自动战斗",
             "[JumpBack]战斗_启用二倍速",
             "活动探索_战斗结束2",
@@ -341,6 +346,8 @@
             }
         },
         "next": [
+            "[JumpBack]跳过首领演出动画",
+            "[JumpBack]跳过首领演出动画_OCR",
             "[JumpBack]子任务_获得物品",
             "[JumpBack]战斗_自动战斗",
             "[JumpBack]战斗_启用二倍速",
@@ -637,6 +644,41 @@
             }
         }
     },
+    "活动探索_奖励上限确认": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    300,
+                    260,
+                    700,
+                    127
+                ],
+                "expected": [
+                    "本周可领取的上限已满",
+                    "是否确认进入"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    788,
+                    435,
+                    30,
+                    30
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1310
+            }
+        }
+    },
     "活动探索_确认": {
         "recognition": {
             "type": "OCR",
@@ -744,6 +786,7 @@
         },
         "post_delay": 2000,
         "next": [
+            "[JumpBack]活动探索_奖励上限确认",
             "[JumpBack]活动探索_确认",
             "[JumpBack]活动探索_关闭第二队",
             "活动探索_第五关开始行动",

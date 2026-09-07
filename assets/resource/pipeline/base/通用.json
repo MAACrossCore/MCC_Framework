@@ -453,6 +453,31 @@
     },
     "跳过首领演出动画": {
         "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1067,
+                    10,
+                    187,
+                    90
+                ],
+                "template": "weekly_skip_720.png",
+                "threshold": 0.52
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "$__mpe_code": {
+            "position": {
+                "x": 252,
+                "y": 12
+            }
+        }
+    },
+    "跳过首领演出动画_OCR": {
+        "recognition": {
             "type": "OCR",
             "param": {
                 "roi": [
@@ -467,10 +492,11 @@
         "action": {
             "type": "Click"
         },
+        "post_delay": 500,
         "$__mpe_code": {
             "position": {
                 "x": 252,
-                "y": 12
+                "y": 92
             }
         }
     },
