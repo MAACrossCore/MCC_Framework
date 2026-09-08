@@ -780,5 +780,9 @@
                 "y": 151
             }
         }
+    },
+    "角斗场_角色OCR": {
+        "recognition": "OCR",
+        "expected": ".+"
     }
 }
