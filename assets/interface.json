@@ -7,9 +7,9 @@
         "name": "自动启动 MuMu 12",
         "label": "仅在选择启动游戏时运行",
         "description": "自动查找 MuMu 12、启动实例并配置 ADB（不打开游戏；开游戏由「启动游戏」任务负责）。",
-        "exec": "./python/python.exe",
+        "exec": "python",
         "args": [
-            "./agent/ensure_mumu.py"
+            "{PROJECT_DIR}/agent/ensure_mumu.py"
         ]
     },
     "controller": [
@@ -35,10 +35,9 @@
         }
     ],
     "agent": {
-        "child_exec": "./python/python.exe",
+        "child_exec": "python",
         "child_args": [
-            "-u",
-            "./agent/main.py"
+            "{PROJECT_DIR}/agent/main.py"
         ]
     },
     "task": [
@@ -1803,5 +1802,5 @@
             ]
         }
     },
-    "github": "https://github.com/Yanghongfe/MAA_CrossCore"
+    "github": "https://github.com/MAACrossCore/MCC_Framework"
 }
