@@ -1,0 +1,614 @@
+diff --git a/MFAAvalonia/Assets/Localization/Strings.resx b/MFAAvalonia/Assets/Localization/Strings.resx
+index 6034778..0568de4 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.resx
+@@ -985,7 +985,7 @@
+         <value>停止任务</value>
+     </data>
+     <data name="SwitchConfiguration" xml:space="preserve">
+-        <value>切换配置</value>
++        <value>账号/模拟器配置</value>
+     </data>
+     <data name="SwitchLanguage" xml:space="preserve">
+         <value>切换语言 🌐</value>
+@@ -1063,7 +1063,7 @@
+         <value>自定义配置选择</value>
+     </data>
+     <data name="TimerCustomConfigTip" xml:space="preserve">
+-        <value>开启后，定时任务将按各自选择的配置执行，而不是使用当前激活的配置</value>
++        <value>定时设置会同步到 Windows 任务计划程序；MFA 未运行时也会自动启动，并执行选定配置中的任务。电脑关机时无法触发。</value>
+     </data>
+     <data name="Tip" xml:space="preserve">
+         <value>提示</value>
+@@ -1144,28 +1144,28 @@
+         <value>是</value>
+     </data>
+     <data name="CurrentConfig" xml:space="preserve">
+-        <value>当前配置</value>
++        <value>当前账号/模拟器配置</value>
+     </data>
+     <data name="ViewOrSwitchConfig" xml:space="preserve">
+-        <value>查看或切换已存在的配置方案</value>
++        <value>每个配置独立保存任务选择、任务参数和模拟器连接</value>
+     </data>
+     <data name="NewConfigName" xml:space="preserve">
+-        <value>新增配置名称</value>
++        <value>新配置名称</value>
+     </data>
+     <data name="SetUniqueIdentifier" xml:space="preserve">
+-        <value>为自定义配置设定唯一标识</value>
++        <value>建议使用账号或模拟器名称，便于定时任务选择</value>
+     </data>
+     <data name="CreateNewConfig" xml:space="preserve">
+-        <value>新增配置</value>
++        <value>复制当前配置</value>
+     </data>
+     <data name="CreateFromCurrent" xml:space="preserve">
+-        <value>基于当前配置创建新模板</value>
++        <value>复制当前任务列表、任务参数和连接设置创建新配置</value>
+     </data>
+     <data name="TriggerTime" xml:space="preserve">
+         <value>触发时间</value>
+     </data>
+     <data name="SelectedConfig" xml:space="preserve">
+-        <value>选用配置</value>
++        <value>执行配置</value>
+     </data>
+     <data name="ExternalNotificationOneBotKey" xml:space="preserve">
+         <value>Key</value>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.en-US.resx b/MFAAvalonia/Assets/Localization/Strings.en-US.resx
+index 8e97d98..66efea2 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.en-US.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.en-US.resx
+@@ -976,7 +976,7 @@
+         <value>Stop Task</value>
+     </data>
+     <data name="SwitchConfiguration" xml:space="preserve">
+-        <value>Switch Configuration</value>
++        <value>Account / Emulator Profiles</value>
+     </data>
+     <data name="SwitchLanguage" xml:space="preserve">
+         <value>Switch Language 🌐</value>
+@@ -1054,7 +1054,7 @@
+         <value>Custom config</value>
+     </data>
+     <data name="TimerCustomConfigTip" xml:space="preserve">
+-        <value>When enabled, each scheduled task runs with its selected config instead of the currently active one</value>
++        <value>Schedules are synchronized with Windows Task Scheduler. MFA starts automatically when needed and runs the selected profile. A powered-off PC cannot trigger tasks.</value>
+     </data>
+     <data name="Tip" xml:space="preserve">
+         <value>Tip</value>
+@@ -1135,28 +1135,28 @@
+         <value>Yes</value>
+     </data>
+     <data name="CurrentConfig" xml:space="preserve">
+-        <value>Current Configuration</value>
++        <value>Current Account / Emulator Profile</value>
+     </data>
+     <data name="ViewOrSwitchConfig" xml:space="preserve">
+-        <value>View or Switch Existing Configuration</value>
++        <value>Each profile stores its own task selection, task options, and emulator connection</value>
+     </data>
+     <data name="NewConfigName" xml:space="preserve">
+-        <value>New Configuration Name</value>
++        <value>New Profile Name</value>
+     </data>
+     <data name="SetUniqueIdentifier" xml:space="preserve">
+-        <value>	Set Unique Identifier for Custom Configuration</value>
++        <value>Use an account or emulator name so the profile is easy to select in schedules</value>
+     </data>
+     <data name="CreateNewConfig" xml:space="preserve">
+-        <value>Create New Configuration</value>
++        <value>Copy Current Profile</value>
+     </data>
+     <data name="CreateFromCurrent" xml:space="preserve">
+-        <value>Create New Template from Current Configuration</value>
++        <value>Copy the current task list, task options, and connection settings</value>
+     </data>
+     <data name="TriggerTime" xml:space="preserve">
+         <value>Trigger Time</value>
+     </data>
+     <data name="SelectedConfig" xml:space="preserve">
+-        <value>Selected Config</value>
++        <value>Profile to Run</value>
+     </data>
+     <data name="ExternalNotificationOneBotKey" xml:space="preserve">
+         <value>Key</value>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx b/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
+index 9bfc49e..4478062 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
+@@ -976,7 +976,7 @@
+         <value>停止任務</value>
+     </data>
+     <data name="SwitchConfiguration" xml:space="preserve">
+-        <value>切換配置</value>
++        <value>帳號/模擬器配置</value>
+     </data>
+     <data name="SwitchLanguage" xml:space="preserve">
+         <value>切換語言 🌐</value>
+@@ -1054,7 +1054,7 @@
+         <value>自定義配置選擇</value>
+     </data>
+     <data name="TimerCustomConfigTip" xml:space="preserve">
+-        <value>開啟後，定時任務將按各自選擇的配置執行，而不是使用目前啟用的配置</value>
++        <value>定時設定會同步到 Windows 工作排程器；MFA 未執行時也會自動啟動，並執行選定配置中的任務。電腦關機時無法觸發。</value>
+     </data>
+     <data name="Tip" xml:space="preserve">
+         <value>提示</value>
+@@ -1135,28 +1135,28 @@
+         <value>是</value>
+     </data>
+     <data name="CurrentConfig" xml:space="preserve">
+-        <value>當前配置</value>
++        <value>目前帳號/模擬器配置</value>
+     </data>
+     <data name="ViewOrSwitchConfig" xml:space="preserve">
+-        <value>查看或切換已存在的配置方案</value>
++        <value>每個配置獨立保存任務選擇、任務參數和模擬器連線</value>
+     </data>
+     <data name="NewConfigName" xml:space="preserve">
+-        <value>新增配置名稱</value>
++        <value>新配置名稱</value>
+     </data>
+     <data name="SetUniqueIdentifier" xml:space="preserve">
+-        <value>為自定義配置設定唯一識別字</value>
++        <value>建議使用帳號或模擬器名稱，方便定時任務選擇</value>
+     </data>
+     <data name="CreateNewConfig" xml:space="preserve">
+-        <value>新增配置</value>
++        <value>複製目前配置</value>
+     </data>
+     <data name="CreateFromCurrent" xml:space="preserve">
+-        <value>基於當前配置創建新範本</value>
++        <value>複製目前任務列表、任務參數和連線設定建立新配置</value>
+     </data>
+     <data name="TriggerTime" xml:space="preserve">
+         <value>	觸發時間</value>
+     </data>
+     <data name="SelectedConfig" xml:space="preserve">
+-        <value>	選用配置</value>
++        <value>執行配置</value>
+     </data>
+     <data name="ExternalNotificationOneBotKey" xml:space="preserve">
+         <value>Key</value>
+diff --git a/MFAAvalonia/ViewModels/Other/InstanceTabBarViewModel.cs b/MFAAvalonia/ViewModels/Other/InstanceTabBarViewModel.cs
+index e9ab94b..1fd834a 100644
+--- a/MFAAvalonia/ViewModels/Other/InstanceTabBarViewModel.cs
++++ b/MFAAvalonia/ViewModels/Other/InstanceTabBarViewModel.cs
+@@ -521,7 +521,8 @@ public partial class InstanceTabBarViewModel : ViewModelBase
+     private async Task AddInstanceCoreAsync(MaaInterface.MaaInterfacePreset? preset)
+     {
+         using var _ = BeginInstanceLogScope("AddInstance");
+-        var lastTab = Tabs.LastOrDefault();
++        // 新配置应复制用户当前正在查看和编辑的配置，而不是固定复制最右侧标签。
++        var lastTab = ActiveTab ?? Tabs.LastOrDefault();
+ 
+         // 先将最右侧实例的当前任务列表（含勾选状态）保存到配置
+         var lastVm = lastTab?.TaskQueueViewModel;
+diff --git a/MFAAvalonia/ViewModels/Other/TimerModel.cs b/MFAAvalonia/ViewModels/Other/TimerModel.cs
+index 4dcd606..cb4430a 100644
+--- a/MFAAvalonia/ViewModels/Other/TimerModel.cs
++++ b/MFAAvalonia/ViewModels/Other/TimerModel.cs
+@@ -48,8 +48,9 @@ public partial class TimerModel : ViewModelBase
+ 
+     private TimerModel()
+     {
+-        CustomConfig = GlobalConfiguration.GetValue(ConfigurationKeys.CustomConfig, bool.FalseString) == bool.TrueString;
+-        ForceScheduledStart = GlobalConfiguration.GetValue(ConfigurationKeys.ForceScheduledStart, bool.FalseString) == bool.TrueString;
++        // LAA 的定时任务始终绑定到明确的账号/模拟器配置。
++        CustomConfig = true;
++        ForceScheduledStart = false;
+ 
+         var count = GlobalConfiguration.GetTimerCount(8);
+         for (var i = 0; i < count; i++)
+@@ -63,6 +64,7 @@ public partial class TimerModel : ViewModelBase
+         };
+         _dispatcherTimer.Tick += CheckTimerElapsed;
+         _dispatcherTimer.Start();
++        QueueSystemTaskSync();
+     }
+ 
+     [RelayCommand]
+@@ -76,6 +78,7 @@ public partial class TimerModel : ViewModelBase
+         }
+         Timers.Add(timer);
+         GlobalConfiguration.SetTimerCount(Timers.Count);
++        QueueSystemTaskSync();
+     }
+ 
+     public void RemoveTimer(TimerProperties timer)
+@@ -96,6 +99,20 @@ public partial class TimerModel : ViewModelBase
+         }
+ 
+         GlobalConfiguration.SetTimerCount(Timers.Count);
++        QueueSystemTaskSync();
++    }
++
++    internal void QueueSystemTaskSync()
++    {
++        if (!OperatingSystem.IsWindows()) return;
++
++        var definitions = Timers.Select(timer => new SystemScheduledTaskManager.TimerDefinition(
++            timer.TimerId,
++            timer.IsOn,
++            timer.Time,
++            timer.ScheduleConfig.Serialize(),
++            timer.TimerConfig ?? string.Empty)).ToArray();
++        _ = SystemScheduledTaskManager.ReplaceAllAsync(definitions);
+     }
+ 
+     /// <summary>
+@@ -191,16 +208,7 @@ public partial class TimerModel : ViewModelBase
+     {
+         var manager = MaaProcessorManager.Instance;
+ 
+-        // 检查全局启动设置
+-        var globalStartEnabled = GlobalConfiguration.GetValue(ConfigurationKeys.GlobalStartEnabled, bool.FalseString) == bool.TrueString;
+-        if (globalStartEnabled && timer.TimerAction == TimerActionType.StartTask)
+-        {
+-            await StartAllEmulatorsAndRunTasks();
+-            return;
+-        }
+-
+-        // 原有逻辑
+-        if (CustomConfig && !string.IsNullOrEmpty(timer.TimerConfig))
++        if (!string.IsNullOrEmpty(timer.TimerConfig))
+         {
+             var targetInstanceId = timer.TimerConfig;
+             manager.EnsureInstanceLoaded(targetInstanceId);
+@@ -232,35 +240,8 @@ public partial class TimerModel : ViewModelBase
+ 
+     private void ExecuteAction(TimerProperties timer, TaskQueueViewModel vm)
+     {
+-        if (timer.TimerAction == TimerActionType.StopTask)
+-        {
+-            if (!vm.IsRunning) return;
+-
+-            if (timer.StopConnectedProcess && timer.StopMFA)
+-            {
+-                // 先关闭连接的进程，再关闭 MFA
+-                vm.StopTask(() => MaaProcessor.CloseSoftware(vm.Processor, Instances.ShutdownApplication));
+-            }
+-            else if (timer.StopConnectedProcess)
+-            {
+-                vm.StopTask(() => MaaProcessor.CloseSoftware(vm.Processor));
+-            }
+-            else if (timer.StopMFA)
+-            {
+-                vm.StopTask(Instances.ShutdownApplication);
+-            }
+-            else
+-            {
+-                vm.StopTask();
+-            }
+-        }
+-        else
+-        {
+-            if (ForceScheduledStart && vm.IsRunning)
+-                vm.StopTask(vm.StartTask);
+-            else
+-                vm.StartTask();
+-        }
++        if (!vm.IsRunning)
++            vm.StartTask();
+     }
+ 
+     /// <summary>
+@@ -325,6 +306,7 @@ public partial class TimerModel : ViewModelBase
+             {
+                 SetProperty(ref _isOn, value);
+                 GlobalConfiguration.SetTimer(TimerId, value.ToString());
++                _parent.QueueSystemTaskSync();
+             }
+         }
+ 
+@@ -336,6 +318,7 @@ public partial class TimerModel : ViewModelBase
+             {
+                 SetProperty(ref _time, value);
+                 GlobalConfiguration.SetTimerTime(TimerId, value.ToString(@"h\:mm"));
++                _parent.QueueSystemTaskSync();
+             }
+         }
+ 
+@@ -350,6 +333,7 @@ public partial class TimerModel : ViewModelBase
+             {
+                 SetProperty(ref _timerConfig, value ?? string.Empty);
+                 GlobalConfiguration.SetTimerConfig(TimerId, _timerConfig ?? string.Empty);
++                _parent.QueueSystemTaskSync();
+             }
+         }
+ 
+@@ -362,6 +346,7 @@ public partial class TimerModel : ViewModelBase
+                 SetNewProperty(ref _scheduleConfig, value);
+                 GlobalConfiguration.SetTimerSchedule(TimerId, _scheduleConfig?.Serialize() ?? string.Empty);
+                 OnPropertyChanged(nameof(ScheduleDisplayText));
++                _parent.QueueSystemTaskSync();
+             }
+         }
+ 
+@@ -413,6 +398,7 @@ public partial class TimerModel : ViewModelBase
+         {
+             GlobalConfiguration.SetTimerSchedule(TimerId, _scheduleConfig.Serialize());
+             OnPropertyChanged(nameof(ScheduleDisplayText));
++            _parent.QueueSystemTaskSync();
+         }
+ 
+         /// <summary>
+diff --git a/MFAAvalonia/Views/UserControls/Settings/TimerSettingsUserControl.axaml b/MFAAvalonia/Views/UserControls/Settings/TimerSettingsUserControl.axaml
+index 3151358..45fdd70 100644
+--- a/MFAAvalonia/Views/UserControls/Settings/TimerSettingsUserControl.axaml
++++ b/MFAAvalonia/Views/UserControls/Settings/TimerSettingsUserControl.axaml
+@@ -50,55 +50,11 @@
+         </Style>
+     </UserControl.Styles>
+     <StackPanel Spacing="8">
+-        <TextBlock
+-            FontWeight="SemiBold"
+-            HorizontalAlignment="Center"
+-            IsVisible="{calcBinding:Binding 'InstanceList.Count > 1',
+-                                            Source={x:Static other:TimerModel.Instance}}"
+-            Text="{markup:I18n {x:Static helper:LangKeys.GlobalConfigTip}}" />
+-        <suki:GlassCard Padding="25">
+-            <StackPanel Spacing="20">
+-                <DockPanel>
+-                    <ToggleSwitch
+-                        Classes="Switch"
+-                        DockPanel.Dock="Right"
+-                        IsChecked="{Binding TimerModels.ForceScheduledStart}"
+-                        IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+-                        ToolTip.Tip="{markup:I18n {x:Static helper:LangKeys.ForceScheduledStartTip}}"
+-                        VerticalAlignment="Top" />
+-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+-                        <TextBlock
+-                            FontSize="16"
+-                            FontWeight="DemiBold"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.ForceScheduledStart}}" />
+-                        <TextBlock
+-                            Foreground="{DynamicResource SukiLowText}"
+-                            Margin="0,12,70,0"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.ForceScheduledStartTip}}"
+-                            TextWrapping="Wrap" />
+-                    </StackPanel>
+-                </DockPanel>
+-                <DockPanel>
+-                    <ToggleSwitch
+-                        Classes="Switch"
+-                        DockPanel.Dock="Right"
+-                        IsChecked="{Binding TimerModels.CustomConfig}"
+-                        IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+-                        ToolTip.Tip="{markup:I18n {x:Static helper:LangKeys.TimerCustomConfigTip}}"
+-                        VerticalAlignment="Top" />
+-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+-                        <TextBlock
+-                            FontSize="16"
+-                            FontWeight="DemiBold"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.TimerCustomConfig}}" />
+-                        <TextBlock
+-                            Foreground="{DynamicResource SukiLowText}"
+-                            Margin="0,12,70,0"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.TimerCustomConfigTip}}"
+-                            TextWrapping="Wrap" />
+-                    </StackPanel>
+-                </DockPanel>
+-            </StackPanel>
++        <suki:GlassCard Padding="20">
++            <TextBlock
++                Foreground="{DynamicResource SukiLowText}"
++                Text="{markup:I18n {x:Static helper:LangKeys.TimerCustomConfigTip}}"
++                TextWrapping="Wrap" />
+         </suki:GlassCard>
+ 
+         <ItemsControl ItemsSource="{Binding TimerModels.Timers}">
+@@ -156,50 +112,7 @@
+                                             VerticalAlignment="Center" />
+                                     </StackPanel>
+                                 </DockPanel>
+-                                <DockPanel>
+-                                    <ComboBox DockPanel.Dock="Right"
+-                                              SelectedIndex="{Binding TimerActionIndex}"
+-                                              VerticalAlignment="Center"
+-                                              Width="215">
+-                                        <ComboBoxItem Content="{markup:I18n {x:Static helper:LangKeys.StartTask}}" />
+-                                        <ComboBoxItem Content="{markup:I18n {x:Static helper:LangKeys.StopTask}}" />
+-                                    </ComboBox>
+-                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+-                                        <TextBlock
+-                                            FontSize="15"
+-                                            Text="{markup:I18n {x:Static helper:LangKeys.TimerAction}}"
+-                                            VerticalAlignment="Center" />
+-                                    </StackPanel>
+-                                </DockPanel>
+-                                <StackPanel IsVisible="{calcBinding:Binding 'TimerActionIndex == 1'}"
+-                                            Spacing="8">
+-                                    <DockPanel>
+-                                        <ToggleSwitch
+-                                            Classes="Switch"
+-                                            DockPanel.Dock="Right"
+-                                            IsChecked="{Binding StopConnectedProcess}"
+-                                            VerticalAlignment="Center" />
+-                                        <TextBlock
+-                                            FontSize="15"
+-                                            HorizontalAlignment="Left"
+-                                            Text="{markup:I18n {x:Static helper:LangKeys.TimerStopConnectedProcess}}"
+-                                            VerticalAlignment="Center" />
+-                                    </DockPanel>
+-                                    <DockPanel>
+-                                        <ToggleSwitch
+-                                            Classes="Switch"
+-                                            DockPanel.Dock="Right"
+-                                            IsChecked="{Binding StopMFA}"
+-                                            VerticalAlignment="Center" />
+-                                        <TextBlock
+-                                            FontSize="15"
+-                                            HorizontalAlignment="Left"
+-                                            Text="{markup:I18n {x:Static helper:LangKeys.TimerStopMFA}}"
+-                                            VerticalAlignment="Center" />
+-                                    </DockPanel>
+-                                </StackPanel>
+-                                <DockPanel x:CompileBindings="False"
+-                                           IsVisible="{Binding CustomConfig, Source={x:Static other:TimerModel.Instance}}">
++                                <DockPanel x:CompileBindings="False">
+                                     <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
+                                               DisplayMemberBinding="{Binding Name}"
+                                               DockPanel.Dock="Right"
+diff --git a/MFAAvalonia/ViewModels/Other/SystemScheduledTaskManager.cs b/MFAAvalonia/ViewModels/Other/SystemScheduledTaskManager.cs
+new file mode 100644
+--- /dev/null
++++ b/MFAAvalonia/ViewModels/Other/SystemScheduledTaskManager.cs
+@@ -0,0 +1,155 @@
++using MFAAvalonia.Extensions;
++using MFAAvalonia.Helper;
++using MFAAvalonia.Helper.ValueType;
++using System;
++using System.Collections.Generic;
++using System.IO;
++using System.Linq;
++using System.Security.Cryptography;
++using System.Text;
++using System.Threading;
++using System.Threading.Tasks;
++
++namespace MFAAvalonia.ViewModels.Other;
++
++/// <summary>
++/// Mirrors MFA timers into Windows Task Scheduler so they still fire while MFA is closed.
++/// The registered task starts MFA with its existing single-instance/autostart command line.
++/// </summary>
++internal static class SystemScheduledTaskManager
++{
++    internal sealed record TimerDefinition(
++        int TimerId,
++        bool IsEnabled,
++        TimeSpan Time,
++        string Schedule,
++        string InstanceId);
++
++    private static readonly SemaphoreSlim SyncGate = new(1, 1);
++    private static long _requestedRevision;
++
++    private static readonly string InstallId = Convert.ToHexString(SHA256.HashData(
++        Encoding.UTF8.GetBytes(Path.GetFullPath(AppContext.BaseDirectory).ToUpperInvariant())))[..12];
++
++    private static string TaskPrefix => $"MFA-LAA-{InstallId}-Timer-";
++
++    public static async Task ReplaceAllAsync(IReadOnlyCollection<TimerDefinition> definitions)
++    {
++        if (!OperatingSystem.IsWindows()) return;
++
++        var revision = Interlocked.Increment(ref _requestedRevision);
++        await SyncGate.WaitAsync();
++        try
++        {
++            // Rapid UI changes are coalesced; the newest snapshot will run after this call.
++            if (revision != Volatile.Read(ref _requestedRevision)) return;
++            await Task.Run(() => ReplaceAllCore(definitions));
++        }
++        catch (Exception ex)
++        {
++            LoggerHelper.Warning($"同步 Windows 定时任务失败：{ex.Message}");
++        }
++        finally
++        {
++            SyncGate.Release();
++        }
++    }
++
++    private static void ReplaceAllCore(IReadOnlyCollection<TimerDefinition> definitions)
++    {
++        var serviceType = Type.GetTypeFromProgID("Schedule.Service")
++            ?? throw new PlatformNotSupportedException("Windows Task Scheduler service is unavailable.");
++        dynamic service = Activator.CreateInstance(serviceType)
++            ?? throw new InvalidOperationException("Unable to create Windows Task Scheduler service.");
++        service.Connect();
++        dynamic root = service.GetFolder("\\");
++
++        var enabled = definitions
++            .Where(IsValid)
++            .ToDictionary(item => TaskName(item.TimerId));
++
++        foreach (dynamic registeredTask in root.GetTasks(1))
++        {
++            string name = registeredTask.Name;
++            if (name.StartsWith(TaskPrefix, StringComparison.OrdinalIgnoreCase)
++                && !enabled.ContainsKey(name))
++            {
++                root.DeleteTask(name, 0);
++            }
++        }
++
++        foreach (var pair in enabled)
++            RegisterOrUpdate(root, service, pair.Key, pair.Value);
++    }
++
++    private static bool IsValid(TimerDefinition timer)
++    {
++        if (!timer.IsEnabled || string.IsNullOrWhiteSpace(timer.InstanceId)) return false;
++        var schedule = new TimerScheduleConfig(timer.Schedule);
++        return schedule.ScheduleType switch
++        {
++            TimerScheduleType.Daily => true,
++            TimerScheduleType.Weekly => schedule.SelectedDaysOfWeek.Count > 0,
++            TimerScheduleType.Monthly => schedule.SelectedDaysOfMonth.Count > 0,
++            _ => false
++        };
++    }
++
++    private static void RegisterOrUpdate(dynamic root, dynamic service, string name, TimerDefinition timer)
++    {
++        var schedule = new TimerScheduleConfig(timer.Schedule);
++        dynamic definition = service.NewTask(0);
++        definition.RegistrationInfo.Description = "MFAA 洛瑟兰战境自动任务";
++        definition.Principal.LogonType = 3; // TASK_LOGON_INTERACTIVE_TOKEN
++        definition.Principal.RunLevel = 0; // Least privilege
++
++        definition.Settings.Enabled = true;
++        definition.Settings.StartWhenAvailable = true;
++        definition.Settings.WakeToRun = true;
++        definition.Settings.DisallowStartIfOnBatteries = false;
++        definition.Settings.StopIfGoingOnBatteries = false;
++        definition.Settings.MultipleInstances = 2; // Ignore a duplicate trigger
++        definition.Settings.ExecutionTimeLimit = "PT0S";
++
++        var triggerType = schedule.ScheduleType switch
++        {
++            TimerScheduleType.Daily => 2,
++            TimerScheduleType.Weekly => 3,
++            TimerScheduleType.Monthly => 4,
++            _ => 2
++        };
++        dynamic trigger = definition.Triggers.Create(triggerType);
++        trigger.Enabled = true;
++        trigger.StartBoundary = DateTime.Today.Add(timer.Time).ToString("yyyy-MM-dd'T'HH:mm:ss");
++
++        if (schedule.ScheduleType == TimerScheduleType.Daily)
++        {
++            trigger.DaysInterval = (short)1;
++        }
++        else if (schedule.ScheduleType == TimerScheduleType.Weekly)
++        {
++            trigger.WeeksInterval = (short)1;
++            trigger.DaysOfWeek = (short)schedule.SelectedDaysOfWeek.Aggregate(
++                0, (mask, day) => mask | (1 << (int)day));
++        }
++        else
++        {
++            trigger.MonthsOfYear = (short)0x0FFF;
++            trigger.DaysOfMonth = schedule.SelectedDaysOfMonth.Aggregate(
++                0, (mask, day) => mask | (1 << (day - 1)));
++        }
++
++        var executable = Environment.ProcessPath
++            ?? Path.Combine(AppContext.BaseDirectory, "MFAAvalonia.exe");
++        dynamic action = definition.Actions.Create(0); // TASK_ACTION_EXEC
++        action.Path = executable;
++        action.WorkingDirectory = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
++        action.Arguments = $"--autostart --instance \"{timer.InstanceId.Replace("\"", "\\\"")}\"";
++
++        // TASK_CREATE_OR_UPDATE + interactive-token logon; no password is stored.
++        root.RegisterTaskDefinition(name, definition, 6, null, null, 3, null);
++    }
++
++    private static string TaskName(int timerId) => $"{TaskPrefix}{timerId + 1}";
++}
++

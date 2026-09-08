@@ -1,0 +1,341 @@
+diff --git a/MFAAvalonia/Assets/Localization/Strings.en-US.resx b/MFAAvalonia/Assets/Localization/Strings.en-US.resx
+index fbd9e6b..4857f5a 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.en-US.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.en-US.resx
+@@ -967,7 +967,7 @@
+             <value>Startup game and script</value>
+         </data>
+     <data name="StartupScriptOnly" xml:space="preserve">
+-            <value>Startup script only</value>
++            <value>Start tasks</value>
+         </data>
+     <data name="Stopping" xml:space="preserve">
+             <value>Stopping......</value>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.resx b/MFAAvalonia/Assets/Localization/Strings.resx
+index 1d91ed7..2072e2f 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.resx
+@@ -976,7 +976,7 @@
+             <value>启动游戏并启动脚本</value>
+         </data>
+         <data name="StartupScriptOnly" xml:space="preserve">
+-            <value>仅启动脚本</value>
++            <value>开始任务</value>
+         </data>
+         <data name="Stopping" xml:space="preserve">
+             <value>正在停止......</value>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx b/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
+index 327295d..b1d79c4 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
+@@ -967,7 +967,7 @@
+             <value>啟動遊戲並啟動腳本</value>
+         </data>
+     <data name="StartupScriptOnly" xml:space="preserve">
+-            <value>僅啟動腳本</value>
++            <value>開始任務</value>
+         </data>
+     <data name="Stopping" xml:space="preserve">
+             <value>正在停止......</value>
+diff --git a/MFAAvalonia/Extensions/GlobalStartManager.cs b/MFAAvalonia/Extensions/GlobalStartManager.cs
+index 33b4781..243c096 100644
+--- a/MFAAvalonia/Extensions/GlobalStartManager.cs
++++ b/MFAAvalonia/Extensions/GlobalStartManager.cs
+@@ -128,13 +128,6 @@ internal static class GlobalStartManager
+                 return GlobalStartResult.Skipped;
+             }
+ 
+-            var beforeTask = vm.Processor.InstanceConfiguration.GetValue(ConfigurationKeys.BeforeTask, "None");
+-            if (beforeTask.Contains("StartupSoftware", StringComparison.OrdinalIgnoreCase))
+-            {
+-                LoggerHelper.Info($"全局启动：按实例配置启动 {instanceName} 的目标程序");
+-                await vm.Processor.StartSoftware();
+-            }
+-
+             await DispatcherHelper.RunOnMainThreadAsync(() =>
+             {
+                 Instances.InstanceTabBarViewModel.SwitchToInstanceById(instanceId);
+diff --git a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+index c7f83a7..1dab627 100644
+--- a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
++++ b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+@@ -4408,22 +4408,9 @@ public class MaaProcessor
+         var afterTask = InstanceConfiguration.GetValue(ConfigurationKeys.AfterTask, "None");
+         switch (afterTask)
+         {
+-            case "CloseMFA":
+-                Instances.ShutdownApplication();
+-                break;
+-            case "CloseEmulator":
+-                CloseSoftware(this);
+-                break;
+-            case "CloseEmulatorAndMFA":
+-                CloseSoftwareAndMFA(this);
+-                break;
+             case "ShutDown":
+                 Instances.ShutdownSystem();
+                 break;
+-            case "ShutDownOnce":
+-                InstanceConfiguration.SetValue(ConfigurationKeys.AfterTask, "None");
+-                Instances.ShutdownSystem();
+-                break;
+             case "CloseEmulatorAndRestartMFA":
+                 CloseSoftwareAndRestartMFA(this);
+                 break;
+diff --git a/MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs b/MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs
+index 6694982..84bcb2f 100644
+--- a/MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs
++++ b/MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs
+@@ -22,8 +22,6 @@ namespace MFAAvalonia.ViewModels.UsersControls.Settings;
+ 
+ public partial class StartSettingsUserControlModel : ViewModelBase
+ {
+-    private readonly LocalizationViewModel _closeSoftwareItem = new(LangKeys.CloseEmulator);
+-    private readonly LocalizationViewModel _closeSoftwareAndMFAItem = new(LangKeys.CloseEmulatorAndMFA);
+     private readonly LocalizationViewModel _closeSoftwareAndRestartMFAItem = new(LangKeys.CloseEmulatorAndRestartMFA);
+     private readonly AvaloniaList<LocalizationViewModel> _afterTaskList;
+     private TaskQueueViewModel? _trackedTaskQueueViewModel;
+@@ -43,14 +41,12 @@ public partial class StartSettingsUserControlModel : ViewModelBase
+         _afterTaskList =
+         [
+             new(LangKeys.None),
+-            new(LangKeys.CloseMFA),
+-            _closeSoftwareItem,
+-            _closeSoftwareAndMFAItem,
+             new(LangKeys.ShutDown),
+-            new(LangKeys.ShutDownOnce),
+             _closeSoftwareAndRestartMFAItem,
+             new(LangKeys.RestartPC),
+         ];
++        BeforeTask = NormalizeBeforeTask(BeforeTask);
++        AfterTask = NormalizeAfterTask(AfterTask);
+     }
+ 
+     protected override void Initialize()
+@@ -158,11 +154,22 @@ public partial class StartSettingsUserControlModel : ViewModelBase
+     public AvaloniaList<LocalizationViewModel> BeforeTaskList =>
+     [
+         new("None"),
+-        new("StartupSoftware"),
+-        new("StartupSoftwareAndScript"),
+         new("StartupScriptOnly"),
+     ];
+ 
++    internal static string NormalizeBeforeTask(string? value) =>
++        string.Equals(value, "StartupScriptOnly", StringComparison.OrdinalIgnoreCase)
++            ? "StartupScriptOnly"
++            : "None";
++
++    internal static string NormalizeAfterTask(string? value) => value switch
++    {
++        "ShutDown" => "ShutDown",
++        "CloseEmulatorAndRestartMFA" => "CloseEmulatorAndRestartMFA",
++        "RestartPC" => "RestartPC",
++        _ => "None"
++    };
++
+     public AvaloniaList<LocalizationViewModel> AfterTaskList => _afterTaskList;
+ 
+ 
+@@ -171,15 +178,27 @@ public partial class StartSettingsUserControlModel : ViewModelBase
+     partial void OnBeforeTaskChanged(string? value)
+     {
+         if (_isSynchronizingStartupSettings) return;
+-        ConfigurationManager.CurrentInstance.SetValue(ConfigurationKeys.BeforeTask, value);
+-        SyncCurrentGlobalEntry(entry => entry.BeforeTask = value);
++        var normalized = NormalizeBeforeTask(value);
++        if (!string.Equals(value, normalized, StringComparison.Ordinal))
++        {
++            BeforeTask = normalized;
++            return;
++        }
++        ConfigurationManager.CurrentInstance.SetValue(ConfigurationKeys.BeforeTask, normalized);
++        SyncCurrentGlobalEntry(entry => entry.BeforeTask = normalized);
+     }
+ 
+     [ObservableProperty] private string? _afterTask = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.AfterTask, "None");
+ 
+     partial void OnAfterTaskChanged(string? value)
+     {
+-        ConfigurationManager.CurrentInstance.SetValue(ConfigurationKeys.AfterTask, value);
++        var normalized = NormalizeAfterTask(value);
++        if (!string.Equals(value, normalized, StringComparison.Ordinal))
++        {
++            AfterTask = normalized;
++            return;
++        }
++        ConfigurationManager.CurrentInstance.SetValue(ConfigurationKeys.AfterTask, normalized);
+     }
+ 
+     [RelayCommand]
+@@ -384,8 +403,6 @@ public partial class StartSettingsUserControlModel : ViewModelBase
+ 
+     private void UpdateAfterTaskDisplayNames()
+     {
+-        _closeSoftwareItem.Name = (_isAdbController ? LangKeys.CloseEmulator : LangKeys.CloseTargetProgram).ToLocalization();
+-        _closeSoftwareAndMFAItem.Name = (_isAdbController ? LangKeys.CloseEmulatorAndMFA : LangKeys.CloseTargetProgramAndMFA).ToLocalization();
+         _closeSoftwareAndRestartMFAItem.Name = (_isAdbController
+             ? LangKeys.CloseEmulatorAndRestartMFA
+             : LangKeys.CloseTargetProgramAndRestartMFA).ToLocalization();
+@@ -407,7 +424,9 @@ public partial class GlobalStartInstanceEntry : ObservableObject
+         InstanceId = instanceId;
+         InstanceName = instanceName;
+         _configuration = configuration;
+-        _beforeTask = configuration.GetValue(ConfigurationKeys.BeforeTask, "None");
++        _beforeTask = StartSettingsUserControlModel.NormalizeBeforeTask(
++            configuration.GetValue(ConfigurationKeys.BeforeTask, "None"));
++        configuration.SetValue(ConfigurationKeys.BeforeTask, _beforeTask);
+         _softwarePath = configuration.GetValue(ConfigurationKeys.SoftwarePath, string.Empty);
+         _emulatorConfig = configuration.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty);
+         _waitSoftwareTime = configuration.GetValue(ConfigurationKeys.WaitSoftwareTime, 60.0);
+@@ -420,8 +439,6 @@ public partial class GlobalStartInstanceEntry : ObservableObject
+     public AvaloniaList<LocalizationViewModel> BeforeTaskList { get; } =
+     [
+         new("None"),
+-        new("StartupSoftware"),
+-        new("StartupSoftwareAndScript"),
+         new("StartupScriptOnly")
+     ];
+ 
+@@ -437,7 +454,13 @@ public partial class GlobalStartInstanceEntry : ObservableObject
+ 
+     partial void OnBeforeTaskChanged(string? value)
+     {
+-        _configuration.SetValue(ConfigurationKeys.BeforeTask, value ?? "None");
++        var normalized = StartSettingsUserControlModel.NormalizeBeforeTask(value);
++        if (!string.Equals(value, normalized, StringComparison.Ordinal))
++        {
++            BeforeTask = normalized;
++            return;
++        }
++        _configuration.SetValue(ConfigurationKeys.BeforeTask, normalized);
+         _parent.SyncCurrentSettingsFromEntry(this);
+     }
+ 
+diff --git a/MFAAvalonia/Views/Windows/RootView.axaml.cs b/MFAAvalonia/Views/Windows/RootView.axaml.cs
+index 1af4c12..aa37c91 100644
+--- a/MFAAvalonia/Views/Windows/RootView.axaml.cs
++++ b/MFAAvalonia/Views/Windows/RootView.axaml.cs
+@@ -393,6 +393,14 @@ public partial class RootView : SukiWindow
+             var vm = Instances.InstanceTabBarViewModel.ActiveTab?.TaskQueueViewModel;
+             if (vm == null) return;
+ 
++            var suppressAutoStartOnce = Convert.ToBoolean(
++                GlobalConfiguration.GetValue(ConfigurationKeys.NoAutoStart, bool.FalseString));
++            if (suppressAutoStartOnce)
++            {
++                GlobalConfiguration.SetValue(ConfigurationKeys.NoAutoStart, bool.FalseString);
++                LoggerHelper.Info("检测到一次性禁止自动启动标记：本次跳过启动后任务，并已清除该标记。");
++            }
++
+             if (AppRuntime.IsAutoStart)
+             {
+                 StartCommandLineAutoRun(vm, AppRuntime.QuitAfterRun, AppRuntime.ForceStart);
+@@ -401,7 +409,7 @@ public partial class RootView : SukiWindow
+ 
+             // 全局启动设置：启动所有模拟器并执行所有实例任务
+             var globalStartEnabled = GlobalConfiguration.GetValue(ConfigurationKeys.GlobalStartEnabled, bool.FalseString) == bool.TrueString;
+-            if (globalStartEnabled && !Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.NoAutoStart, bool.FalseString)))
++            if (globalStartEnabled && !suppressAutoStartOnce)
+             {
+                 DispatcherHelper.RunOnMainThread((Action)(async () =>
+                 {
+@@ -419,74 +427,6 @@ public partial class RootView : SukiWindow
+                         await Task.Delay(300);
+                         if ((MaaProcessor.Interface?.Controller?.Count ?? 0) == 1 || !ConfigurationManager.CurrentInstance.ContainsKey(ConfigurationKeys.CurrentController))
+                             vm.CurrentController = (MaaProcessor.Interface?.Controller?.FirstOrDefault()?.Type).ToMaaControllerTypes(vm.CurrentController);
+-                        var noAutoStart = Convert.ToBoolean(
+-                            GlobalConfiguration.GetValue(ConfigurationKeys.NoAutoStart, bool.FalseString));
+-                        if (!noAutoStart)
+-                        {
+-                            var beforeTask = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.BeforeTask, "None");
+-                            var startupScriptOnly = beforeTask.Equals("StartupScriptOnly", StringComparison.OrdinalIgnoreCase);
+-                            var delayFingerprintMatching = beforeTask.Contains("StartupSoftware", StringComparison.OrdinalIgnoreCase);
+-                            if (beforeTask.Contains("Startup", StringComparison.OrdinalIgnoreCase) || startupScriptOnly)
+-                            {
+-                                // 只有当不是 StartupScriptOnly 时才启动游戏
+-                                if (!startupScriptOnly)
+-                                {
+-                                    vm.Processor.TaskQueue.Enqueue(new MFATask
+-                                    {
+-                                        Name = "启动前",
+-                                        Type = MFATask.MFATaskType.MFA,
+-                                        Action = async () => await vm.Processor.WaitSoftware(),
+-                                        OwnerViewModel = vm,
+-                                    });
+-                                }
+-                                // StartupScriptOnly 或 StartupSoftwareAndScript 时启动脚本 (onlyStart = false)
+-                                // StartupSoftware 时只启动游戏不启动脚本 (onlyStart = true)
+-                                var controllerType = vm.CurrentController;
+-                                if (controllerType == MaaControllerTypes.PlayCover)
+-                                {
+-                                    vm.TryReadPlayCoverConfig();
+-                                }
+-                                else if (ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.RememberAdb, true) && !delayFingerprintMatching)
+-                                {
+-                                    vm.TryReadAdbDeviceFromConfig(false, false);
+-                                }
+-                                var onlyStart = beforeTask.Equals("StartupSoftware", StringComparison.OrdinalIgnoreCase);
+-                                vm.Processor.Start(onlyStart, checkUpdate: false);
+-                            }
+-                            else
+-                            {
+-                                var controllerType = vm.CurrentController;
+-                                var controllerKey = controllerType switch
+-                                {
+-                                    MaaControllerTypes.Adb => "Emulator",
+-                                    MaaControllerTypes.Win32 => "Window",
+-                                    MaaControllerTypes.MacOS => "Window",
+-                                    MaaControllerTypes.PlayCover => "TabPlayCover",
+-                                    _ => "Window"
+-                                };
+-
+-                                vm.AddLogByKey("ConnectingTo", (IBrush?)null, true, true, controllerKey);
+-
+-                                if (controllerType == MaaControllerTypes.PlayCover)
+-                                {
+-                                    vm.TryReadPlayCoverConfig();
+-                                }
+-                                else
+-                                {
+-                                    vm.TryReadAdbDeviceFromConfig();
+-                                }
+-
+-                                vm.Processor.TaskQueue.Enqueue(new MFATask
+-                                {
+-                                    Name = "连接检测",
+-                                    Type = MFATask.MFATaskType.MFA,
+-                                    Action = async () => await vm.Processor.TestConnecting(),
+-                                    OwnerViewModel = vm,
+-                                });
+-                                vm.Processor.Start(true, checkUpdate: false);
+-                            }
+-                        }
+-
+                         // 重新初始化控制器选项，确保 ControllerOptions 包含正确的控制器列表
+                         // 因为 TaskQueueViewModel.Initialize() 可能在 MaaProcessor.Interface初始化之前被调用
+                         vm.InitializeControllerOptions();
+@@ -550,6 +490,23 @@ public partial class RootView : SukiWindow
+                     await Task.Delay(300);
+                     await AnnouncementViewModel.CheckAnnouncement();
+                 }, name: "公告和最新版本检测");
++
++                TaskManager.RunTaskAsync(async () =>
++                {
++                    await Task.Delay(1500);
++                    var beforeTask = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.BeforeTask, "None");
++                    var shouldStartTasks = !suppressAutoStartOnce
++                        && beforeTask.Equals("StartupScriptOnly", StringComparison.OrdinalIgnoreCase);
++                    LoggerHelper.Info($"启动后操作检查：BeforeTask={beforeTask}, SuppressOnce={suppressAutoStartOnce}, StartTasks={shouldStartTasks}");
++                    if (!shouldStartTasks)
++                        return;
++
++                    await DispatcherHelper.RunOnMainThreadAsync(() =>
++                    {
++                        LoggerHelper.Info("启动后操作：开始执行当前配置的已选任务。");
++                        vm.StartTask();
++                    });
++                }, name: "启动后操作检查");
+             }
+             else
+             {

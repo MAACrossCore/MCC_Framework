@@ -165,6 +165,8 @@ jobs:
           git -C .tmp/MFAAvalonia-src apply "$GITHUB_WORKSPACE/ui_custom/MFAAvalonia/laa-pretask-path-resolution.patch"
           git -C .tmp/MFAAvalonia-src apply "$GITHUB_WORKSPACE/ui_custom/MFAAvalonia/laa-stop-on-task-failure.patch"
           git -C .tmp/MFAAvalonia-src apply "$GITHUB_WORKSPACE/ui_custom/MFAAvalonia/laa-no-autostart.patch"
+          git -C .tmp/MFAAvalonia-src apply "$GITHUB_WORKSPACE/ui_custom/MFAAvalonia/laa-simplified-settings.patch"
+          git -C .tmp/MFAAvalonia-src apply "$GITHUB_WORKSPACE/ui_custom/MFAAvalonia/laa-project-profiles-scheduler.patch"
 
           case "${{ matrix.os }}-${{ matrix.arch }}" in
             win-x86_64) rid=win-x64 ;;

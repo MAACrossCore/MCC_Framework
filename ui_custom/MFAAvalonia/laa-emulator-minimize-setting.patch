@@ -1,0 +1,127 @@
+diff --git a/MFAAvalonia/Assets/Localization/Strings.en-US.resx b/MFAAvalonia/Assets/Localization/Strings.en-US.resx
+--- a/MFAAvalonia/Assets/Localization/Strings.en-US.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.en-US.resx
+@@ -102,6 +102,9 @@
+     <data name="AutomaticMinimize" xml:space="preserve">
+         <value>Auto Minimize after launched</value>
+     </data>
++    <data name="MinimizeEmulatorAfterLaunch" xml:space="preserve">
++        <value>Minimize emulator after launch</value>
++    </data>
+     <data name="AutomaticUpdateMFA" xml:space="preserve">
+         <value>Automatic Software Update</value>
+     </data>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.resx b/MFAAvalonia/Assets/Localization/Strings.resx
+--- a/MFAAvalonia/Assets/Localization/Strings.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.resx
+@@ -110,6 +110,9 @@
+     <data name="AutomaticMinimize" xml:space="preserve">
+         <value>启动 MFA 后直接最小化</value>
+     </data>
++    <data name="MinimizeEmulatorAfterLaunch" xml:space="preserve">
++        <value>启动后模拟器最小化</value>
++    </data>
+     <data name="AutomaticUpdateMFA" xml:space="preserve">
+         <value>自动更新软件</value>
+     </data>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx b/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
+--- a/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
+@@ -102,6 +102,9 @@
+     <data name="AutomaticMinimize" xml:space="preserve">
+         <value>啟動 MFA 後直接最小化</value>
+     </data>
++    <data name="MinimizeEmulatorAfterLaunch" xml:space="preserve">
++        <value>啟動後模擬器最小化</value>
++    </data>
+     <data name="AutomaticUpdateMFA" xml:space="preserve">
+         <value>自動更新軟體</value>
+     </data>
+diff --git a/MFAAvalonia/Configuration/ConfigurationKeys.cs b/MFAAvalonia/Configuration/ConfigurationKeys.cs
+--- a/MFAAvalonia/Configuration/ConfigurationKeys.cs
++++ b/MFAAvalonia/Configuration/ConfigurationKeys.cs
+@@ -35,6 +35,7 @@ public static class ConfigurationKeys
+     public const string AfterTask = "AfterTask";
+     public const string AutoMinimize = "AutoMinimize";
+     public const string AutoHide = "AutoHide";
++    public const string MinimizeEmulatorAfterLaunch = "MinimizeEmulatorAfterLaunch";
+     public const string SoftwarePath = "SoftwarePath";
+     public const string WaitSoftwareTime = "WaitSoftwareTime";
+     public const string EmulatorConfig = "EmulatorConfig";
+@@ -224,6 +225,7 @@ public static class ConfigurationKeys
+         SoftwarePath,
+         WaitSoftwareTime,
+         EmulatorConfig,
++        MinimizeEmulatorAfterLaunch,
+         RememberAdb,
+         UseFingerprintMatching,
+         AdbControlScreenCapType,
+diff --git a/MFAAvalonia/Helper/Instances.cs b/MFAAvalonia/Helper/Instances.cs
+--- a/MFAAvalonia/Helper/Instances.cs
++++ b/MFAAvalonia/Helper/Instances.cs
+@@ -588,6 +588,7 @@ public static partial class Instances
+                 var start = StartSettingsUserControlModel;
+                 start.AutoMinimize = ConfigurationManager.Current.GetValue(ConfigurationKeys.AutoMinimize, false);
+                 start.AutoHide = ConfigurationManager.Current.GetValue(ConfigurationKeys.AutoHide, false);
++                start.MinimizeEmulatorAfterLaunch = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.MinimizeEmulatorAfterLaunch, false);
+                 start.SoftwarePath = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.SoftwarePath, string.Empty);
+                 start.EmulatorConfig = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty);
+                 start.WaitSoftwareTime = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.WaitSoftwareTime, 60.0);
+diff --git a/MFAAvalonia/Helper/LangKeys.cs b/MFAAvalonia/Helper/LangKeys.cs
+--- a/MFAAvalonia/Helper/LangKeys.cs
++++ b/MFAAvalonia/Helper/LangKeys.cs
+@@ -39,6 +39,7 @@ public static class LangKeys
+ 	public static readonly string AutomaticDetectionUpdate = "AutomaticDetectionUpdate";
+ 	public static readonly string AutomaticHide = "AutomaticHide";
+ 	public static readonly string AutomaticMinimize = "AutomaticMinimize";
++	public static readonly string MinimizeEmulatorAfterLaunch = "MinimizeEmulatorAfterLaunch";
+ 	public static readonly string AutomaticUpdateMFA = "AutomaticUpdateMFA";
+ 	public static readonly string AutomaticUpdateResource = "AutomaticUpdateResource";
+ 	public static readonly string AutoStartOption = "AutoStartOption";
+diff --git a/MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs b/MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs
+--- a/MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs
++++ b/MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs
+@@ -77,6 +77,8 @@ public partial class StartSettingsUserControlModel : ViewModelBase
+ 
+     [ObservableProperty] private bool _autoHide = ConfigurationManager.Current.GetValue(ConfigurationKeys.AutoHide, false);
+ 
++    [ObservableProperty] private bool _minimizeEmulatorAfterLaunch = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.MinimizeEmulatorAfterLaunch, false);
++
+     [ObservableProperty] private string _softwarePath = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.SoftwarePath, string.Empty);
+ 
+     [ObservableProperty] private string _emulatorConfig = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty);
+@@ -94,6 +96,11 @@ public partial class StartSettingsUserControlModel : ViewModelBase
+         ConfigurationManager.Current.SetValue(ConfigurationKeys.AutoHide, value);
+     }
+ 
++    partial void OnMinimizeEmulatorAfterLaunchChanged(bool value)
++    {
++        ConfigurationManager.CurrentInstance.SetValue(ConfigurationKeys.MinimizeEmulatorAfterLaunch, value);
++    }
++
+     partial void OnSoftwarePathChanged(string value)
+     {
+         if (_isSynchronizingStartupSettings) return;
+diff --git a/MFAAvalonia/Views/UserControls/Settings/StartSettingsUserControl.axaml b/MFAAvalonia/Views/UserControls/Settings/StartSettingsUserControl.axaml
+--- a/MFAAvalonia/Views/UserControls/Settings/StartSettingsUserControl.axaml
++++ b/MFAAvalonia/Views/UserControls/Settings/StartSettingsUserControl.axaml
+@@ -399,6 +399,19 @@
+                             Text="{markup:I18n {x:Static helper:LangKeys.AutomaticMinimize}}" />
+                     </StackPanel>
+                 </DockPanel>
++                <DockPanel>
++                    <ToggleSwitch
++                        Classes="Switch"
++                        DockPanel.Dock="Right"
++                        IsChecked="{Binding MinimizeEmulatorAfterLaunch}"
++                        VerticalAlignment="Top" />
++                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
++                        <TextBlock
++                            FontSize="16"
++                            FontWeight="SemiBold"
++                            Text="{markup:I18n {x:Static helper:LangKeys.MinimizeEmulatorAfterLaunch}}" />
++                    </StackPanel>
++                </DockPanel>
+                 <DockPanel>
+                     <ToggleSwitch
+                         Classes="Switch"

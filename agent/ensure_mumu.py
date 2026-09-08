@@ -67,6 +67,13 @@ def instance_files():
 
 
 def selected_instance():
+    explicit_path = os.environ.get("MFA_INSTANCE_CONFIG_PATH")
+    if explicit_path:
+        path = Path(explicit_path)
+        if path.is_file():
+            return path, load_json(path)
+        log(f"MFA 指定的实例配置不存在：{path}")
+
     fallback = None
     for path in instance_files():
         data = load_json(path)
@@ -122,6 +129,7 @@ def runtime_settings(instance):
         "vm_index": requested_index,
         "auto_start": task_option_case(instance, AUTOSTART_OPTION, "开启") != "关闭",
         "redetect": task_option_case(instance, REDETECT_OPTION, "关闭") == "开启",
+        "minimize_after_launch": bool(instance.get("MinimizeEmulatorAfterLaunch", False)),
     }
 
 
@@ -314,6 +322,33 @@ def ensure_android(manager, index, info, allow_start=True):
     return {}
 
 
+def minimize_mumu(manager, index):
+    """最小化指定 MuMu 实例的主窗口；失败只记录，不中断任务。"""
+    if os.name != "nt":
+        return False
+    try:
+        import ctypes
+
+        user32 = ctypes.windll.user32
+        for _ in range(20):
+            info = manager_info(manager, index)
+            handle_text = str(info.get("main_wnd") or "").strip()
+            try:
+                handle = int(handle_text, 16)
+            except ValueError:
+                handle = 0
+            if handle and user32.IsWindow(handle):
+                if user32.ShowWindowAsync(handle, 6):  # SW_MINIMIZE
+                    log(f"已最小化 MuMu 实例 {index}")
+                    return True
+            time.sleep(0.25)
+    except Exception as exc:
+        log(f"最小化 MuMu 实例 {index} 失败：{exc}")
+        return False
+    log(f"未找到 MuMu 实例 {index} 的可最小化窗口")
+    return False
+
+
 def adb_devices(adb):
     _, output, _ = run([adb, "devices"], timeout=20)
     devices = {}
@@ -459,8 +494,17 @@ def update_instance(path, instance, adb, serial, root, index):
     }
     # 不保留过期 InfoHandle，否则 MFA 可能仍按 device=<none> 连接
     instance["AdbDevice"] = device
+    manager = Path(root) / "nx_main" / "MuMuManager.exe"
+    if manager.is_file():
+        # 与 MFA「启动设置 > 游戏路径」使用同一套启动入口。这样连接失败时
+        # MFA 可以直接复用本次自动检测到的 MuMu，而不依赖用户手工填写路径。
+        instance["SoftwarePath"] = str(manager.resolve())
+        if index is not None:
+            instance["EmulatorConfig"] = f"control --vmindex {index} launch"
     save_json(path, instance)
     log(f"已写入 MFA 连接：{serial}")
+    if manager.is_file():
+        log(f"已同步 MFA 游戏路径：{manager.resolve()}")
 
 
 def main():
@@ -504,6 +548,7 @@ def main():
         log("没有发现可用的 MuMu 12 实例")
         return 1
     log(f"[2/3] 使用 MuMu 实例 {index}")
+    launched_by_pretask = not info.get("is_process_started") and not info.get("is_android_started")
     info = ensure_android(manager, index, info, allow_start=settings["auto_start"])
     if not info:
         return 1
@@ -514,6 +559,8 @@ def main():
 
     save_json(CACHE_FILE, {"root": str(root), "vm_index": index, "adb_serial": serial})
     update_instance(instance_path, instance, adb, serial, root, index)
+    if launched_by_pretask and settings["minimize_after_launch"]:
+        minimize_mumu(manager, index)
     log("[3/3] MuMu 与 ADB 已就绪（不开游戏）")
     return 0
 

@@ -1,0 +1,224 @@
+diff --git a/MFAAvalonia/Views/Pages/SettingsView.axaml b/MFAAvalonia/Views/Pages/SettingsView.axaml
+index 6541db8..c932eca 100644
+--- a/MFAAvalonia/Views/Pages/SettingsView.axaml
++++ b/MFAAvalonia/Views/Pages/SettingsView.axaml
+@@ -36,5 +36,6 @@
+                                  StackSummaryWidth="220">
+                 <suki:SettingsLayout.Items>
++                    <!-- LAA: simplified settings -->
+                     <suki:SettingsLayoutItem
+                         Content="{extensions:ServiceProvider ServiceType={x:Type settings:ConfigurationMgrUserControl}}"
+                         Header="{markup:I18n {x:Static helper:LangKeys.SwitchConfiguration}}" />
+@@ -54,12 +55,6 @@
+                     <suki:SettingsLayoutItem
+                         Content="{extensions:ServiceProvider ServiceType={x:Type settings:GuiSettingsUserControl}}"
+                         Header="{markup:I18n {x:Static helper:LangKeys.UiSettings}}" />
+-                    <suki:SettingsLayoutItem
+-                        Content="{extensions:ServiceProvider ServiceType={x:Type settings:ExternalNotificationSettingsUserControl}}"
+-                        Header="{markup:I18n {x:Static helper:LangKeys.ExternalNotificationSettings}}" />
+-                    <suki:SettingsLayoutItem
+-                        Content="{extensions:ServiceProvider ServiceType={x:Type settings:HotKeySettingsUserControl}}"
+-                        Header="{markup:I18n {x:Static helper:LangKeys.HotKeySettings}}" />
+                     <suki:SettingsLayoutItem
+                         Content="{extensions:ServiceProvider ServiceType={x:Type settings:VersionUpdateSettingsUserControl}}"
+                         Header="{markup:I18n {x:Static helper:LangKeys.UpdateSettings}}" />
+diff --git a/MFAAvalonia/Views/UserControls/Settings/GuiSettingsUserControl.axaml b/MFAAvalonia/Views/UserControls/Settings/GuiSettingsUserControl.axaml
+index 09c282b..6975f4c 100644
+--- a/MFAAvalonia/Views/UserControls/Settings/GuiSettingsUserControl.axaml
++++ b/MFAAvalonia/Views/UserControls/Settings/GuiSettingsUserControl.axaml
+@@ -195,116 +195,6 @@
+                             TextWrapping="Wrap" />
+                     </StackPanel>
+                 </DockPanel>
+-                <DockPanel>
+-                    <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
+-                              DockPanel.Dock="Right"
+-                              ItemsSource="{Binding AvailableBackgroundStyles}"
+-                              SelectedValue="{Binding BackgroundStyle}"
+-                              Width="215" />
+-                    <StackPanel HorizontalAlignment="Left">
+-                        <TextBlock
+-                            FontSize="16"
+-                            FontWeight="SemiBold"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.BackgroundStyleTitle}}" />
+-                        <TextBlock
+-                            Foreground="{DynamicResource SukiLowText}"
+-                            Margin="0,12,70,0"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.BackgroundStyleDescription}}"
+-                            TextWrapping="Wrap" />
+-                    </StackPanel>
+-                </DockPanel>
+-
+-                <DockPanel>
+-                    <ToggleSwitch
+-                        Classes="Switch"
+-                        DockPanel.Dock="Right"
+-                        IsChecked="{Binding BackgroundAnimations}"
+-                        VerticalAlignment="Top" />
+-                    <StackPanel HorizontalAlignment="Left">
+-                        <TextBlock
+-                            FontSize="16"
+-                            FontWeight="DemiBold"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.AnimatedBackgroundTitle}}" />
+-                        <TextBlock
+-                            Foreground="{DynamicResource SukiLowText}"
+-                            Margin="0,12,70,0"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.AnimatedBackgroundDescription}}"
+-                            TextWrapping="Wrap" />
+-                    </StackPanel>
+-                </DockPanel>
+-
+-                <DockPanel>
+-                    <ToggleSwitch
+-                        DockPanel.Dock="Right"
+-                        IsChecked="{Binding BackgroundTransitions}"
+-                        VerticalAlignment="Top" />
+-                    <StackPanel HorizontalAlignment="Left">
+-                        <TextBlock
+-                            FontSize="16"
+-                            FontWeight="DemiBold"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.BackgroundTransitionsTitle}}" />
+-                        <TextBlock
+-                            Foreground="{DynamicResource SukiLowText}"
+-                            Margin="0,12,70,0"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.BackgroundTransitionsDescription}}"
+-                            TextWrapping="Wrap" />
+-                    </StackPanel>
+-                </DockPanel>
+-                <!-- Background Image Settings -->
+-                <DockPanel>
+-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
+-                        <Button
+-                            Command="{Binding ClearBackgroundImageCommand}" Classes="Basic Round"
+-                            IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+-                            Margin="7,0,8,0"
+-                            Padding="0"
+-                            ToolTip.Tip="{markup:I18n {x:Static helper:LangKeys.ButtonClear}}">
+-                            <fluent1:FluentIcon Height="18"
+-                                                 Icon="ArrowSync"
+-                                                 IconSize="Size16"
+-                                                 IconVariant="Regular" />
+-                        </Button>
+-                        <Button
+-                            Command="{Binding SelectBackgroundImageCommand}"
+-                            Content="{markup:I18n {x:Static helper:LangKeys.Select}}"
+-                            Height="40"
+-                            Width="215" />
+-                    </StackPanel>
+-                    <StackPanel HorizontalAlignment="Left">
+-                        <TextBlock
+-                            FontSize="16"
+-                            FontWeight="DemiBold"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.BackgroundImageTitle}}" />
+-                        <TextBlock
+-                            Foreground="{DynamicResource SukiLowText}"
+-                            Margin="0,12,70,0"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.BackgroundImageDescription}}"
+-                            TextWrapping="Wrap" />
+-                    </StackPanel>
+-                </DockPanel>
+-
+-                <!-- Background Image Opacity -->
+-                <DockPanel IsVisible="{Binding HasBackgroundImage}">
+-                    <Slider
+-                        DockPanel.Dock="Right"
+-                        Width="215"
+-                        Minimum="0"
+-                        Maximum="1"
+-                        Value="{Binding BackgroundImageOpacity}"
+-                        TickFrequency="0.1"
+-                        IsSnapToTickEnabled="False" />
+-                    <StackPanel HorizontalAlignment="Left">
+-                        <TextBlock
+-                            FontSize="16"
+-                            FontWeight="DemiBold"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.BackgroundImageOpacityTitle}}" />
+-                        <TextBlock
+-                            Foreground="{DynamicResource SukiLowText}"
+-                            Margin="0,12,70,0"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.BackgroundImageOpacityDescription}}"
+-                            TextWrapping="Wrap" />
+-                    </StackPanel>
+-                </DockPanel>
+             </StackPanel>
+         </suki:GlassCard>
+         <suki:GlassCard Margin="0,25,0,0" Padding="25">
+@@ -329,78 +219,6 @@
+                 </StackPanel>
+             </DockPanel>
+         </suki:GlassCard>
+-        <!-- Font Scale Settings -->
+-        <suki:GlassCard Margin="0,25,0,0" Padding="25">
+-            <StackPanel Spacing="10">
+-                <DockPanel>
+-                    <TextBlock
+-                        DockPanel.Dock="Right"
+-                        Text="{Binding FontScaleDisplay}"
+-                        VerticalAlignment="Center"
+-                        Width="60"
+-                        TextAlignment="Center"
+-                        FontWeight="DemiBold" />
+-                    <StackPanel HorizontalAlignment="Left">
+-                        <TextBlock
+-                            FontSize="16"
+-                            FontWeight="DemiBold"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.FontScaleTitle}}" />
+-                        <TextBlock
+-                            Foreground="{DynamicResource SukiLowText}"
+-                            Margin="0,12,70,0"
+-                            Text="{markup:I18n {x:Static helper:LangKeys.FontScaleDescription}}"
+-                            TextWrapping="Wrap" />
+-                    </StackPanel>
+-                </DockPanel>
+-                <Slider
+-                    Minimum="0.8"
+-                    Maximum="1.5"
+-                    Value="{Binding FontScale}"
+-                    TickFrequency="0.1"
+-                    IsSnapToTickEnabled="True"
+-                    TickPlacement="BottomRight" />
+-            </StackPanel>
+-        </suki:GlassCard>
+-        <suki:GlassCard Margin="0,25,0,0" Padding="25">
+-            <DockPanel>
+-                <ToggleSwitch
+-                    Classes="Switch"
+-                    DockPanel.Dock="Right"
+-                    IsChecked="{Binding ShouldMinimizeToTray}"
+-                    VerticalAlignment="Top" />
+-                <StackPanel HorizontalAlignment="Left">
+-                    <TextBlock
+-                        FontSize="16"
+-                        FontWeight="SemiBold"
+-                        Text="{markup:I18n {x:Static helper:LangKeys.MinimizeToTray}}" />
+-                    <TextBlock
+-                        Foreground="{DynamicResource SukiLowText}"
+-                        Margin="0,12,70,0"
+-                        Text="{markup:I18n {x:Static helper:LangKeys.MinimizeToTrayDescription}}"
+-                        TextWrapping="Wrap" />
+-                </StackPanel>
+-            </DockPanel>
+-        </suki:GlassCard>
+-        <suki:GlassCard Margin="0,25,0,0" Padding="25">
+-            <DockPanel>
+-                <ToggleSwitch
+-                    Classes="Switch"
+-                    DockPanel.Dock="Right"
+-                    IsChecked="{Binding EnableToastNotification}"
+-                    VerticalAlignment="Top" />
+-                <StackPanel HorizontalAlignment="Left">
+-                    <TextBlock
+-                        FontSize="16"
+-                        FontWeight="SemiBold"
+-                        Text="{markup:I18n {x:Static helper:LangKeys.Notification}}" />
+-                    <TextBlock
+-                        Foreground="{DynamicResource SukiLowText}"
+-                        Margin="0,12,70,0"
+-                        Text="{markup:I18n {x:Static helper:LangKeys.NotificationDescription}}"
+-                        TextWrapping="Wrap" />
+-                </StackPanel>
+-            </DockPanel>
+-        </suki:GlassCard>
+     </StackPanel>
+ 
+ </UserControl>

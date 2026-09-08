@@ -23,9 +23,15 @@ $patches = @(
     @{ File = 'laa-chip-filter-total-level.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'MinimumTotalLevel' },
     @{ File = 'laa-chip-task-checkbox.patch'; MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'UseChipTaskCheckBox' },
     @{ File = 'laa-pretask-path-resolution.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'localPythonCandidates' },
+    @{ File = 'laa-pretask-config-sync.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'MFA_INSTANCE_CONFIG_PATH' },
     @{ File = 'laa-stop-on-task-failure.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'ContinueOnError = false' },
     @{ File = 'laa-no-autostart.patch'; MarkerFile = 'MFAAvalonia\Views\Windows\RootView.axaml.cs'; Marker = 'if \(!noAutoStart\)' },
-    @{ File = 'laa-reset-task-confirmation.patch'; MarkerFile = 'MFAAvalonia\ViewModels\Pages\TaskQueueViewModel.cs'; Marker = '当前操作会重置任务列表中所有已有设置' }
+    @{ File = 'laa-reset-task-confirmation.patch'; MarkerFile = 'MFAAvalonia\ViewModels\Pages\TaskQueueViewModel.cs'; Marker = '当前操作会重置任务列表中所有已有设置' },
+    @{ File = 'laa-simplified-settings.patch'; MarkerFile = 'MFAAvalonia\Views\Pages\SettingsView.axaml'; Marker = 'LAA: simplified settings' },
+    @{ File = 'laa-project-profiles-scheduler.patch'; MarkerFile = 'MFAAvalonia\ViewModels\Other\SystemScheduledTaskManager.cs'; Marker = 'SystemScheduledTaskManager' },
+    @{ File = 'laa-emulator-minimize-setting.patch'; MarkerFile = 'MFAAvalonia\Configuration\ConfigurationKeys.cs'; Marker = 'MinimizeEmulatorAfterLaunch' },
+    @{ File = 'laa-simplified-start-end-actions.patch'; MarkerFile = 'MFAAvalonia\ViewModels\UsersControls\Settings\StartSettingsUserControlModel.cs'; Marker = 'NormalizeBeforeTask' },
+    @{ File = 'laa-settings-runtime-fixes.patch'; MarkerFile = 'MFAAvalonia\Extensions\GlobalStartManager.cs'; Marker = '未进入运行状态' }
 )
 
 foreach ($patchSpec in $patches) {
@@ -54,7 +60,13 @@ $env:TMP = $env:TEMP
 New-Item -ItemType Directory -Force -Path $env:DOTNET_CLI_HOME, $env:NUGET_PACKAGES, $env:TEMP | Out-Null
 
 & $dotnet restore (Join-Path $source 'MFAAvalonia.Desktop\MFAAvalonia.Desktop.csproj') -r win-x64
+if ($LASTEXITCODE -ne 0) {
+    throw "MFAAvalonia restore failed with exit code $LASTEXITCODE"
+}
 & $dotnet build (Join-Path $source 'MFAAvalonia.Desktop\MFAAvalonia.Desktop.csproj') -c Release -r win-x64 --no-restore
+if ($LASTEXITCODE -ne 0) {
+    throw "MFAAvalonia build failed with exit code $LASTEXITCODE"
+}
 
 $running = Get-Process -Name 'MFAAvalonia' -ErrorAction SilentlyContinue
 if ($running) {

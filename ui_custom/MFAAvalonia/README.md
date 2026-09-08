@@ -12,8 +12,42 @@ The no-autostart patch keeps normal window startup passive. Controller
 connection and project pretasks begin only after the user starts a task, so
 the MuMu launcher cannot run merely because MFA was opened.
 
+After the MuMu pretask detects an installation and instance, it writes the
+matching `MuMuManager.exe` path and instance launch arguments into that MFA
+profile. MFA reloads the profile immediately so the startup settings UI and
+connection-recovery launcher use the detected values without an application
+restart.
+
+Startup settings also provide a per-profile "minimize emulator after launch"
+switch. When the MuMu pretask launches an instance, it waits for Android and
+ADB to become ready, then minimizes that exact instance through the main window
+handle reported by `MuMuManager`.
+
+The startup-action selector is limited to "None" and "Start tasks". "Start
+tasks" starts the current profile's selected task queue as soon as MFA opens.
+The post-task selector keeps only none, shutdown, close the emulator and restart
+MFA, and restart the computer. Previously saved removed choices are normalized
+to none, and the removed actions are no longer executable by the backend.
+
+Global batch startup follows each included profile's startup action: profiles
+set to "None" are skipped, while profiles set to "Start tasks" are started. A
+profile is counted as successfully started only after its task queue actually
+enters the running state. The ineffective global "continue after errors" switch
+is hidden because LAA deliberately uses strict task-failure handling and handles
+tolerated failures inside the relevant task flow.
+
 The task-list reset button asks for confirmation before replacing the current
 task order and all saved task settings with interface defaults.
+
+The settings page hides external notification and hotkey configuration. Its UI
+section keeps theme and language controls only; the underlying configuration
+models and defaults remain intact for compatibility with existing profiles.
+
+The account/emulator profile page copies the currently active profile, including
+its task selection, task options, and controller settings. Timers are simplified
+to a date, time, and target profile, then mirrored to Windows Task Scheduler.
+They can start MFA and the selected profile even when MFA is not already running;
+enabled tasks also request wake-to-run and are removed from Windows when disabled.
 
 The three lock-mode labels remain visible at all times. The current main skill
 is shown as a solid green button: click to select it and double-click to edit.
