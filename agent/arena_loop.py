@@ -42,6 +42,8 @@ NODE_DEFEAT   = "ArenaDefeat"
 NODE_REWARD   = "ArenaReward"
 STRAT_HIGH    = "尽量刷取高分"
 STRAT_COMPLETE= "尽量完成挑战"
+POINTS_MIN_HIGH = 28      # 尽量刷取高分：至少 28 分才挑战
+POINTS_MIN_COMPLETE = 20  # 尽量完成挑战：至少 20 分才挑战
 REPEAT_ZERO   = "重复挑战直到次数归零"
 REPEAT_CUSTOM = "自定次数"
 ACTION_CHALLENGE = "challenge"
@@ -73,7 +75,8 @@ def candidate_meets_requirements(own, opponent, points, allowed_gap, strategy):
     if opponent is None:
         return False
     power_ok = not should_refresh_for_power(own, opponent, allowed_gap)
-    points_ok = points is None or points >= (28 if strategy == STRAT_HIGH else 26)
+    min_points = POINTS_MIN_HIGH if strategy == STRAT_HIGH else POINTS_MIN_COMPLETE
+    points_ok = points is None or points >= min_points
     return power_ok and points_ok
 
 

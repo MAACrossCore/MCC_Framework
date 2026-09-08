@@ -1,60 +1,1347 @@
 {
-  "$__mpe_config_arena": { "$__mpe_code": { "prefix": "", "coordinateMode": "absolute-v1", "filename": "模拟军演", "version": "v1.10.0", "savedViewport": { "x": 40, "y": 40, "zoom": 0.65 } } },
-  "ArenaTask": { "recognition": "DirectHit", "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "init" }, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 80, "y": 100 } } },
-
-  "竞技场_页面接续": { "next": ["竞技场_接续列表", "竞技场_接续确认页返回", "竞技场_接续奖励", "竞技场_接续胜利", "竞技场_接续失败", "竞技场_主界面进出击", "竞技场_二级菜单进军演", "竞技场_模式页进镜像竞技", "竞技场_接续点主页"], "$__mpe_code": { "position": { "x": 380, "y": 100 } } },
-  "竞技场_接续列表": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:arena" }, "action": "DoNothing", "next": "竞技场_己方战力分派", "$__mpe_code": { "position": { "x": 700, "y": -160 } } },
-  "竞技场_接续确认页返回": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:confirm" }, "action": "Click", "target": [92, 22, 34, 34], "post_delay": 900, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 700, "y": -20 } } },
-  "竞技场_接续奖励": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:reward" }, "action": "Click", "target": [623, 450, 34, 34], "post_delay": 900, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 700, "y": 120 } } },
-  "竞技场_接续胜利": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:victory" }, "action": "Click", "target": [623, 450, 34, 34], "post_delay": 700, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 700, "y": 260 } } },
-  "竞技场_接续失败": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:defeat" }, "action": "Click", "target": [440, 634, 141, 40], "post_delay": 900, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 700, "y": 330 } } },
-  "竞技场_主界面进出击": { "recognition": "OCR", "expected": ["基地", "任务", "编队"], "roi": [493, 580, 773, 137], "threshold": 0.2, "action": "Click", "target": [1161, 587, 46, 46], "post_delay": 1800, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 700, "y": 400 } } },
-  "竞技场_二级菜单进军演": { "recognition": "OCR", "expected": ["模拟军演"], "roi": [150, 200, 350, 300], "threshold": 0.2, "action": "Click", "target": [296, 330, 34, 60], "post_delay": 1600, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 700, "y": 540 } } },
-  "竞技场_模式页进镜像竞技": { "recognition": "OCR", "expected": ["镜像竞技"], "roi": [380, 90, 500, 440], "threshold": 0.2, "action": "Click", "target": [489, 410, 34, 44], "post_delay": 1800, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 700, "y": 680 } } },
-  "竞技场_接续点主页": { "recognition": "TemplateMatch", "template": ["StartUp/HomeButton.png", "StartUp/HomeButton1.png"], "roi": [180, 10, 100, 70], "action": "Click", "post_delay": 1800, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 700, "y": 820 } } },
-
-  "竞技场_己方战力分派": { "next": ["竞技场_打开进攻部署", "竞技场_开始本轮判定"], "$__mpe_code": { "position": { "x": 1020, "y": -120 } } },
-  "竞技场_打开进攻部署": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "state:own_missing" }, "action": "Click", "target": [1139, 639, 34, 34], "post_delay": 1000, "next": "竞技场_读取己方战力", "$__mpe_code": { "position": { "x": 1320, "y": -220 } } },
-  "竞技场_读取己方战力": { "recognition": "DirectHit", "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "capture_own_power" }, "next": "竞技场_部署页返回", "$__mpe_code": { "position": { "x": 1620, "y": -220 } } },
-  "竞技场_部署页返回": { "recognition": "DirectHit", "action": "Click", "target": [92, 22, 34, 34], "post_delay": 1000, "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 1920, "y": -220 } } },
-  "竞技场_开始本轮判定": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "state:own_ready" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "evaluate" }, "next": "竞技场_决策分派", "$__mpe_code": { "position": { "x": 1320, "y": 0 } } },
-
-  "竞技场_决策分派": { "next": ["竞技场_决策挑战", "竞技场_决策刷新", "竞技场_决策重读", "竞技场_决策重新寻路", "竞技场_决策完成模拟归零", "竞技场_决策完成目标", "竞技场_决策完成刷新归零", "竞技场_决策失败"], "$__mpe_code": { "position": { "x": 1620, "y": 0 } } },
-  "竞技场_决策挑战": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "decision:challenge" }, "action": "Click", "target": [463, 206, 34, 34], "post_delay": 1000, "next": "竞技场_确认挑战", "$__mpe_code": { "position": { "x": 1940, "y": -80 } } },
-  "竞技场_确认挑战": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:confirm" }, "action": "Click", "target": [822, 630, 34, 34], "post_delay": 900, "next": "竞技场_等待结算", "$__mpe_code": { "position": { "x": 2240, "y": -80 } } },
-  "竞技场_决策刷新": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "decision:refresh" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "refresh" }, "post_delay": 1200, "next": "竞技场_开始本轮判定", "$__mpe_code": { "position": { "x": 1940, "y": 80 } } },
-  "竞技场_决策重读": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "decision:retry_counter" }, "action": "DoNothing", "post_delay": 350, "next": "竞技场_开始本轮判定", "$__mpe_code": { "position": { "x": 1940, "y": 220 } } },
-  "竞技场_决策重新寻路": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "decision:navigate" }, "action": "DoNothing", "next": "竞技场_页面接续", "$__mpe_code": { "position": { "x": 1940, "y": 360 } } },
-  "竞技场_决策完成模拟归零": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "decision:stop_sim_empty" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "finish" }, "$__mpe_code": { "position": { "x": 1940, "y": 500 } } },
-  "竞技场_决策完成目标": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "decision:stop_custom_target" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "finish" }, "$__mpe_code": { "position": { "x": 1940, "y": 640 } } },
-  "竞技场_决策完成刷新归零": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "decision:stop_refresh_empty" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "finish" }, "$__mpe_code": { "position": { "x": 1940, "y": 780 } } },
-  "竞技场_决策失败": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "decision:fail" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "fail" }, "$__mpe_code": { "position": { "x": 1940, "y": 920 } } },
-
-  "竞技场_等待结算": { "next": ["[JumpBack]跳过首领演出动画", "[JumpBack]跳过首领演出动画_OCR", "竞技场_结算完成", "竞技场_结算失败", "竞技场_结算奖励", "竞技场_结算胜利", "竞技场_结算误入确认页", "竞技场_确认按钮重试", "竞技场_确认按钮失败", "竞技场_战斗跳过", "竞技场_结算超时", "竞技场_结算轮询"], "$__mpe_code": { "position": { "x": 2540, "y": -80 } } },
-  "竞技场_结算完成": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:battle_complete" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "mark_challenge" }, "next": "竞技场_开始本轮判定", "$__mpe_code": { "position": { "x": 2840, "y": -300 } } },
-  "竞技场_结算奖励": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:reward" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "mark_reward" }, "next": "竞技场_关闭结算奖励", "$__mpe_code": { "position": { "x": 2840, "y": -160 } } },
-  "竞技场_关闭结算奖励": { "recognition": "DirectHit", "action": "Click", "target": [623, 450, 34, 34], "post_delay": 900, "next": "竞技场_等待结算", "$__mpe_code": { "position": { "x": 3140, "y": -160 } } },
-  "竞技场_结算胜利": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:victory" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "mark_result", "result": "success" }, "next": "竞技场_关闭结算胜利", "$__mpe_code": { "position": { "x": 2840, "y": -20 } } },
-  "竞技场_关闭结算胜利": { "recognition": "DirectHit", "action": "Click", "target": [623, 450, 34, 34], "post_delay": 700, "next": "竞技场_等待结算", "$__mpe_code": { "position": { "x": 3140, "y": -20 } } },
-  "竞技场_结算失败": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:defeat" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "mark_result", "result": "failure" }, "next": "竞技场_关闭结算失败", "$__mpe_code": { "position": { "x": 2840, "y": -90 } } },
-  "竞技场_关闭结算失败": { "recognition": "DirectHit", "action": "Click", "target": [440, 634, 141, 40], "post_delay": 900, "next": "竞技场_等待结算", "$__mpe_code": { "position": { "x": 3140, "y": -90 } } },
-  "竞技场_结算误入确认页": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:settlement_confirm" }, "action": "Click", "target": [92, 22, 34, 34], "post_delay": 900, "next": "竞技场_等待结算", "$__mpe_code": { "position": { "x": 2840, "y": 120 } } },
-  "竞技场_确认按钮重试": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:confirm_retry" }, "action": "Click", "target": [822, 630, 34, 34], "post_delay": 900, "next": "竞技场_等待结算", "$__mpe_code": { "position": { "x": 3140, "y": 80 } } },
-  "竞技场_确认按钮失败": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:confirm_failed" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "fail" }, "$__mpe_code": { "position": { "x": 3140, "y": 180 } } },
-  "竞技场_战斗跳过": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:skip" }, "action": "Click", "post_delay": 400, "next": "竞技场_等待结算", "$__mpe_code": { "position": { "x": 2840, "y": 260 } } },
-  "竞技场_结算超时": { "recognition": "Custom", "custom_recognition": "arena_state", "custom_recognition_param": { "expected": "page:battle_timeout" }, "action": "Custom", "custom_action": "arena_atomic", "custom_action_param": { "operation": "fail" }, "$__mpe_code": { "position": { "x": 3140, "y": 320 } } },
-  "竞技场_结算轮询": { "recognition": "DirectHit", "action": "DoNothing", "pre_delay": 350, "next": "竞技场_等待结算", "$__mpe_code": { "position": { "x": 2840, "y": 400 } } },
-
-  "ArenaReadOwnPower": { "recognition": "OCR", "roi": [41, 141, 105, 27] },
-  "ArenaReadOppPower": { "recognition": "OCR", "roi": [987, 148, 97, 29] },
-  "ArenaReadPoints": { "recognition": "OCR", "roi": [1193, 147, 38, 32] },
-  "ArenaReadRefresh": { "recognition": "OCR", "roi": [1105, 99, 61, 26] },
-  "ArenaReadChallenges": { "recognition": "OCR", "roi": [237, 343, 50, 33] },
-  "ArenaPageTitle": { "recognition": "OCR", "roi": [413, 73, 800, 80], "expected": ["对手阵容", "刷新对手"], "threshold": 0.2, "action": "DoNothing" },
-  "ArenaDeployButton": { "recognition": "OCR", "roi": [1047, 600, 233, 113], "expected": ["进攻部署"], "threshold": 0.2, "action": "DoNothing" },
-  "ArenaRefresh": { "recognition": "TemplateMatch", "template": "arena_refresh.png", "action": "Click" },
-  "ConfirmStart": { "recognition": "TemplateMatch", "template": "challenge_start.png", "action": "Click" },
-  "ArenaResult": { "recognition": "OCR", "roi": [13, 13, 400, 147], "expected": ["战斗胜利"], "threshold": 0.2 },
-  "ArenaDefeat": { "recognition": "OCR", "roi": [406, 54, 451, 116], "expected": ["战斗失败"], "threshold": 0.2 },
-  "ArenaReward": { "recognition": "OCR", "roi": [487, 147, 333, 113], "expected": ["获得物品"], "threshold": 0.2 }
+    "$__mpe_config_模拟军演": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788876983021,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MAAlocalhost\\resource\\pipeline\\base\\模拟军演.json",
+            "savedViewport": {
+                "x": 686,
+                "y": 173,
+                "zoom": 0.53
+            },
+            "filename": "模拟军演",
+            "version": "v1.9.3"
+        }
+    },
+    "ArenaDefeat": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    19,
+                    11,
+                    1194,
+                    167
+                ],
+                "expected": [
+                    "战斗失败"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": -601,
+                "y": -61
+            }
+        }
+    },
+    "ArenaDeployButton": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1047,
+                    600,
+                    233,
+                    113
+                ],
+                "expected": [
+                    "进攻部署"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": -676,
+                "y": 195
+            }
+        }
+    },
+    "ArenaPageTitle": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    413,
+                    73,
+                    800,
+                    80
+                ],
+                "expected": [
+                    "对手阵容",
+                    "刷新对手"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": -623,
+                "y": 383
+            }
+        }
+    },
+    "ArenaReadChallenges": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    237,
+                    343,
+                    50,
+                    33
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    },
+    "ArenaReadOppPower": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    987,
+                    148,
+                    97,
+                    29
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    },
+    "ArenaReadOwnPower": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    41,
+                    141,
+                    105,
+                    27
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    },
+    "ArenaReadPoints": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1193,
+                    147,
+                    38,
+                    32
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": -297,
+                "y": 112
+            }
+        }
+    },
+    "ArenaReadRefresh": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1105,
+                    99,
+                    61,
+                    26
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 326,
+                "y": -210
+            }
+        }
+    },
+    "ArenaRefresh": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "arena_refresh.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": -271,
+                "y": 671
+            }
+        }
+    },
+    "ArenaResult": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    13,
+                    13,
+                    400,
+                    147
+                ],
+                "expected": [
+                    "战斗胜利"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 269,
+                "y": 633
+            }
+        }
+    },
+    "ArenaReward": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    487,
+                    147,
+                    333,
+                    113
+                ],
+                "expected": [
+                    "获得物品"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 21,
+                "y": 544
+            }
+        }
+    },
+    "ArenaTask": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "init"
+                }
+            }
+        },
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 105,
+                "y": 242
+            }
+        }
+    },
+    "ConfirmStart": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "challenge_start.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": -248,
+                "y": 379
+            }
+        }
+    },
+    "竞技场_主界面进出击": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    493,
+                    580,
+                    773,
+                    137
+                ],
+                "expected": [
+                    "基地",
+                    "任务",
+                    "编队"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1161,
+                    587,
+                    46,
+                    46
+                ]
+            }
+        },
+        "post_delay": 1800,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 400
+            }
+        }
+    },
+    "竞技场_二级菜单进军演": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    150,
+                    200,
+                    350,
+                    300
+                ],
+                "expected": [
+                    "模拟军演"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    296,
+                    330,
+                    34,
+                    60
+                ]
+            }
+        },
+        "post_delay": 1600,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 540
+            }
+        }
+    },
+    "竞技场_关闭结算失败": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    440,
+                    634,
+                    141,
+                    40
+                ]
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "竞技场_等待结算"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3140,
+                "y": -90
+            }
+        }
+    },
+    "竞技场_关闭结算奖励": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    623,
+                    450,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "竞技场_等待结算"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3140,
+                "y": -160
+            }
+        }
+    },
+    "竞技场_关闭结算胜利": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    623,
+                    450,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 700,
+        "next": [
+            "竞技场_等待结算"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3140,
+                "y": -20
+            }
+        }
+    },
+    "竞技场_决策分派": {
+        "next": [
+            "竞技场_决策挑战",
+            "竞技场_决策刷新",
+            "竞技场_决策重读",
+            "竞技场_决策重新寻路",
+            "竞技场_决策完成模拟归零",
+            "竞技场_决策完成目标",
+            "竞技场_决策完成刷新归零",
+            "竞技场_决策失败"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1620,
+                "y": 0
+            }
+        }
+    },
+    "竞技场_决策刷新": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "decision:refresh"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "refresh"
+                }
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "竞技场_开始本轮判定"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1940,
+                "y": 80
+            }
+        }
+    },
+    "竞技场_决策失败": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "decision:fail"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "fail"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1940,
+                "y": 920
+            }
+        }
+    },
+    "竞技场_决策完成刷新归零": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "decision:stop_refresh_empty"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "finish"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1940,
+                "y": 780
+            }
+        }
+    },
+    "竞技场_决策完成模拟归零": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "decision:stop_sim_empty"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "finish"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1940,
+                "y": 500
+            }
+        }
+    },
+    "竞技场_决策完成目标": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "decision:stop_custom_target"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "finish"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1940,
+                "y": 640
+            }
+        }
+    },
+    "竞技场_决策挑战": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "decision:challenge"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    463,
+                    206,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "竞技场_确认挑战"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1940,
+                "y": -80
+            }
+        }
+    },
+    "竞技场_决策重新寻路": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "decision:navigate"
+                }
+            }
+        },
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1940,
+                "y": 360
+            }
+        }
+    },
+    "竞技场_决策重读": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "decision:retry_counter"
+                }
+            }
+        },
+        "post_delay": 350,
+        "next": [
+            "竞技场_开始本轮判定"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1940,
+                "y": 220
+            }
+        }
+    },
+    "竞技场_己方战力分派": {
+        "next": [
+            "竞技场_打开进攻部署",
+            "竞技场_开始本轮判定"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1020,
+                "y": -120
+            }
+        }
+    },
+    "竞技场_开始本轮判定": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "state:own_ready"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "evaluate"
+                }
+            }
+        },
+        "next": [
+            "竞技场_决策分派"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1320,
+                "y": 0
+            }
+        }
+    },
+    "竞技场_战斗跳过": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:skip"
+                }
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 400,
+        "next": [
+            "竞技场_等待结算"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2840,
+                "y": 260
+            }
+        }
+    },
+    "竞技场_打开进攻部署": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "state:own_missing"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1139,
+                    639,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "竞技场_读取己方战力"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1320,
+                "y": -220
+            }
+        }
+    },
+    "竞技场_接续列表": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:arena"
+                }
+            }
+        },
+        "next": [
+            "竞技场_己方战力分派"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": -160
+            }
+        }
+    },
+    "竞技场_接续失败": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:defeat"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    440,
+                    634,
+                    141,
+                    40
+                ]
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 330
+            }
+        }
+    },
+    "竞技场_接续奖励": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:reward"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    623,
+                    450,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 120
+            }
+        }
+    },
+    "竞技场_接续点主页": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    180,
+                    10,
+                    100,
+                    70
+                ],
+                "template": [
+                    "StartUp/HomeButton.png",
+                    "StartUp/HomeButton1.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1800,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 820
+            }
+        }
+    },
+    "竞技场_接续确认页返回": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:confirm"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    92,
+                    22,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": -20
+            }
+        }
+    },
+    "竞技场_接续胜利": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:victory"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    623,
+                    450,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 700,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 260
+            }
+        }
+    },
+    "竞技场_模式页进镜像竞技": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    380,
+                    90,
+                    500,
+                    440
+                ],
+                "expected": [
+                    "镜像竞技"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    489,
+                    410,
+                    34,
+                    44
+                ]
+            }
+        },
+        "post_delay": 1800,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 680
+            }
+        }
+    },
+    "竞技场_确认按钮失败": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:confirm_failed"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "fail"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3140,
+                "y": 180
+            }
+        }
+    },
+    "竞技场_确认按钮重试": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:confirm_retry"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    822,
+                    630,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "竞技场_等待结算"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3140,
+                "y": 80
+            }
+        }
+    },
+    "竞技场_确认挑战": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:confirm"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    822,
+                    630,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "竞技场_等待结算"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2240,
+                "y": -80
+            }
+        }
+    },
+    "竞技场_等待结算": {
+        "next": [
+            "[JumpBack]跳过首领演出动画",
+            "[JumpBack]跳过首领演出动画_OCR",
+            "竞技场_结算完成",
+            "竞技场_结算失败",
+            "竞技场_结算奖励",
+            "竞技场_结算胜利",
+            "竞技场_结算误入确认页",
+            "竞技场_确认按钮重试",
+            "竞技场_确认按钮失败",
+            "竞技场_战斗跳过",
+            "竞技场_结算超时",
+            "竞技场_结算轮询"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2540,
+                "y": -80
+            }
+        }
+    },
+    "竞技场_结算失败": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:defeat"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "mark_result",
+                    "result": "failure"
+                }
+            }
+        },
+        "next": [
+            "竞技场_关闭结算失败"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2840,
+                "y": -90
+            }
+        }
+    },
+    "竞技场_结算奖励": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:reward"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "mark_reward"
+                }
+            }
+        },
+        "next": [
+            "竞技场_关闭结算奖励"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2840,
+                "y": -160
+            }
+        }
+    },
+    "竞技场_结算完成": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:battle_complete"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "mark_challenge"
+                }
+            }
+        },
+        "next": [
+            "竞技场_开始本轮判定"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2840,
+                "y": -300
+            }
+        }
+    },
+    "竞技场_结算胜利": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:victory"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "mark_result",
+                    "result": "success"
+                }
+            }
+        },
+        "next": [
+            "竞技场_关闭结算胜利"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2840,
+                "y": -20
+            }
+        }
+    },
+    "竞技场_结算误入确认页": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:settlement_confirm"
+                }
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    92,
+                    22,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "竞技场_等待结算"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2840,
+                "y": 120
+            }
+        }
+    },
+    "竞技场_结算超时": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:battle_timeout"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "fail"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3140,
+                "y": 320
+            }
+        }
+    },
+    "竞技场_结算轮询": {
+        "pre_delay": 350,
+        "next": [
+            "竞技场_等待结算"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2840,
+                "y": 400
+            }
+        }
+    },
+    "竞技场_读取己方战力": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "capture_own_power"
+                }
+            }
+        },
+        "next": [
+            "竞技场_部署页返回"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1620,
+                "y": -220
+            }
+        }
+    },
+    "竞技场_部署页返回": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    92,
+                    22,
+                    34,
+                    34
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "竞技场_页面接续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1920,
+                "y": -220
+            }
+        }
+    },
+    "竞技场_页面接续": {
+        "next": [
+            "竞技场_接续列表",
+            "竞技场_接续确认页返回",
+            "竞技场_接续奖励",
+            "竞技场_接续胜利",
+            "竞技场_接续失败",
+            "竞技场_主界面进出击",
+            "竞技场_二级菜单进军演",
+            "竞技场_模式页进镜像竞技",
+            "竞技场_接续点主页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 380,
+                "y": 100
+            }
+        }
+    },
+    "$__mpe_external_跳过首领演出动画_模拟军演": {
+        "$__mpe_code": {
+            "position": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    },
+    "$__mpe_external_跳过首领演出动画_OCR_模拟军演": {
+        "$__mpe_code": {
+            "position": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    }
 }

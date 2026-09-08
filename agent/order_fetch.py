@@ -34,6 +34,18 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE_PATH = ROOT / "config" / "orders_state.json"
 SOURCE_PATH = ROOT / "config" / "orders_source.json"
 
+# Android KEYCODE_* — MuMu/ADB 上 Ctrl+A 常无效或映射错误，改用退格清空。
+KEYCODE_MOVE_END = 123
+KEYCODE_DEL = 67
+SEARCH_FIELD_CLEAR_DEL_COUNT = 16
+
+
+def _clear_search_field(ctrl):
+    """Clear the focused search box without Ctrl+A (unreliable on emulators)."""
+    ctrl.post_click_key(KEYCODE_MOVE_END).wait()
+    for _ in range(SEARCH_FIELD_CLEAR_DEL_COUNT):
+        ctrl.post_click_key(KEYCODE_DEL).wait()
+
 
 def _norm_friends(raw):
     """统一每条带 status；旧数据没有 status 的一律当 held。"""
@@ -160,10 +172,7 @@ class InputCurrentUid(CustomAction):
         uid = str(held[-1]["uid"])
 
         ctrl = context.tasker.controller
-        ctrl.post_key_down(113).wait()
-        ctrl.post_click_key(29).wait()
-        ctrl.post_key_up(113).wait()
-        ctrl.post_click_key(67).wait()
+        _clear_search_field(ctrl)
 
         print(f"[输入当前UID] {uid}")
         ctrl.post_input_text(uid).wait()
