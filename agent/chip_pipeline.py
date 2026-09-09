@@ -50,6 +50,8 @@ def _set_next_phase():
         _SESSION["phase"] = "cleanup"
     elif _SESSION.get("options", {}).get("filter") and not _SESSION.get("filter_done"):
         _SESSION["phase"] = "filter"
+    elif _SESSION.get("return_to") == "daily_capacity":
+        _SESSION["phase"] = "daily_return"
     else:
         _SESSION["phase"] = "done"
 
@@ -76,6 +78,21 @@ class ChipPipelineAction(CustomAction):
                     "Pipeline读取芯片任务选项：清理=%s，按方案筛选=%s",
                     _SESSION["options"]["cleanup"], _SESSION["options"]["filter"],
                 )
+                return True
+
+            if operation == "init_capacity_cleanup":
+                engine = ChipFilterFlow()
+                _SESSION.clear()
+                _SESSION.update({
+                    "engine": engine,
+                    "options": {"cleanup": True, "filter": False},
+                    "cleanup_done": False,
+                    "filter_done": False,
+                    "return_to": "daily_capacity",
+                    "status": "ready",
+                })
+                _set_next_phase()
+                log.info("每日探索仓满容错：强制执行一次四星及以下芯片清理")
                 return True
 
             engine = _SESSION.get("engine")

@@ -141,6 +141,14 @@ def instance_config_path():
 class ChipFilterFlow(CustomAction):
     """Apply the saved filter plan to every chip currently stored in the warehouse."""
 
+    detail_name_rois = DETAIL_NAME_ROIS
+    detail_level_rois = DETAIL_LEVEL_ROIS
+    detail_names_roi = DETAIL_NAMES_ROI
+    detail_levels_roi = DETAIL_LEVELS_ROI
+    detail_lock_y_offset = 166
+    detail_lock_y_min = 150
+    detail_lock_y_max = 215
+
     @staticmethod
     def _sleep(context, seconds):
         deadline = time.time() + seconds
@@ -630,10 +638,14 @@ class ChipFilterFlow(CustomAction):
             return False
         return None
 
+    def _read_lock_state(self, context, point):
+        """Screen adapter hook; warehouse keeps its recorded visual heuristic."""
+        return self._read_detail_lock_visual(self._shot(context), point)
+
     def _read_skill_name(self, context, image, row):
         choices = MAIN_SKILLS if row == 0 else SUB_SKILLS
         texts = self._ocr_results(
-            context, image, "ChipSkillName", DETAIL_NAME_ROIS[row], choices
+            context, image, "ChipSkillName", self.detail_name_rois[row], choices
         )
         normalized = [normalize_ocr(text) for text in texts]
         for choice in choices:
@@ -643,7 +655,7 @@ class ChipFilterFlow(CustomAction):
 
     def _read_skill_level(self, context, image, row):
         texts = self._ocr_results(
-            context, image, "ChipSkillLevel", DETAIL_LEVEL_ROIS[row]
+            context, image, "ChipSkillLevel", self.detail_level_rois[row]
         )
         for text in texts:
             level = parse_level(text)
@@ -656,10 +668,10 @@ class ChipFilterFlow(CustomAction):
         for _ in range(7):
             image = self._shot(context)
             name_detail = self._ocr_detail(
-                context, image, "ChipSkillName", DETAIL_NAMES_ROI, ALL_SKILLS
+                context, image, "ChipSkillName", self.detail_names_roi, ALL_SKILLS
             )
             level_detail = self._ocr_detail(
-                context, image, "ChipSkillLevel", DETAIL_LEVELS_ROI
+                context, image, "ChipSkillLevel", self.detail_levels_roi
             )
             names = []
             for item in (getattr(name_detail, "all_results", None) or []):
@@ -685,7 +697,10 @@ class ChipFilterFlow(CustomAction):
                 first_name_y = round(names[0][0] * REFERENCE_SIZE[1] / image_height)
                 detail["_lock_toggle_point"] = (
                     DETAIL_LOCK_TOGGLE[0],
-                    max(150, min(215, first_name_y - 166)),
+                    max(
+                        self.detail_lock_y_min,
+                        min(self.detail_lock_y_max, first_name_y - self.detail_lock_y_offset),
+                    ),
                 )
                 readings.append(detail)
                 if has_stable_detail(readings):
@@ -737,9 +752,7 @@ class ChipFilterFlow(CustomAction):
 
         desired_locked = evaluate_chip(detail, plan)["desired_locked"]
         lock_toggle_point = detail["_lock_toggle_point"]
-        locked_before = self._read_detail_lock_visual(
-            self._shot(context), lock_toggle_point
-        )
+        locked_before = self._read_lock_state(context, lock_toggle_point)
         if locked_before is None:
             log.warning("芯片%d详情锁形状无法可靠确认，已跳过且不会点击", slot["index"])
             summary["lock_state_failed"] += 1
@@ -783,9 +796,7 @@ class ChipFilterFlow(CustomAction):
             action = "上锁" if desired_locked else "取消上锁"
             self._click(context, lock_toggle_point, action)
             self._sleep(context, 0.7)
-            state_after = self._read_detail_lock_visual(
-                self._shot(context), lock_toggle_point
-            )
+            state_after = self._read_lock_state(context, lock_toggle_point)
             verified = state_after == desired_locked
         self._click(context, DETAIL_CLOSE_BLANK, "详情外空白处")
         self._sleep(context, 0.25)

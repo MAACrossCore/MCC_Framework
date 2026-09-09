@@ -196,6 +196,7 @@
             "type": "Click"
         },
         "next": [
+            "每日探索_芯片仓库上限确认",
             "扫荡成功"
         ],
         "$__mpe_code": {
@@ -227,6 +228,8 @@
         },
         "focus": "true",
         "next": [
+            "每日探索_芯片仓满重试成功",
+            "每日探索_芯片仓库上限确认",
             "使用燃料界面",
             "开启加成",
             "扫荡成功"
@@ -668,9 +671,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 10
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],
@@ -695,9 +702,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 2
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],
@@ -722,9 +733,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 3
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],
@@ -749,9 +764,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 4
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],
@@ -776,9 +795,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 5
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],
@@ -803,9 +826,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 6
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],
@@ -830,9 +857,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 7
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],
@@ -857,9 +888,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 8
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],
@@ -884,9 +919,13 @@
                 "template": "选择次数.png"
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 9
         },
+        "post_delay": 900,
         "next": [
             "开始战斗"
         ],

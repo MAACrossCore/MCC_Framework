@@ -24,6 +24,7 @@ import number_lt  # noqa: F401  # 注册 number_lt 自定义识别
 import order_fetch  # noqa: F401  # 注册 取下一单、输入当前UID
 from arena_pipeline import ArenaPipelineAction, ArenaPipelineRecognition
 from chip_pipeline import ChipPipelineAction, ChipPipelineRecognition
+from daily_chip_rewards import DailyChipRewardAction, DailyChipRewardRecognition
 from activity_pipeline import ActivityPipelineAction, ActivityPipelineRecognition
 from shutdown_mumu import ShutdownMumuAction
 from jdc_select_character import JdcSelectCharacter
@@ -36,6 +37,8 @@ AgentServer.custom_action("arena_atomic")(ArenaPipelineAction)
 AgentServer.custom_recognition("arena_state")(ArenaPipelineRecognition)
 AgentServer.custom_action("chip_atomic")(ChipPipelineAction)
 AgentServer.custom_recognition("chip_state")(ChipPipelineRecognition)
+AgentServer.custom_action("daily_chip_reward")(DailyChipRewardAction)
+AgentServer.custom_recognition("daily_chip_reward_state")(DailyChipRewardRecognition)
 AgentServer.custom_action("activity_atomic")(ActivityPipelineAction)
 AgentServer.custom_recognition("activity_state")(ActivityPipelineRecognition)
 AgentServer.custom_action("shutdown_mumu")(ShutdownMumuAction)

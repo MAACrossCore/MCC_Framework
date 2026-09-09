@@ -1112,7 +1112,7 @@ index fb1f3df..407e0c5 100644
      }
  
 +    private static bool UsesChipFilterPlan(DragItemViewModel dragItem) =>
-+        dragItem.InterfaceItem?.Entry is "ChipDetailReadTask";
++        dragItem.InterfaceItem?.Entry is "ChipDetailReadTask" or "出击任务列表";
 +
 +    private void ChipFilterPlanButton_OnClick(object? sender, RoutedEventArgs e) =>
 +        OpenChipFilterPlanWindow();
