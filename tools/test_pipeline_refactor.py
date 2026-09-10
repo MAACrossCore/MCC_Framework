@@ -23,34 +23,93 @@ def referenced_nodes(data):
     for node in data.values():
         if not isinstance(node, dict):
             continue
-        values = node.get("next", [])
-        if isinstance(values, str):
-            values = [values]
-        yield from values
+        yield from next_list(node)
+
+
+def next_list(node):
+    """`next` 既可以是字符串，也可以是列表。"""
+    values = node.get("next")
+    if values is None:
+        return []
+    return [values] if isinstance(values, str) else list(values)
+
+
+def custom_action_name(node):
+    """取出 Custom 动作名。
+
+    兼容 MaaFW 的两种写法：扁平式 `"action": "Custom"` + `custom_action`，
+    以及对象式 `"action": {"type": "Custom", "param": {...}}`。
+    """
+    action = node.get("action")
+    if isinstance(action, dict):
+        return (action.get("param") or {}).get("custom_action")
+    if action == "Custom":
+        return node.get("custom_action")
+    return None
+
+
+def custom_action_param(node):
+    """取出 Custom 动作的参数，兼容扁平式与对象式写法。"""
+    action = node.get("action")
+    if isinstance(action, dict):
+        return (action.get("param") or {}).get("custom_action_param")
+    return node.get("custom_action_param")
+
+
+def recognition_param(node, key):
+    """取出识别参数，兼容扁平式与对象式写法。"""
+    recognition = node.get("recognition")
+    if isinstance(recognition, dict):
+        return (recognition.get("param") or {}).get(key)
+    return node.get(key)
+
+
+def all_pipeline_nodes():
+    """MaaFramework 会把 pipeline 下所有 JSON 合并成一张全局节点表。
+
+    因此跨文件 `next` 是合法且项目通行的写法，引用检查必须针对合并后的表。
+    """
+    nodes = {}
+    for path in (ROOT / "assets" / "resource" / "pipeline").rglob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        for name in data:
+            if not name.startswith("$__"):
+                nodes.setdefault(name, path.name)
+    return nodes
 
 
 def test_runtime_entries_use_atomic_agents_not_legacy_whole_task_actions():
     arena = load_pipeline("模拟军演.json")
     chip = load_pipeline("chip.json")
-    assert arena["ArenaTask"]["custom_action"] == "arena_atomic"
-    assert chip["ChipDetailReadTask"]["custom_action"] == "chip_atomic"
+    assert custom_action_name(arena["ArenaTask"]) == "arena_atomic"
+    assert custom_action_name(chip["ChipDetailReadTask"]) == "chip_atomic"
     serialized = json.dumps({"arena": arena, "chip": chip}, ensure_ascii=False)
     assert '"arena_loop"' not in serialized
     assert '"chip_filter_flow"' not in serialized
 
 
-def test_every_local_pipeline_edge_has_a_node_and_mpe_layout():
+def test_every_pipeline_edge_has_a_node_and_mpe_layout():
+    nodes = all_pipeline_nodes()
     for filename in ("模拟军演.json", "chip.json"):
         data = load_pipeline(filename)
         for reference in referenced_nodes(data):
             if reference.startswith("["):
                 continue
-            assert reference in data, (filename, reference)
+            assert reference in nodes, (filename, reference)
         flow_nodes = [
             node for name, node in data.items()
             if not name.startswith("$__") and isinstance(node, dict)
         ]
-        assert all("$__mpe_code" in node for node in flow_nodes if "next" in node or "custom_action" in node)
+        assert all(
+            "$__mpe_code" in node
+            for node in flow_nodes
+            if "next" in node or custom_action_name(node)
+        )
 
 
 def test_chip_domain_has_no_warehouse_or_mfa_task_dependency():
@@ -88,8 +147,8 @@ def test_pipeline_exposes_required_control_flow_branches():
         "竞技场_决策完成刷新归零", "竞技场_结算奖励", "竞技场_结算失败",
         "竞技场_关闭结算失败", "竞技场_结算超时", "ArenaDefeat",
     ))
-    assert arena["ArenaDefeat"]["expected"] == ["战斗失败"]
-    assert arena["竞技场_结算失败"]["custom_action_param"] == {
+    assert recognition_param(arena["ArenaDefeat"], "expected") == ["战斗失败"]
+    assert custom_action_param(arena["竞技场_结算失败"]) == {
         "operation": "mark_result", "result": "failure",
     }
     arena_agent = (ROOT / "agent" / "arena_pipeline.py").read_text(encoding="utf-8-sig")
@@ -110,7 +169,7 @@ def test_weekly_and_arena_battle_loops_prioritize_skip_button():
     for node_name in ("活动探索_战斗中1", "活动探索_战斗中2", "活动探索_战斗中3"):
         assert weekly[node_name]["next"][0] == skip
         assert weekly[node_name]["next"][1] == skip_ocr
-    assert arena["竞技场_确认挑战"]["next"] == "竞技场_等待结算"
+    assert next_list(arena["竞技场_确认挑战"]) == ["竞技场_等待结算"]
     assert arena["竞技场_等待结算"]["next"][0] == skip
     assert arena["竞技场_等待结算"]["next"][1] == skip_ocr
     assert common["跳过首领演出动画"]["recognition"]["type"] == "TemplateMatch"
@@ -120,12 +179,12 @@ def test_weekly_and_arena_battle_loops_prioritize_skip_button():
         "threshold": 0.52,
     }
     assert common["跳过首领演出动画"]["action"]["type"] == "Click"
-    assert common["跳过首领演出动画_OCR"]["recognition"]["param"]["expected"] == "跳过"
+    assert recognition_param(common["跳过首领演出动画_OCR"], "expected") == "跳过"
 
     reward_limit = "[JumpBack]活动探索_奖励上限确认"
     assert weekly["活动探索_开始"]["next"][0] == reward_limit
     assert weekly["活动探索_第五关开始"]["next"][0] == reward_limit
-    assert weekly["活动探索_奖励上限确认"]["recognition"]["param"]["expected"] == [
+    assert recognition_param(weekly["活动探索_奖励上限确认"], "expected") == [
         "本周可领取的上限已满",
         "是否确认进入",
     ]

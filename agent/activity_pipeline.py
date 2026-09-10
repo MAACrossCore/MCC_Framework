@@ -58,6 +58,8 @@ ROI_LARGE_POTION_STOCK = [965, 330, 70, 65]
 COUNT_CLICK_DELAY = 0.6
 POTION_CLICK_DELAY = 0.6
 POTION_BATCH_LIMIT = 50
+# 目标超过这个值时，先按最大键到 50 再往回收，比从小累加少点很多次
+POTION_FAST_THRESHOLD = 25
 
 
 def _param(raw):
@@ -388,6 +390,13 @@ class ActivityPipelineAction(CustomAction):
                 if target == POTION_BATCH_LIMIT:
                     _click(context, *POTION_MAX_POINT)
                     time.sleep(POTION_CLICK_DELAY)
+                elif target > POTION_FAST_THRESHOLD:
+                    # 目标偏大：先取最大（一次到 50），再按减号退到目标
+                    _click(context, *POTION_MAX_POINT)
+                    time.sleep(POTION_CLICK_DELAY)
+                    for _ in range(POTION_BATCH_LIMIT - target):
+                        _click(context, *POTION_MINUS_POINT)
+                        time.sleep(POTION_CLICK_DELAY)
                 else:
                     _click(context, *POTION_MIN_POINT)
                     time.sleep(POTION_CLICK_DELAY)

@@ -42,16 +42,25 @@ def assert_pipeline_geometry_in_bounds(path):
     data = json.loads(Path(path).read_text(encoding="utf-8-sig"))
     width, height = PIPELINE_SIZE
     for kind, geometry in iter_pipeline_geometry(data):
+        # schema 允许 roi / target 写成 true 或引用其它节点名
+        if kind in ("roi", "target") and isinstance(geometry, (bool, str)):
+            continue
         assert isinstance(geometry, list), (kind, geometry)
         if kind in ("roi", "target"):
             assert len(geometry) == 4, (kind, geometry)
             x, y, box_width, box_height = geometry
             assert x >= 0 and y >= 0 and box_width >= 0 and box_height >= 0
             assert x + box_width <= width and y + box_height <= height, (kind, geometry)
-        else:
-            assert len(geometry) in (2, 4), (kind, geometry)
-            x, y = geometry[:2]
-            assert 0 <= x <= width and 0 <= y <= height, (kind, geometry)
+            continue
+        # begin / end 支持 list<...> 途径点写法（MaaFW v4.5.x），逐个分支校验
+        branches = geometry if geometry and isinstance(geometry[0], list) else [geometry]
+        for branch in branches:
+            if isinstance(branch, (bool, str)):
+                continue
+            assert isinstance(branch, list), (kind, branch)
+            assert len(branch) in (2, 4), (kind, branch)
+            x, y = branch[:2]
+            assert 0 <= x <= width and 0 <= y <= height, (kind, branch)
 
 
 def test_viewport_maps_reference_geometry_to_720p_and_1080p():
@@ -88,6 +97,34 @@ def test_creation_particle_pipeline_uses_maa_720p_coordinate_space():
     assert_pipeline_geometry_in_bounds(path)
 
 
+def recognition_type(node):
+    """识别类型，兼容扁平式与 `{"type", "param"}` 对象式写法。"""
+    recognition = node.get("recognition")
+    if isinstance(recognition, dict):
+        return recognition.get("type")
+    return recognition
+
+
+def recognition_param(node, key):
+    """识别参数，兼容扁平式与对象式写法。"""
+    recognition = node.get("recognition")
+    if isinstance(recognition, dict):
+        return (recognition.get("param") or {}).get(key)
+    return node.get(key)
+
+
+def action_param(node):
+    """动作参数，兼容扁平式与对象式写法。"""
+    action = node.get("action")
+    if isinstance(action, dict):
+        return dict(action.get("param") or {})
+    return {
+        key: node[key]
+        for key in ("target", "begin", "end")
+        if key in node
+    }
+
+
 def test_creation_particle_count_is_image_located_and_verified_as_three():
     path = ROOT / "assets" / "resource" / "pipeline" / "base" / "创生微粒刷取.json"
     data = json.loads(path.read_text(encoding="utf-8-sig"))
@@ -95,15 +132,16 @@ def test_creation_particle_count_is_image_located_and_verified_as_three():
     verify = data["创生微粒_确认次数为3"]
     increment = data["创生微粒_识别并点击加号"]
     assert calibrate["next"] == ["创生微粒_确认次数为3", "创生微粒_识别并点击加号"]
-    assert verify["recognition"] == "OCR"
-    assert verify["expected"] == ["^3$"]
-    assert verify["only_rec"] is True
+    assert recognition_type(verify) == "OCR"
+    assert recognition_param(verify, "expected") == ["^3$"]
+    assert recognition_param(verify, "only_rec") is True
     assert verify["next"] == ["开始战斗"]
-    assert increment["recognition"] == "TemplateMatch"
-    assert increment["template"] == "选择次数.png"
-    assert (ROOT / "assets" / "resource" / "image" / increment["template"]).is_file()
-    assert increment["roi"] == [503, 531, 84, 59]
-    assert "target" not in increment
+    assert recognition_type(increment) == "TemplateMatch"
+    template = recognition_param(increment, "template")
+    assert template == "选择次数.png"
+    assert (ROOT / "assets" / "resource" / "image" / template).is_file()
+    assert recognition_param(increment, "roi") == [503, 531, 84, 59]
+    assert "target" not in action_param(increment)
     assert increment["next"] == ["创生微粒_次数校准为3"]
 
 

@@ -1,0 +1,204 @@
+{
+    "$__mpe_config_每日探索-体力药": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "filename": "每日探索-体力药",
+            "version": "v1.9.2",
+            "savedViewport": { "x": 0, "y": 0, "zoom": 0.55 }
+        }
+    },
+    "每日探索_体力药准备": {
+        "enabled": true,
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "daily_stamina",
+        "custom_action_param": { "operation": "prepare" },
+        "pre_wait_freezes": { "time": 800, "threshold": 0.95 },
+        "next": ["每日探索_计划结束收尾", "每日探索_待使用体力药", "扫荡"],
+        "on_error": ["出击任务列表"],
+        "$__mpe_code": { "position": { "x": 100, "y": 100 } }
+    },
+    "每日探索_计划结束收尾": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_stamina_state",
+        "custom_recognition_param": { "expected": "plan:finished" },
+        "action": "Custom",
+        "custom_action": "daily_stamina",
+        "custom_action_param": { "operation": "finish" },
+        "next": ["出击任务列表"],
+        "$__mpe_code": { "position": { "x": 100, "y": -80 } }
+    },
+    "每日探索_待使用体力药": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_stamina_state",
+        "custom_recognition_param": { "expected": "potion:pending" },
+        "action": "DoNothing",
+        "next": ["每日探索_打开体力药"],
+        "$__mpe_code": { "position": { "x": 100, "y": -240 } }
+    },
+    "每日探索_无需补药": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["扫荡"],
+        "$__mpe_code": { "position": { "x": 100, "y": -400 } }
+    },
+    "每日探索_打开体力药": {
+        "recognition": "OCR",
+        "expected": ["\\d+/\\d+"],
+        "roi": [855, 25, 90, 35],
+        "threshold": 0.2,
+        "pre_wait_freezes": { "time": 800, "threshold": 0.95 },
+        "action": "Click",
+        "post_delay": 1200,
+        "next": ["每日探索_体力药列表"],
+        "$__mpe_code": { "position": { "x": 400, "y": 100 } }
+    },
+    "每日探索_体力药列表": {
+        "recognition": "OCR",
+        "expected": ["燃料补给", "使用后恢复10燃料", "使用后恢复120燃料"],
+        "roi": [180, 90, 870, 500],
+        "threshold": 0.2,
+        "pre_wait_freezes": { "time": 800, "threshold": 0.95 },
+        "action": "DoNothing",
+        "next": ["每日探索_点击小药使用", "每日探索_点击大药使用"],
+        "$__mpe_code": { "position": { "x": 700, "y": 100 } }
+    },
+    "每日探索_点击小药使用": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_stamina_state",
+        "custom_recognition_param": { "expected": "potion:small" },
+        "action": "Click",
+        "target": [738, 532, 4, 4],
+        "post_delay": 1000,
+        "next": ["每日探索_体力药使用结果", "每日探索_体力药数量页"],
+        "$__mpe_code": { "position": { "x": 1050, "y": 0 } }
+    },
+    "每日探索_点击大药使用": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_stamina_state",
+        "custom_recognition_param": { "expected": "potion:large" },
+        "action": "Click",
+        "target": [951, 532, 4, 4],
+        "post_delay": 1000,
+        "next": ["每日探索_体力药使用结果", "每日探索_体力药数量页"],
+        "$__mpe_code": { "position": { "x": 1050, "y": 200 } }
+    },
+    "每日探索_体力药数量页": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_stamina_state",
+        "custom_recognition_param": { "expected": "potion:quantity_page" },
+        "action": "Custom",
+        "custom_action": "daily_stamina",
+        "custom_action_param": { "operation": "set_potion_use_count" },
+        "next": ["每日探索_确认使用体力药"],
+        "$__mpe_code": { "position": { "x": 1500, "y": 200 } }
+    },
+    "每日探索_确认使用体力药": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [800, 480, 4, 4],
+        "post_delay": 1200,
+        "next": ["每日探索_体力药使用结果", "每日探索_点外边缘_一下"],
+        "$__mpe_code": { "position": { "x": 1800, "y": 200 } }
+    },
+    "每日探索_体力药使用结果": {
+        "recognition": "OCR",
+        "expected": "点击空白处继续",
+        "roi": [420, 400, 450, 200],
+        "threshold": 0.2,
+        "action": "Click",
+        "target": [760, 460, 4, 4],
+        "post_delay": 1200,
+        "next": ["每日探索_点外边缘_一下"],
+        "$__mpe_code": { "position": { "x": 1800, "y": 0 } }
+    },
+    "每日探索_点外边缘_一下": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [1120, 360, 4, 4],
+        "post_delay": 900,
+        "next": ["每日探索_点外边缘_两下"],
+        "$__mpe_code": { "position": { "x": 2050, "y": 60 } }
+    },
+    "每日探索_点外边缘_两下": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [1120, 360, 4, 4],
+        "post_delay": 900,
+        "next": ["每日探索_点外边缘_三下"],
+        "$__mpe_code": { "position": { "x": 2300, "y": 60 } }
+    },
+    "每日探索_点外边缘_三下": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [1120, 360, 4, 4],
+        "post_delay": 900,
+        "next": ["每日探索_已回到关卡页", "每日探索_点外边缘_继续"],
+        "$__mpe_code": { "position": { "x": 2450, "y": 60 } }
+    },
+    "每日探索_点外边缘_继续": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [1120, 360, 4, 4],
+        "post_delay": 900,
+        "next": ["每日探索_已回到关卡页", "每日探索_点外边缘_继续"],
+        "timeout": 6000,
+        "on_error": ["出击任务列表"],
+        "$__mpe_code": { "position": { "x": 2650, "y": 60 } }
+    },
+    "每日探索_已回到关卡页": {
+        "recognition": "OCR",
+        "expected": ["开始战斗", "扫荡"],
+        "roi": [840, 580, 420, 55],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": ["扫荡"],
+        "on_error": ["出击任务列表"],
+        "$__mpe_code": { "position": { "x": 2550, "y": 60 } }
+    },
+    "每日探索_扫荡弹窗已打开": {
+        "recognition": "OCR",
+        "expected": ["现在", "扫荡后"],
+        "roi": [580, 470, 270, 150],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "pre_wait_freezes": { "time": 1000, "threshold": 0.95 },
+        "next": ["每日探索_按体力计算次数", "每日探索_按次数扫荡"],
+        "$__mpe_code": { "position": { "x": 1900, "y": 100 } }
+    },
+    "每日探索_按体力计算次数": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "daily_stamina",
+        "custom_action_param": { "operation": "set_sweep_count_by_stamina" },
+        "post_delay": 900,
+        "next": ["开始战斗"],
+        "$__mpe_code": { "position": { "x": 2150, "y": 100 } }
+    },
+    "每日探索_按次数扫荡": {
+        "enabled": false,
+        "recognition": "Custom",
+        "custom_recognition": "daily_stamina_state",
+        "custom_recognition_param": { "expected": "batch:pending" },
+        "action": "Custom",
+        "custom_action": "daily_stamina",
+        "custom_action_param": { "operation": "set_sweep_count" },
+        "post_delay": 900,
+        "next": ["开始战斗"],
+        "$__mpe_code": { "position": { "x": 2400, "y": 100 } }
+    },
+    "每日探索_下一批": {
+        "enabled": false,
+        "recognition": "Custom",
+        "custom_recognition": "daily_stamina_state",
+        "custom_recognition_param": { "expected": "batch:next" },
+        "action": "Custom",
+        "custom_action": "daily_stamina",
+        "custom_action_param": { "operation": "advance_batch" },
+        "post_delay": 800,
+        "next": ["每日探索_按次数扫荡"],
+        "on_error": ["通用-返回主页"],
+        "$__mpe_code": { "position": { "x": 2700, "y": 100 } }
+    }
+}

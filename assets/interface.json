@@ -66,7 +66,7 @@
             "entry": "出击任务列表",
             "option": [
                 "关卡选择",
-                "是否手动选择次数(开启燃料使用)",
+                "体力消耗方式",
                 "每日探索掉落加成"
             ]
         },
@@ -1498,41 +1498,150 @@
             ],
             "type": "select"
         },
-        "是否手动选择次数(开启燃料使用)": {
+        "体力消耗方式": {
+            "type": "select",
+            "label": "体力消耗方式",
+            "default_case": "消耗完体力",
             "cases": [
                 {
-                    "name": "No",
+                    "name": "消耗完体力",
                     "pipeline_override": {
                         "扫荡次数选择": {
+                            "enabled": true
+                        },
+                        "每日探索_按体力计算次数": {
                             "enabled": true
                         },
                         "自选扫荡次数": {
                             "enabled": false
                         },
-                        "使用燃料界面": {
+                        "每日探索_按次数扫荡": {
+                            "enabled": false
+                        }
+                    },
+                    "option": [
+                        "每日探索_使用体力药-消耗完"
+                    ]
+                },
+                {
+                    "name": "指定次数",
+                    "pipeline_override": {
+                        "扫荡次数选择": {
+                            "enabled": false
+                        },
+                        "自选扫荡次数": {
+                            "enabled": false
+                        },
+                        "每日探索_扫荡弹窗已打开": {
+                            "enabled": false
+                        },
+                        "每日探索_按次数扫荡": {
+                            "enabled": true
+                        },
+                        "每日探索_下一批": {
+                            "enabled": true
+                        }
+                    },
+                    "option": [
+                        "每日探索_自定次数",
+                        "每日探索_使用体力药-自定"
+                    ]
+                }
+            ]
+        },
+        "每日探索_自定次数": {
+            "type": "input",
+            "label": "指定扫荡次数",
+            "inputs": [
+                {
+                    "name": "扫荡次数",
+                    "label": "扫荡次数",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入大于或等于 1 的整数"
+                }
+            ]
+        },
+        "每日探索_使用体力药-消耗完": {
+            "type": "select",
+            "label": "体力药",
+            "default_case": "不使用",
+            "cases": [
+                {
+                    "name": "不使用",
+                    "pipeline_override": {
+                        "每日探索_体力药准备": {
                             "enabled": true
                         }
                     }
                 },
                 {
-                    "name": "Yes",
+                    "name": "使用",
                     "pipeline_override": {
-                        "扫荡次数选择": {
-                            "enabled": false
-                        },
-                        "自选扫荡次数": {
-                            "enabled": true
-                        },
-                        "使用燃料界面": {
+                        "每日探索_体力药准备": {
                             "enabled": true
                         }
                     },
                     "option": [
-                        "手动次数"
+                        "每日探索_体力药类型",
+                        "每日探索_体力药数量"
                     ]
                 }
-            ],
-            "type": "switch"
+            ]
+        },
+        "每日探索_使用体力药-自定": {
+            "type": "select",
+            "label": "体力药",
+            "default_case": "不使用",
+            "cases": [
+                {
+                    "name": "不使用",
+                    "pipeline_override": {
+                        "每日探索_体力药准备": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "使用",
+                    "pipeline_override": {
+                        "每日探索_体力药准备": {
+                            "enabled": true
+                        }
+                    },
+                    "option": [
+                        "每日探索_体力药类型"
+                    ]
+                }
+            ]
+        },
+        "每日探索_体力药类型": {
+            "type": "select",
+            "label": "体力药类型",
+            "default_case": "小药",
+            "cases": [
+                {
+                    "name": "小药"
+                },
+                {
+                    "name": "大药"
+                }
+            ]
+        },
+        "每日探索_体力药数量": {
+            "type": "input",
+            "label": "体力药数量",
+            "inputs": [
+                {
+                    "name": "体力药数量",
+                    "label": "数量",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入大于或等于 1 的整数"
+                }
+            ]
         },
         "周本关卡选择": {
             "cases": [
