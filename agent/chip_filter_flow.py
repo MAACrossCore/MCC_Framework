@@ -107,6 +107,28 @@ def parse_decompose_selected_count(text):
     return int(match.group(1)) if match else None
 
 
+def parse_detail_level_cluster(texts):
+    """Parse one visual level row, including the game's narrow level-1 glyph.
+
+    On the chip detail card PaddleOCR can split ``等级. 1`` into ``等级.`` and
+    a tiny trailing glyph recognized as ``④`` or ``+``.  Levels 2/3 remain
+    readable as digits.  Only infer level 1 when both pieces exist in the same
+    horizontal row, so an incomplete bare label cannot drive a lock decision.
+    """
+    values = [str(text or "") for text in texts]
+    for text in values:
+        level = parse_level(text)
+        if level is not None:
+            return level
+    normalized = [normalize_ocr(text) for text in values]
+    has_label = any(text == "等级" for text in normalized)
+    has_narrow_one = any(
+        text.strip() in {"④", "+", "|", "丨", "I", "l"}
+        for text in values
+    )
+    return 1 if has_label and has_narrow_one else None
+
+
 def quality_option_is_selected(image, point):
     """Read the yellow selected frame without depending on RGB/BGR channel order."""
     x, y, width, height = scale_roi(
@@ -681,11 +703,25 @@ class ChipFilterFlow(CustomAction):
                 choice = next((value for value in ALL_SKILLS if value in text), None)
                 if choice:
                     names.append((self._result_y(item), choice))
-            levels = []
+            level_clusters = []
             for item in (getattr(level_detail, "all_results", None) or []):
-                level = parse_level(getattr(item, "text", ""))
+                y = self._result_y(item)
+                text = str(getattr(item, "text", ""))
+                cluster = next(
+                    (value for value in level_clusters if abs(y - value["y"]) <= 12),
+                    None,
+                )
+                if cluster is None:
+                    cluster = {"y": y, "ys": [], "texts": []}
+                    level_clusters.append(cluster)
+                cluster["ys"].append(y)
+                cluster["texts"].append(text)
+                cluster["y"] = round(sum(cluster["ys"]) / len(cluster["ys"]))
+            levels = []
+            for cluster in level_clusters:
+                level = parse_detail_level_cluster(cluster["texts"])
                 if level is not None:
-                    levels.append((self._result_y(item), level))
+                    levels.append((cluster["y"], level))
             names.sort()
             levels.sort()
             rows = []

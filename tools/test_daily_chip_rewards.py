@@ -146,6 +146,21 @@ def test_matching_settlement_chip_is_locked_once_then_verified_read_only():
     assert summary["locked"] == 1
 
 
+def test_matching_level_three_settlement_chip_keeps_game_default_lock():
+    plan = json.loads((ROOT / "assets" / "default" / "chip_filter_plan.json").read_text(
+        encoding="utf-8-sig"
+    ))
+    flow = _FakeSettlementFlow(_detail(3, (("命中", 1), ("耐久", 1), ("攻击", 1))))
+    summary, results = _settlement_summary(), []
+    flow._process_slot(None, {"index": 1, "point": (1250, 200)}, plan, results, summary)
+    assert flow.lock_reads == 0
+    assert not any("上锁" in label for label in flow.click_labels)
+    assert results[0]["matches_plan"] is True
+    assert results[0]["auto_locked_by_game"] is True
+    assert results[0]["operation"] == "leave_untouched"
+    assert summary["unchanged"] == 1
+
+
 def _ocr_item(text, y, height=24):
     return SimpleNamespace(text=text, box=(610, y, 45, height))
 

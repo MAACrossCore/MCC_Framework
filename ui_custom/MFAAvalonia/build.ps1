@@ -23,6 +23,7 @@ $patches = @(
     @{ File = 'laa-chip-filter-total-level.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'MinimumTotalLevel' },
     @{ File = 'laa-chip-task-checkbox.patch'; MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'UseChipTaskCheckBox' },
     @{ File = 'laa-daily-chip-stage-schedule.patch'; MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'DailyChipStageSchedule' },
+    @{ File = 'laa-limited-trade-chip-options.patch'; MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'IsLimitedTradeChipTypeOption' },
     @{ File = 'laa-pretask-path-resolution.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'localPythonCandidates' },
     @{ File = 'laa-pretask-config-sync.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'MFA_INSTANCE_CONFIG_PATH' },
     @{ File = 'laa-stop-on-task-failure.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'ContinueOnError = false' },

@@ -365,7 +365,14 @@ class DailyChipRewardFlow(ChipFilterFlow):
             return
 
         decision = evaluate_chip(detail, plan)
-        should_lock = bool(decision["desired_locked"])
+        matches_plan = bool(decision["desired_locked"])
+        main_level = int(detail["main_skill"]["level"])
+        # The game automatically locks settlement chips whose main skill is
+        # level 3.  Clicking the toggle here would therefore unlock them.
+        # This exception is intentionally local to daily-explore settlement
+        # rewards; warehouse/base filtering keeps its existing semantics.
+        auto_locked_by_game = main_level == 3
+        should_lock = matches_plan and not auto_locked_by_game
         lock_toggle_point = detail.pop("_lock_toggle_point")
         verified = True
         changed = False
@@ -403,6 +410,8 @@ class DailyChipRewardFlow(ChipFilterFlow):
             "initial_state_checked": False,
             "locked_before": False,
             "desired_locked": should_lock,
+            "matches_plan": matches_plan,
+            "auto_locked_by_game": auto_locked_by_game,
             "changed": changed,
             "change_needed": should_lock,
             "verified": verified,
@@ -419,7 +428,7 @@ class DailyChipRewardFlow(ChipFilterFlow):
             slot["index"], detail["main_skill"]["name"], detail["main_skill"]["level"],
             "、".join("%s%d" % (item["name"], item["level"])
                       for item in detail["sub_skills"]),
-            "符合" if should_lock else "不符合",
+            "符合但游戏已自动上锁" if matches_plan and auto_locked_by_game else "符合" if should_lock else "不符合",
             "预览上锁" if should_lock and dry_run else "点击一次上锁" if changed else "不点击",
             "已锁定" if verified and changed else "无需锁定" if not should_lock else "未通过",
             detail["elapsed_ms"],

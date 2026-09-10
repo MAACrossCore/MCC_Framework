@@ -20,6 +20,7 @@ from chip_filter_flow import (  # noqa: E402
     MAIN_SKILLS,
     SUB_SKILLS,
     VISIBLE_SLOTS,
+    parse_detail_level_cluster,
     parse_decompose_selected_count,
     quality_option_is_selected,
 )
@@ -94,6 +95,13 @@ def test_level_parser_and_recorded_lock_point():
     assert parse_level("3") == 3
     assert parse_level("等级 15") is None
     assert DETAIL_LOCK_TOGGLE == (1207, 196)
+
+
+def test_detail_level_cluster_handles_real_level_one_ocr_split():
+    assert parse_detail_level_cluster(["等级.", "④"]) == 1
+    assert parse_detail_level_cluster(["等级.", "+"]) == 1
+    assert parse_detail_level_cluster(["等级。2", "④"]) == 2
+    assert parse_detail_level_cluster(["等级."]) is None
 
 
 def test_saved_plan_match_logic():
