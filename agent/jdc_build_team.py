@@ -311,18 +311,14 @@ def build_final_team(
     size=5
 ):
 
-    if len(
-        owned
-    ) <= size:
+    if len(owned) < size:
 
         print(
-            "[角斗场] 可用角色数量不超过5，"
-            "直接使用全部角色"
+            "[角斗场] 可用角色不足5人："
+            f"{len(owned)}"
         )
 
-        return list(
-            owned
-        )
+        return None
 
     combinations = list(
         itertools.combinations(
@@ -337,12 +333,40 @@ def build_final_team(
     )
 
     ranked = []
+    unplaceable = []
 
     for combo in combinations:
 
         team = list(
             combo
         )
+
+        # ----------------------------------------------------
+        # 先判断这5个人能不能在3x3里合法摆下。
+        # 不能摆的组合直接淘汰，避免最后选出高分但无法编队的队伍。
+        # ----------------------------------------------------
+        placement = build_placement(
+            team
+        )
+
+        if placement is None:
+
+            names = [
+                c["name"]
+                for c in team
+            ]
+
+            unplaceable.append(
+                names
+            )
+
+            print(
+                "[角斗场] 组合无法合法摆位，跳过："
+                +
+                str(names)
+            )
+
+            continue
 
         score, detail, avoid_reasons = (
             team_total_score(
@@ -356,27 +380,48 @@ def build_final_team(
                 score,
                 team,
                 detail,
-                avoid_reasons
+                avoid_reasons,
+                placement
             )
         )
+
+    if not ranked:
+
+        print(
+            "[角斗场] 所有5人组合都无法合法摆位"
+        )
+
+        if unplaceable:
+
+            print(
+                "[角斗场] 无法摆位组合数量："
+                f"{len(unplaceable)}"
+            )
+
+        return None
 
     ranked.sort(
         key=lambda item: -item[0]
     )
 
-    best_score, best_team, best_detail, best_avoid = (
-        ranked[0]
-    )
+    (
+        best_score,
+        best_team,
+        best_detail,
+        best_avoid,
+        best_placement
+    ) = ranked[0]
 
     print(
-        "[角斗场] 组合评分TOP5："
+        "[角斗场] 可摆位组合评分TOP5："
     )
 
     for (
         score,
         team,
         detail,
-        avoid_reasons
+        avoid_reasons,
+        placement
     ) in ranked[:5]:
 
         names = [
@@ -394,7 +439,8 @@ def build_final_team(
         line = (
             f"  {score:.2f} "
             f"{names} "
-            f"[{metrics}]"
+            f"[{metrics}] "
+            f"摆位分={placement['score']:.2f}"
         )
 
         if avoid_reasons:
@@ -412,7 +458,7 @@ def build_final_team(
         )
 
     print(
-        "[角斗场] 最优5人组合："
+        "[角斗场] 最优可摆位5人组合："
         +
         str(
             [
@@ -1229,7 +1275,10 @@ class JdcBuildTeam(
                 )
             )
 
-            owned = []
+            # 当前画面通常只显示前6个角色。
+            # 第7/8个角色可能初始看不到，所以不能只用 visible
+            # 作为最终配队候选池。
+            visible_owned = []
 
             for name in visible:
 
@@ -1239,9 +1288,31 @@ class JdcBuildTeam(
 
                 if c is not None:
 
-                    owned.append(
+                    visible_owned.append(
                         c
                     )
+
+            # 先把当前可见角色同步进完整已获得角色池。
+            sync_owned_characters(
+                visible_owned
+            )
+
+            # 最终配队使用完整 jdc_preliminary，
+            # 这样第7/8次获得的角色也会参与评分。
+            owned = list(
+                jdc.jdc_preliminary
+            )
+
+            print(
+                "[角斗场] 完整已获得角色池："
+                +
+                str(
+                    [
+                        c["name"]
+                        for c in owned
+                    ]
+                )
+            )
 
             if len(owned) < 5:
 
@@ -1251,11 +1322,6 @@ class JdcBuildTeam(
                 )
 
                 return False
-
-            # 同步6人给第7/8次选角
-            sync_owned_characters(
-                owned
-            )
 
             jdc.jdc_phase = (
                 jdc.JDC_PHASE_BUILD_TEAM
@@ -1273,6 +1339,14 @@ class JdcBuildTeam(
                     5
                 )
             )
+
+            if not final_team:
+
+                print(
+                    "[角斗场] 没有找到可合法摆位的5人组合"
+                )
+
+                return False
 
             jdc.jdc_final_team = list(
                 final_team
@@ -1328,6 +1402,12 @@ class JdcBuildTeam(
             )
 
             if placement is None:
+
+                print(
+                    "[角斗场] 异常：已筛选为可摆位组合，"
+                    "但再次计算摆位失败"
+                )
+
                 return False
 
             centers = (
@@ -1396,11 +1476,15 @@ class JdcBuildTeam(
 
                 failed = False
 
-                for c in final_team:
+                # 初始只显示前6个角色，第7/8个可能被挡在后面。
+                # 每拖走一个角色，右侧列表会补位，所以这里动态挑选
+                # “当前可见且尚未上阵”的目标角色，而不是死按固定顺序。
+                pending = {
+                    c["name"]
+                    for c in final_team
+                }
 
-                    name = c[
-                        "name"
-                    ]
+                while pending:
 
                     visible = (
                         scan_character_list(
@@ -1412,16 +1496,42 @@ class JdcBuildTeam(
                         )
                     )
 
-                    if name not in visible:
+                    chosen = None
+
+                    for c in final_team:
+
+                        name = c[
+                            "name"
+                        ]
+
+                        if (
+                            name in pending
+                            and
+                            name in visible
+                        ):
+
+                            chosen = c
+                            break
+
+                    if chosen is None:
 
                         print(
-                            "[角斗场] "
-                            f"找不到：{name}"
+                            "[角斗场] 当前可见角色中"
+                            "找不到任何待上阵角色："
+                            +
+                            str(
+                                sorted(
+                                    pending
+                                )
+                            )
                         )
 
                         failed = True
-
                         break
+
+                    name = chosen[
+                        "name"
+                    ]
 
                     sx, sy = (
                         visible[
@@ -1452,6 +1562,10 @@ class JdcBuildTeam(
                         ty,
                         swipe_duration
                     ).wait()
+
+                    pending.remove(
+                        name
+                    )
 
                     time.sleep(
                         delay

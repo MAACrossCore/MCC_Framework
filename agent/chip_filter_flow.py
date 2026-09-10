@@ -107,6 +107,28 @@ def parse_decompose_selected_count(text):
     return int(match.group(1)) if match else None
 
 
+def parse_detail_level_cluster(texts):
+    """Parse one visual level row, including the game's narrow level-1 glyph.
+
+    On the chip detail card PaddleOCR can split ``等级. 1`` into ``等级.`` and
+    a tiny trailing glyph recognized as ``④`` or ``+``.  Levels 2/3 remain
+    readable as digits.  Only infer level 1 when both pieces exist in the same
+    horizontal row, so an incomplete bare label cannot drive a lock decision.
+    """
+    values = [str(text or "") for text in texts]
+    for text in values:
+        level = parse_level(text)
+        if level is not None:
+            return level
+    normalized = [normalize_ocr(text) for text in values]
+    has_label = any(text == "等级" for text in normalized)
+    has_narrow_one = any(
+        text.strip() in {"④", "+", "|", "丨", "I", "l"}
+        for text in values
+    )
+    return 1 if has_label and has_narrow_one else None
+
+
 def quality_option_is_selected(image, point):
     """Read the yellow selected frame without depending on RGB/BGR channel order."""
     x, y, width, height = scale_roi(
@@ -140,6 +162,14 @@ def instance_config_path():
 
 class ChipFilterFlow(CustomAction):
     """Apply the saved filter plan to every chip currently stored in the warehouse."""
+
+    detail_name_rois = DETAIL_NAME_ROIS
+    detail_level_rois = DETAIL_LEVEL_ROIS
+    detail_names_roi = DETAIL_NAMES_ROI
+    detail_levels_roi = DETAIL_LEVELS_ROI
+    detail_lock_y_offset = 166
+    detail_lock_y_min = 150
+    detail_lock_y_max = 215
 
     @staticmethod
     def _sleep(context, seconds):
@@ -630,10 +660,14 @@ class ChipFilterFlow(CustomAction):
             return False
         return None
 
+    def _read_lock_state(self, context, point):
+        """Screen adapter hook; warehouse keeps its recorded visual heuristic."""
+        return self._read_detail_lock_visual(self._shot(context), point)
+
     def _read_skill_name(self, context, image, row):
         choices = MAIN_SKILLS if row == 0 else SUB_SKILLS
         texts = self._ocr_results(
-            context, image, "ChipSkillName", DETAIL_NAME_ROIS[row], choices
+            context, image, "ChipSkillName", self.detail_name_rois[row], choices
         )
         normalized = [normalize_ocr(text) for text in texts]
         for choice in choices:
@@ -643,7 +677,7 @@ class ChipFilterFlow(CustomAction):
 
     def _read_skill_level(self, context, image, row):
         texts = self._ocr_results(
-            context, image, "ChipSkillLevel", DETAIL_LEVEL_ROIS[row]
+            context, image, "ChipSkillLevel", self.detail_level_rois[row]
         )
         for text in texts:
             level = parse_level(text)
@@ -656,10 +690,10 @@ class ChipFilterFlow(CustomAction):
         for _ in range(7):
             image = self._shot(context)
             name_detail = self._ocr_detail(
-                context, image, "ChipSkillName", DETAIL_NAMES_ROI, ALL_SKILLS
+                context, image, "ChipSkillName", self.detail_names_roi, ALL_SKILLS
             )
             level_detail = self._ocr_detail(
-                context, image, "ChipSkillLevel", DETAIL_LEVELS_ROI
+                context, image, "ChipSkillLevel", self.detail_levels_roi
             )
             names = []
             for item in (getattr(name_detail, "all_results", None) or []):
@@ -669,11 +703,25 @@ class ChipFilterFlow(CustomAction):
                 choice = next((value for value in ALL_SKILLS if value in text), None)
                 if choice:
                     names.append((self._result_y(item), choice))
-            levels = []
+            level_clusters = []
             for item in (getattr(level_detail, "all_results", None) or []):
-                level = parse_level(getattr(item, "text", ""))
+                y = self._result_y(item)
+                text = str(getattr(item, "text", ""))
+                cluster = next(
+                    (value for value in level_clusters if abs(y - value["y"]) <= 12),
+                    None,
+                )
+                if cluster is None:
+                    cluster = {"y": y, "ys": [], "texts": []}
+                    level_clusters.append(cluster)
+                cluster["ys"].append(y)
+                cluster["texts"].append(text)
+                cluster["y"] = round(sum(cluster["ys"]) / len(cluster["ys"]))
+            levels = []
+            for cluster in level_clusters:
+                level = parse_detail_level_cluster(cluster["texts"])
                 if level is not None:
-                    levels.append((self._result_y(item), level))
+                    levels.append((cluster["y"], level))
             names.sort()
             levels.sort()
             rows = []
@@ -685,7 +733,10 @@ class ChipFilterFlow(CustomAction):
                 first_name_y = round(names[0][0] * REFERENCE_SIZE[1] / image_height)
                 detail["_lock_toggle_point"] = (
                     DETAIL_LOCK_TOGGLE[0],
-                    max(150, min(215, first_name_y - 166)),
+                    max(
+                        self.detail_lock_y_min,
+                        min(self.detail_lock_y_max, first_name_y - self.detail_lock_y_offset),
+                    ),
                 )
                 readings.append(detail)
                 if has_stable_detail(readings):
@@ -737,9 +788,7 @@ class ChipFilterFlow(CustomAction):
 
         desired_locked = evaluate_chip(detail, plan)["desired_locked"]
         lock_toggle_point = detail["_lock_toggle_point"]
-        locked_before = self._read_detail_lock_visual(
-            self._shot(context), lock_toggle_point
-        )
+        locked_before = self._read_lock_state(context, lock_toggle_point)
         if locked_before is None:
             log.warning("芯片%d详情锁形状无法可靠确认，已跳过且不会点击", slot["index"])
             summary["lock_state_failed"] += 1
@@ -783,9 +832,7 @@ class ChipFilterFlow(CustomAction):
             action = "上锁" if desired_locked else "取消上锁"
             self._click(context, lock_toggle_point, action)
             self._sleep(context, 0.7)
-            state_after = self._read_detail_lock_visual(
-                self._shot(context), lock_toggle_point
-            )
+            state_after = self._read_lock_state(context, lock_toggle_point)
             verified = state_after == desired_locked
         self._click(context, DETAIL_CLOSE_BLANK, "详情外空白处")
         self._sleep(context, 0.25)

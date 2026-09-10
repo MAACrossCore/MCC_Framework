@@ -58,7 +58,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "next": [
             "每日探索_层数选择"
         ],
@@ -87,7 +87,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "next": [
             "每日探索_层数选择"
         ],
@@ -116,7 +116,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "next_doc": "Set in code.",
         "$__mpe_code": {
             "position": {
@@ -163,7 +163,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "text_doc": "Set in code.",
         "next": [
             "每日探索_扫荡"
@@ -193,7 +193,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "next": [
             "[JumpBack]每日探索_扫荡双倍",
             "每日探索_扫荡奖励",
@@ -234,7 +234,7 @@
                 ]
             }
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "next": [
             "每日探索_开始战斗",
             "每日探索_扫荡"
@@ -264,7 +264,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "$__mpe_code": {
             "position": {
                 "x": 2802,
@@ -290,7 +290,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "next": [
             "[JumpBack]每日探索_升级",
             "每日探索_扫荡",
@@ -321,7 +321,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "next": [
             "每日探索_层数选择"
         ],
@@ -350,7 +350,7 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 2000,
+        "post_delay": 2600,
         "next": [
             "每日探索_层数选择"
         ],
@@ -662,6 +662,317 @@
             "position": {
                 "x": 1522,
                 "y": 12
+            }
+        }
+    },
+    "每日探索_芯片双倍记录": {
+        "recognition": "OCR",
+        "roi": [
+            280,
+            285,
+            720,
+            180
+        ],
+        "expected": [
+            "掉落加成",
+            "剩余"
+        ],
+        "threshold": 0.2,
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "record_double"
+        },
+        "post_delay": 1200,
+        "next": [
+            "每日探索_芯片仓库上限确认",
+            "每日探索_芯片结算确认"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3060,
+                "y": 1180
+            }
+        }
+    },
+    "每日探索_芯片结算确认": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "settlement"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    225,
+                    120,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 1800,
+        "next": "每日探索_芯片奖励初始化",
+        "$__mpe_code": {
+            "position": {
+                "x": 3270,
+                "y": 1320
+            }
+        }
+    },
+    "每日探索_芯片奖励初始化": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "init_rewards"
+        },
+        "pre_delay": 1500,
+        "next": "每日探索_芯片奖励分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3370,
+                "y": 1180
+            }
+        }
+    },
+    "每日探索_芯片仓库上限确认": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "capacity_overflow"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "handle_capacity_overflow"
+        },
+        "post_delay": 1200,
+        "next": "每日探索_芯片仓满处理分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3220,
+                "y": 980
+            }
+        }
+    },
+    "每日探索_芯片仓满处理分派": {
+        "next": [
+            "每日探索_芯片仓满允许清理",
+            "每日探索_芯片仓满取消结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3320,
+                "y": 980
+            }
+        }
+    },
+    "每日探索_芯片仓满允许清理": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:capacity_cleanup"
+        },
+        "action": "DoNothing",
+        "next": "每日探索_芯片仓满清理初始化",
+        "$__mpe_code": {
+            "position": {
+                "x": 3480,
+                "y": 880
+            }
+        }
+    },
+    "每日探索_芯片仓满取消结束": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:capacity_abort"
+        },
+        "action": "DoNothing",
+        "$__mpe_code": {
+            "position": {
+                "x": 3480,
+                "y": 1080
+            }
+        }
+    },
+    "每日探索_芯片仓满清理初始化": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "chip_atomic",
+        "custom_action_param": {
+            "operation": "init_capacity_cleanup"
+        },
+        "next": "芯片_阶段分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3420,
+                "y": 900
+            }
+        }
+    },
+    "每日探索_芯片仓满清理返回": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "return_after_capacity_cleanup"
+        },
+        "next": "开始战斗",
+        "$__mpe_code": {
+            "position": {
+                "x": 4720,
+                "y": 900
+            }
+        }
+    },
+    "每日探索_芯片仓满重试成功": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "capacity_retry_succeeded"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "clear_capacity_retry"
+        },
+        "next": [
+            "每日探索_芯片双倍记录",
+            "开启加成",
+            "每日探索_芯片结算确认"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4960,
+                "y": 900
+            }
+        }
+    },
+    "每日探索_芯片奖励分派": {
+        "next": [
+            "每日探索_芯片奖励处理一枚",
+            "每日探索_芯片奖励滚动",
+            "每日探索_芯片奖励完成",
+            "每日探索_芯片奖励失败"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3670,
+                "y": 1180
+            }
+        }
+    },
+    "每日探索_芯片奖励处理一枚": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:process"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "process_one"
+        },
+        "next": "每日探索_芯片奖励分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3980,
+                "y": 960
+            }
+        }
+    },
+    "每日探索_芯片奖励滚动": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:scroll"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "scroll_rows"
+        },
+        "next": "每日探索_芯片奖励分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3980,
+                "y": 1120
+            }
+        }
+    },
+    "每日探索_芯片奖励完成": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:done"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "finish"
+        },
+        "next": "扫荡成功-检查",
+        "$__mpe_code": {
+            "position": {
+                "x": 3980,
+                "y": 1280
+            }
+        }
+    },
+    "每日探索_芯片奖励失败": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:failed"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "finish"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3980,
+                "y": 1440
+            }
+        }
+    },
+    "DailyChipLockActionBadge": {
+        "recognition": "TemplateMatch",
+        "roi": [
+            760,
+            90,
+            90,
+            90
+        ],
+        "template": "chip_locked_badge.png",
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "$__mpe_code": {
+            "position": {
+                "x": 4300,
+                "y": 1180
+            }
+        }
+    },
+    "DailyChipUnlockActionBadge": {
+        "recognition": "TemplateMatch",
+        "roi": [
+            760,
+            90,
+            90,
+            90
+        ],
+        "template": "chip_unlock_action_badge.png",
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "$__mpe_code": {
+            "position": {
+                "x": 4300,
+                "y": 1340
             }
         }
     }

@@ -1,4 +1,419 @@
 {
+    "$__mpe_config_创生微粒刷取": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788875882498,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MAAlocalhost\\resource\\pipeline\\base\\创生微粒刷取.json",
+            "savedViewport": {
+                "x": -1191,
+                "y": 29,
+                "zoom": 0.8
+            },
+            "filename": "创生微粒刷取",
+            "version": "v1.9.3"
+        }
+    },
+    "创生微粒_任务完成": {
+        "focus": "创生微粒刷取完成",
+        "$__mpe_code": {
+            "position": {
+                "x": 2892,
+                "y": 819
+            }
+        }
+    },
+    "创生微粒_关卡01页面": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    830,
+                    70,
+                    420,
+                    310
+                ],
+                "expected": [
+                    "关卡 01",
+                    "推荐战力"
+                ]
+            }
+        },
+        "next": [
+            "创生微粒_票数为0结束",
+            "创生微粒_点击扫荡"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 750
+            }
+        }
+    },
+    "创生微粒_完成后返回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    180,
+                    10,
+                    100,
+                    70
+                ],
+                "template": [
+                    "StartUp/HomeButton.png",
+                    "StartUp/HomeButton1.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2500,
+        "next": [
+            "创生微粒_确认主界面基地"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2252,
+                "y": 735
+            }
+        }
+    },
+    "创生微粒_开始时路径外返回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    180,
+                    10,
+                    100,
+                    70
+                ],
+                "template": [
+                    "StartUp/HomeButton.png",
+                    "StartUp/HomeButton1.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2500,
+        "next": [
+            "创生微粒刷取"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1441
+            }
+        }
+    },
+    "创生微粒_次数弹窗接续": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    785,
+                    475,
+                    330,
+                    90
+                ],
+                "expected": "无限制次数"
+            }
+        },
+        "next": [
+            "创生微粒_次数校准为3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 503
+            }
+        }
+    },
+    "创生微粒_次数校准为3": {
+        "next": [
+            "创生微粒_确认次数为3",
+            "创生微粒_识别并点击加号"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2216,
+                "y": 240
+            }
+        }
+    },
+    "创生微粒_每日探索分类页": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    35,
+                    260,
+                    260,
+                    190
+                ],
+                "expected": "每日探索"
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    530,
+                    500,
+                    35,
+                    35
+                ],
+                "end": [
+                    [
+                        555,
+                        180,
+                        35,
+                        35
+                    ]
+                ],
+                "duration": 650
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "创生微粒_点击核心开发"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 988
+            }
+        }
+    },
+    "创生微粒_点击扫荡": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    850,
+                    565,
+                    100,
+                    100
+                ],
+                "expected": "扫荡"
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "创生微粒_次数校准为3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 408
+            }
+        }
+    },
+    "创生微粒_点击核心开发": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    250,
+                    390,
+                    520,
+                    260
+                ],
+                "expected": "核心开发"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": [
+            "创生微粒_选择超维跃升"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 802
+            }
+        }
+    },
+    "创生微粒_确认主界面基地": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    500,
+                    580,
+                    190,
+                    140
+                ],
+                "expected": "基地",
+                "threshold": 0.2
+            }
+        },
+        "next": [
+            "创生微粒_任务完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2572,
+                "y": 774
+            }
+        }
+    },
+    "创生微粒_确认次数为3": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    325,
+                    501,
+                    140,
+                    33
+                ],
+                "expected": [
+                    "^3$"
+                ],
+                "only_rec": true,
+                "threshold": 0.2
+            }
+        },
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2558,
+                "y": 378
+            }
+        }
+    },
+    "创生微粒_票数为0结束": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1070,
+                    535,
+                    200,
+                    80
+                ],
+                "expected": "票数数量：0",
+                "threshold": 0.2
+            }
+        },
+        "focus": "本周超维跃升门票已用完",
+        "next": [
+            "创生微粒_完成后返回主界面"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 753
+            }
+        }
+    },
+    "创生微粒_识别并点击加号": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "创生微粒_次数校准为3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2535,
+                "y": -42
+            }
+        }
+    },
+    "创生微粒_进入超维跃升关卡01": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    300,
+                    95,
+                    500,
+                    170
+                ],
+                "expected": [
+                    "可获得角色超维跃升",
+                    "超维跃升"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1045,
+                    280,
+                    30,
+                    35
+                ]
+            }
+        },
+        "post_delay": 1500,
+        "next": [
+            "创生微粒_关卡01页面"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 745
+            }
+        }
+    },
+    "创生微粒_选择超维跃升": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    90,
+                    410,
+                    180
+                ],
+                "expected": "超维跃升"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": [
+            "创生微粒_进入超维跃升关卡01"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 756
+            }
+        }
+    },
     "创生微粒刷取": {
         "next": [
             "创生微粒_次数弹窗接续",
@@ -11,164 +426,44 @@
             "创生微粒_每日探索分类页",
             "出击",
             "创生微粒_开始时路径外返回主界面"
-        ]
-    },
-    "创生微粒_开始时路径外返回主界面": {
-        "recognition": "TemplateMatch",
-        "template": [
-            "StartUp/HomeButton.png",
-            "StartUp/HomeButton1.png"
         ],
-        "roi": [180, 10, 100, 70],
-        "action": "Click",
-        "post_delay": 2500,
-        "next": [
-            "创生微粒刷取"
-        ]
+        "$__mpe_code": {
+            "position": {
+                "x": -109,
+                "y": 698
+            }
+        }
     },
-    "创生微粒_每日探索分类页": {
-        "recognition": "OCR",
-        "expected": "每日探索",
-        "roi": [35, 260, 260, 190],
-        "action": "Swipe",
-        "begin": [530, 500, 35, 35],
-        "end": [555, 180, 35, 35],
-        "duration": 650,
-        "post_delay": 1200,
-        "next": [
-            "创生微粒_点击核心开发"
-        ]
+    "$__mpe_external_开始战斗_创生微粒刷取": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2892,
+                "y": 529
+            }
+        }
     },
-    "创生微粒_点击核心开发": {
-        "recognition": "OCR",
-        "expected": "核心开发",
-        "roi": [250, 390, 520, 260],
-        "action": "Click",
-        "post_delay": 1500,
-        "next": [
-            "创生微粒_选择超维跃升"
-        ]
+    "$__mpe_external_扫荡成功_创生微粒刷取": {
+        "$__mpe_code": {
+            "position": {
+                "x": 340,
+                "y": 893
+            }
+        }
     },
-    "创生微粒_选择超维跃升": {
-        "recognition": "OCR",
-        "expected": "超维跃升",
-        "roi": [800, 90, 410, 180],
-        "action": "Click",
-        "post_delay": 1500,
-        "next": [
-            "创生微粒_进入超维跃升关卡01"
-        ]
+    "$__mpe_external_扫荡成功-检查_创生微粒刷取": {
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 767
+            }
+        }
     },
-    "创生微粒_进入超维跃升关卡01": {
-        "recognition": "OCR",
-        "expected": [
-            "可获得角色超维跃升",
-            "超维跃升"
-        ],
-        "roi": [300, 95, 500, 170],
-        "action": "Click",
-        "target": [1045, 280, 30, 35],
-        "post_delay": 1500,
-        "next": [
-            "创生微粒_关卡01页面"
-        ]
-    },
-    "创生微粒_关卡01页面": {
-        "recognition": "OCR",
-        "expected": [
-            "关卡 01",
-            "推荐战力"
-        ],
-        "roi": [830, 70, 420, 310],
-        "action": "DoNothing",
-        "next": [
-            "创生微粒_票数为0结束",
-            "创生微粒_点击扫荡"
-        ]
-    },
-    "创生微粒_票数为0结束": {
-        "recognition": "OCR",
-        "expected": "票数数量：0",
-        "roi": [1070, 535, 200, 80],
-        "threshold": 0.2,
-        "action": "DoNothing",
-        "focus": "本周超维跃升门票已用完",
-        "next": [
-            "创生微粒_完成后返回主界面"
-        ]
-    },
-    "创生微粒_点击扫荡": {
-        "recognition": "OCR",
-        "expected": "扫荡",
-        "roi": [850, 565, 100, 100],
-        "action": "Click",
-        "post_delay": 1000,
-        "next": [
-            "创生微粒_次数校准为3"
-        ]
-    },
-    "创生微粒_次数弹窗接续": {
-        "recognition": "OCR",
-        "expected": "无限制次数",
-        "roi": [785, 475, 330, 90],
-        "action": "DoNothing",
-        "next": [
-            "创生微粒_次数校准为3"
-        ]
-    },
-    "创生微粒_次数校准为3": {
-        "next": [
-            "创生微粒_确认次数为3",
-            "创生微粒_识别并点击加号"
-        ]
-    },
-    "创生微粒_确认次数为3": {
-        "recognition": "OCR",
-        "expected": [
-            "^3$"
-        ],
-        "only_rec": true,
-        "roi": [433, 506, 59, 24],
-        "threshold": 0.2,
-        "action": "DoNothing",
-        "next": [
-            "开始战斗"
-        ]
-    },
-    "创生微粒_识别并点击加号": {
-        "recognition": "TemplateMatch",
-        "template": "选择次数.png",
-        "roi": [503, 531, 84, 59],
-        "action": "Click",
-        "post_delay": 500,
-        "next": [
-            "创生微粒_次数校准为3"
-        ]
-    },
-    "创生微粒_完成后返回主界面": {
-        "recognition": "TemplateMatch",
-        "template": [
-            "StartUp/HomeButton.png",
-            "StartUp/HomeButton1.png"
-        ],
-        "roi": [180, 10, 100, 70],
-        "action": "Click",
-        "post_delay": 2500,
-        "next": [
-            "创生微粒_确认主界面基地"
-        ]
-    },
-    "创生微粒_确认主界面基地": {
-        "recognition": "OCR",
-        "expected": "基地",
-        "roi": [500, 580, 190, 140],
-        "threshold": 0.2,
-        "action": "DoNothing",
-        "next": [
-            "创生微粒_任务完成"
-        ]
-    },
-    "创生微粒_任务完成": {
-        "focus": "创生微粒刷取完成"
+    "$__mpe_external_出击_创生微粒刷取": {
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 645
+            }
+        }
     }
 }

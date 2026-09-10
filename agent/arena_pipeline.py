@@ -32,6 +32,11 @@ from viewport import scale_roi
 log = logging.getLogger("arena.pipeline")
 _SESSION = {}
 
+# 单场挑战从判定 challenge 起，到结算完成的最长等待（秒）
+BATTLE_SETTLE_TIMEOUT_SEC = 180
+# 整个竞技场 Pipeline 任务总时长上限（秒）
+PIPELINE_RUN_TIMEOUT_SEC = 1200
+
 
 def _param(raw):
     try:
@@ -75,7 +80,7 @@ class ArenaPipelineAction(CustomAction):
                     "completion_reason": None,
                     "victory_seen": False,
                     "reward_seen": False,
-                    "deadline": time.monotonic() + 1200,
+                    "deadline": time.monotonic() + PIPELINE_RUN_TIMEOUT_SEC,
                     "target_validated": False,
                     "confirm_attempts": 0,
                     "battle_deadline": None,
@@ -107,7 +112,9 @@ class ArenaPipelineAction(CustomAction):
             if operation == "evaluate":
                 if time.monotonic() >= _SESSION["deadline"]:
                     _SESSION["decision"] = "fail"
-                    _SESSION["fail_reason"] = "竞技场Pipeline运行超过20分钟"
+                    _SESSION["fail_reason"] = (
+                        f"竞技场Pipeline运行超过{PIPELINE_RUN_TIMEOUT_SEC // 60}分钟"
+                    )
                     return True
                 image = engine._shot(context)
                 if not engine._is_arena_list(context, image):
@@ -152,7 +159,9 @@ class ArenaPipelineAction(CustomAction):
                 })
                 if decision == ACTION_CHALLENGE:
                     _SESSION["confirm_attempts"] = 1
-                    _SESSION["battle_deadline"] = time.monotonic() + 70
+                    _SESSION["battle_deadline"] = (
+                        time.monotonic() + BATTLE_SETTLE_TIMEOUT_SEC
+                    )
                     _SESSION["pending_result"] = None
                     _SESSION["victory_seen"] = False
                     _SESSION["reward_seen"] = False
@@ -309,7 +318,9 @@ class ArenaPipelineRecognition(CustomRecognition):
         if expected == "page:battle_timeout":
             deadline = _SESSION.get("battle_deadline")
             if deadline is not None and time.monotonic() >= deadline:
-                _SESSION["fail_reason"] = "竞技场战斗或结算等待超过70秒"
+                _SESSION["fail_reason"] = (
+                    f"竞技场战斗或结算等待超过{BATTLE_SETTLE_TIMEOUT_SEC}秒"
+                )
                 _SESSION["decision"] = "fail"
                 return _hit({"timeout": True})
             return None

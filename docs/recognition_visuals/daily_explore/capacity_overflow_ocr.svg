@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <image href="capacity_and_count_source_1280x720.png" width="1280" height="720"/>
+  <rect x="240" y="167" width="800" height="400" fill="none" stroke="#ff9800" stroke-width="4"/>
+  <text x="246" y="160" fill="#ff9800" font-size="22" font-family="Microsoft YaHei">仓满弹窗 OCR 区域（1920基准：[360,250,1200,600]）</text>
+  <rect x="773" y="430" width="58" height="34" fill="none" stroke="#00e676" stroke-width="4"/>
+  <circle cx="802" cy="447" r="8" fill="none" stroke="#00e676" stroke-width="3"/>
+  <text x="840" y="452" fill="#00e676" font-size="20" font-family="Microsoft YaHei">OCR 实测“确定”框；每次点击前重新定位</text>
+</svg>
