@@ -1,5 +1,8 @@
 # MFAAvalonia UI patches — apply in this order (pin: commit 6065fe3 @ v2.15.2).
 # Single source of truth: build.ps1, apply-patches.sh, and install.yml read this file.
+#
+# IMPORTANT: patches must apply to clean upstream 6065fe3, then accumulate in this order.
+# Do not bump MFAA_VERSION unless every patch is regenerated against the new commit.
 laa-chip-filter.patch
 laa-chip-filter-total-level.patch
 # TaskOptionGenerator changes live in laa-limited-trade-chip-options.patch (apply before TaskQueueView checkbox UI).
@@ -15,5 +18,6 @@ laa-project-profiles-scheduler.patch
 laa-emulator-minimize-setting.patch
 laa-simplified-start-end-actions.patch
 laa-settings-runtime-fixes.patch
+# After emulator-minimize: Strings.resx has MinimizeEmulatorAfterLaunch between AutomaticMinimize and AutomaticUpdateMFA.
 laa-rebrand-mcc-text.patch
 laa-rebrand-mcc-logo.patch

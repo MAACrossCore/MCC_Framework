@@ -1,15 +1,23 @@
 diff --git a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs b/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
-index 2412f2f..8c23bc8 100644
 --- a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
 +++ b/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
-@@ -22,0 +23 @@ using Newtonsoft.Json.Linq;
+@@ -20,7 +20,9 @@
+ using MFAAvalonia.Views.Windows;
+ using Newtonsoft.Json;
+ using Newtonsoft.Json.Linq;
+ using SukiUI.Dialogs;
 +using SukiUI.Controls;
-@@ -23,0 +25 @@ using SukiUI.Dialogs;
 +using SukiUI.MessageBox;
-@@ -1110 +1112 @@ public partial class TaskQueueViewModel : ViewModelBase, IDisposable
+ using System;
+ using System.Buffers;
+ using System.Collections.Generic;
+@@ -1107,8 +1109,20 @@
+     }
+ 
+     [RelayCommand]
 -    private void ResetTasks()
 +    private async Task ResetTasks()
-@@ -1112,0 +1115,12 @@ public partial class TaskQueueViewModel : ViewModelBase, IDisposable
+     {
 +        var result = await SukiMessageBox.ShowDialog(new SukiMessageBoxHost
 +        {
 +            Content = "当前操作会重置任务列表中所有已有设置，是否继续？",
@@ -22,3 +30,6 @@ index 2412f2f..8c23bc8 100644
 +        if (result is not SukiMessageBoxResult.Yes)
 +            return;
 +
+         using var _ = BeginUiLogScope("ResetTasks");
+         // 保留特殊任务（倒计时、系统通知等用户手动添加的自定义 Action 任务）
+         var specialTasks = TaskItemViewModels

@@ -11,7 +11,7 @@ index 6034778..a80c2c6 100644
      </data>
      <data name="AutoDetect" xml:space="preserve">
          <value>AutoDetect (自动检测)</value>
-@@ -105,10 +105,10 @@
+@@ -105,13 +105,13 @@
          <value>自动检测更新</value>
      </data>
      <data name="AutomaticHide" xml:space="preserve">
@@ -21,6 +21,9 @@ index 6034778..a80c2c6 100644
      <data name="AutomaticMinimize" xml:space="preserve">
 -        <value>启动 MFA 后直接最小化</value>
 +        <value>启动 MCC 后直接最小化</value>
+     </data>
+     <data name="MinimizeEmulatorAfterLaunch" xml:space="preserve">
+         <value>启动后模拟器最小化</value>
      </data>
      <data name="AutomaticUpdateMFA" xml:space="preserve">
          <value>自动更新软件</value>
@@ -153,7 +156,7 @@ index 9bfc49e..3ed5e70 100644
      </data>
      <data name="AutoDetect" xml:space="preserve">
          <value>AutoDetect (自動偵測)</value>
-@@ -97,10 +97,10 @@
+@@ -97,13 +97,13 @@
          <value>自動檢測更新</value>
      </data>
      <data name="AutomaticHide" xml:space="preserve">
@@ -163,6 +166,9 @@ index 9bfc49e..3ed5e70 100644
      <data name="AutomaticMinimize" xml:space="preserve">
 -        <value>啟動 MFA 後直接最小化</value>
 +        <value>啟動 MCC 後直接最小化</value>
+     </data>
+     <data name="MinimizeEmulatorAfterLaunch" xml:space="preserve">
+         <value>啟動後模擬器最小化</value>
      </data>
      <data name="AutomaticUpdateMFA" xml:space="preserve">
          <value>自動更新軟體</value>
