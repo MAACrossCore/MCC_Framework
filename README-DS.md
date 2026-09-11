@@ -6,38 +6,92 @@
 
 ---
 
-## 0. 这个文件是什么
-
-**用途**：让其他人一眼看清「DSH 这条线做过什么、做到哪一步、怎么实现的、还剩什么没做」。
-
-**和现有文档的分工**（避免重复）：
-
-| 文档 | 职责 |
-|---|---|
-| `README.md` | 项目总览（面向使用者） |
-| `开发专用.md` | 开发环境、调试流程、项目规则 |
-| `开发踩坑.md` | 通用踩坑（模板匹配、Agent 连接等） |
-| `docs/交接-<功能名>.md` | **单个功能的详细交接**（含实机证据、参数速查） |
-| **`README-DS.md`（本文）** | **DSH 会话的工作台账**：做过什么、进度、实现要点、遗留 |
-
-**维护约定**（我承诺遵守）：
-1. 每次会话结束前更新本文档——新增功能就加一节，改了行为就改对应小节，踩了新坑就追加第 4 节。
-2. 详细到"下次怎么继续"的程度：关键文件路径、参数、验证命令都写上。
-3. 不重复 `docs/交接-*.md` 的内容，只写指针 + 进度摘要。
-
----
-
 ## 1. 进度总览
 
 | 日期 | 功能 | 状态 | 详细文档 |
 |---|---|---|---|
 | 2026-09-11 | 每日探索「体力消耗方式」 | ✅ 已合并、待实机复跑 | `docs/交接-每日探索体力消耗方式.md` |
 | 2026-09-11 | 分支整理：`codex/daily-chip-rewards` → `huangtong` | ✅ 完成，codex 待删 | `docs/交接-每日探索体力消耗方式.md` §〇 |
+| 2026-09-11 | 限时贸易所芯片箱：上级类型 ↔ 品质 双向联动 | ✅ 代码完成，**待装 DLL + 实机点一遍** | 本文 §2 |
 | 2026-09-11 | 持久化工作台账（本文档） | ✅ | 本文 |
 
 ---
 
-## 2. 每日探索「体力消耗方式」（2026-09-11）
+## 2. 限时贸易所芯片箱：上级类型 ↔ 品质 双向联动（2026-09-11）
+
+**问题**（用户报告）：在「限时贸易所购买 → 芯片箱」里，可能出现
+**上级选了「特防」，但下方 R4/R5 一个都没勾**的空档。这种状态逻辑不通顺，
+实际可能导致购买行为不符合预期。
+
+**目标行为**：
+1. 选中上级类型时，下方弹出的品质默认 **R4 + R5 都勾选**；
+2. R4、R5 **都取消勾选**时，上级类型自动**变为不选中**。
+
+### 2.1 实现位置：C# 自研 UI，不是 interface.json
+
+这类"勾选联动"是**运行时 UI 行为**，`interface.json` 只是声明式配置
+（`case.option` 只能控制子选项**是否显示**，不能反向改父选项），所以必须在
+自研 UI 里做。
+
+| 项 | 内容 |
+|---|---|
+| 源码 | `.tmp/MFAAvalonia-src`（上游 `6065fe3`，各补丁已打） |
+| 改动文件 | `MFAAvalonia/Helper/TaskOptionGenerator.cs` → `CreateCheckboxControl` |
+| 补丁 | `ui_custom/MFAAvalonia/laa-limited-trade-chip-options.patch` |
+| 构建 | `ui_custom/MFAAvalonia/build.ps1` |
+| 产物 | `install/libs/MFAAvalonia.Core.dll` |
+
+**代码要点**：
+
+- 新增 `LimitedTradeChipTypeNameOf("限时贸易_特防芯片箱品质") -> "特防"`，
+  由品质选项名反推上级类型名（两端固定前后缀，不用硬编码类型列表）。
+- `CreateCheckboxControl` 里维护两个局部表：
+  `toggleButtonsByCaseName`（case 名 → 按钮）、
+  `chipQualityParentToggles`（品质选项名 → 上级按钮）。
+- 品质勾选框取消勾选、且自身 `SelectedCases` 已空 → `SyncChipQualityParent(..., false)`
+  把上级按钮置为不勾选。只在状态**确实要变**时才赋值，避免递归。
+- 上级类型被勾选时，顺带把其下品质按钮补成勾选（兜底被取消过的情形）。
+- 子选项控件由上级的 `UpdateSubOptions()` 重建；上级取消勾选后子控件随之消失，
+  所以把上级置为未勾选**不会**留下悬空的子控件。
+
+### 2.2 购买侧核对（结论：一致，无需改 agent）
+
+追了一遍实际购买路径，**UI 与购买行为是一致的**，靠的是三道闸：
+
+| 闸 | 位置 | 作用 |
+|---|---|---|
+| 1 | 初始化 `load_settings()` | 整轮只读一次配置，白名单随之固定 |
+| 2 | `if not whitelist:` | 白名单为空直接进 `done`，根本不做扫描 |
+| 3 | `scan_items` 的 `_canonical_item(text, choices)` | 只回白名单内的名字 |
+
+因此「品质全不勾 → 该芯片箱不在白名单 → 扫不到 → 不会买」成立。
+
+> ⚠️ 边界说明：白名单过滤在 **`scan_items`**，**不在** `select_purchase_plan`。
+> 后者完全信任传入的扫描结果（把白名单外商品直接喂进去它照样会选）。
+> 生产路径下 `ordered` 只可能来自 `scan_items(..., whitelist, ...)`，所以安全；
+> 这一点已写成测试 `test_purchase_plan_trusts_the_scanned_items` 固定下来。
+
+### 2.3 验证状态
+
+| 项 | 状态 |
+|---|---|
+| C# 编译 | ✅ `dotnet build -c Release -r win-x64` 成功，无 error |
+| 补丁与工作区一致 | ✅ 正向 `git apply` 到干净源码 == 当前工作区 |
+| 新增回归测试 | ✅ `tools/test_limited_trade.py` 24 项（+6） |
+| 全量测试 | ✅ 14 个文件 183 项通过 |
+| **DLL 安装** | ⏳ **需关闭 MFA 后执行**（build.ps1 拒绝在 MFA 运行时覆盖） |
+| **实机点选验证** | ⏳ 待装完 DLL 后：勾「特防」→ 看 R4/R5 是否自动全勾；取消 R4+R5 → 看「特防」是否自动取消 |
+
+安装命令（**先关闭 MFA**）：
+
+```powershell
+cd E:\MAA_crosscore
+pwsh -File ui_custom\MFAAvalonia\build.ps1
+```
+
+---
+
+## 3. 每日探索「体力消耗方式」（2026-09-11）
 
 **目标**：把**活动**任务里那套「刷关票消耗方式」搬进**每日探索**，替换原来的
 「是否手动选择次数(开启燃料使用)」，并让它成为**扫荡次数的唯一来源**——
@@ -50,7 +104,7 @@
 次数上限 10（游戏弹窗限制）
 ```
 
-### 2.1 新增 / 修改的文件
+### 3.1 新增 / 修改的文件
 
 | 文件 | 作用 |
 |---|---|
@@ -64,7 +118,7 @@
 | `tools/test_daily_stamina_dialog.py` | Custom 动作测试（38 项，打桩 OCR/点击） |
 | `tools/ocr_screenshot.py` | **新增工具**：对已存 PNG 跑 MaaFW OCR，离线定位 ROI |
 
-### 2.2 整条流程
+### 3.2 整条流程
 
 ```
 每日探索_第几层
@@ -85,7 +139,7 @@
 **「不需要补药」不用 `False` 表达**——那会踩 `on_error: ["扫荡"]` 这条边，
 而 MaaFW 的 `on_error` 在 action 返回 False 时到底走不走，Python 层没有文档，不能赌。
 
-### 2.3 关键实现要点（接手必读）
+### 3.3 关键实现要点（接手必读）
 
 **① 扫荡次数：游戏不显示次数，必须照抄活动**
 
@@ -132,7 +186,7 @@ MFA 把用户填的值存在 `item["data"][输入名]`：
 （`pre_wait_freezes` 1000ms + OCR「现在」「扫荡后」）。少了这道闸，
 加减键坐标会落在关卡页上（`敌方信息` 在 `(868,528,73,22)`，正好被 `(545,560)` 命中）。
 
-### 2.4 验证方式
+### 3.4 验证方式
 
 ```powershell
 cd E:\MAA_crosscore
@@ -159,7 +213,7 @@ Get-ChildItem tools\test_*.py | ForEach-Object { .\.venv\Scripts\python.exe -B $
 5. **双倍确认弹窗照旧出现**，`开始战斗` 后命中 `开启加成`
 6. 「指定次数+不使用体力药+体力不够」时日志出现提示，且**任务显示成功**
 
-### 2.5 遗留 / 已知限制
+### 3.5 遗留 / 已知限制
 
 | 项 | 说明 |
 |---|---|
@@ -170,7 +224,7 @@ Get-ChildItem tools\test_*.py | ForEach-Object { .\.venv\Scripts\python.exe -B $
 
 ---
 
-## 3. 分支整理（2026-09-11）
+## 4. 分支整理（2026-09-11）
 
 **背景**：`codex/daily-chip-rewards` 是 2026-09-08 从 `huangtong`（`7484e92`）拉出去的分支，
 09-09/09-10 的芯片筛选与限时贸易是在它上面提交的，不在 `huangtong` 上。
@@ -202,11 +256,11 @@ git push origin --delete codex/daily-chip-rewards      # 远程
 
 ---
 
-## 4. DSH 会话踩过的坑
+## 5. DSH 会话踩过的坑
 
 （通用坑请看 `开发踩坑.md`；这里只记 DSH 这条线遇到的）
 
-### 4.1 别照抄交接文档里的 ROI 就直接写代码
+### 5.1 别照抄交接文档里的 ROI 就直接写代码
 
 **现象**：`ROI_SWEEP_COUNT = [433,506,59,24]`（文档标注「与 `次数到10次` ROI 一致 ✅」）
 实机 OCR 直接读空：
@@ -226,7 +280,7 @@ git push origin --delete codex/daily-chip-rewards      # 远程
 .\.venv\Scripts\python.exe -B tools\ocr_screenshot.py "install\debug\on_error\xxx.png"
 ```
 
-### 4.2 agent 的 INFO 日志不进 MFA 日志
+### 5.2 agent 的 INFO 日志不进 MFA 日志
 
 **现象**：流程明显不对，但 `install/logs/log-*.log` 里**一条错误都没有**。
 
@@ -235,13 +289,13 @@ git push origin --delete codex/daily-chip-rewards      # 远程
 **处理**：「没有任何错误但流程不对」时，**直接读 `install/config/instances/default.json`
 看真实选项值**，别猜。这次就是靠这个在两分钟内定位到输入框读法问题。
 
-### 4.3 写 `interface.json` 别用 JSON 库整体重排
+### 5.3 写 `interface.json` 别用 JSON 库整体重排
 
 **现象**：用 `json.loads` + `json.dumps` 改一行，结果 393 增 94 删的假 diff。
 
 **处理**：**字符串级精修**。改完 `git diff --stat` 确认只有目标几行。
 
-### 4.4 PowerShell 写文件会加 BOM
+### 5.4 PowerShell 写文件会加 BOM
 
 **现象**：`Out-File -Encoding utf8`（PS 5.1）和 `Set-Content -Encoding UTF8`
 都会在文件开头写 `EF BB BF`，导致提交信息标题变成 `﻿feat(...)`、
@@ -249,7 +303,7 @@ Python 源码 `py_compile` 报 `invalid non-printable character U+FEFF`。
 
 **处理**：写文本一律用 Python：`Path.write_text(text, encoding="utf-8", newline="\n")`。
 
-### 4.5 测试里 `_SESSION` 必须拷贝
+### 5.5 测试里 `_SESSION` 必须拷贝
 
 **现象**：断言全部 `KeyError`。
 
@@ -257,7 +311,7 @@ Python 源码 `py_compile` 报 `invalid non-printable character U+FEFF`。
 
 **处理**：`return result, recorder, dict(pipeline._SESSION)`。
 
-### 4.6 项目根目录的 PowerShell 引号/中文坑
+### 5.6 项目根目录的 PowerShell 引号/中文坑
 
 - `python -c "…"` 传含引号的代码会被剥引号 → **写成临时 `.py` 文件再跑**
 - `git show` / `Format-Hex` 输出中文会被转义 → 用 Python 走 `subprocess` 读字节
@@ -265,7 +319,7 @@ Python 源码 `py_compile` 报 `invalid non-printable character U+FEFF`。
 
 ---
 
-## 5. 常用命令速查
+## 6. 常用命令速查
 
 ```powershell
 cd E:\MAA_crosscore
@@ -293,8 +347,9 @@ Select-String -Path install\debug\maafw.log -Pattern 'msg=Node\.PipelineNode\.(S
 
 ---
 
-## 6. 更新日志
+## 7. 更新日志
 
 | 日期 | 内容 |
 |---|---|
 | 2026-09-11 | 建立本文档；补录「每日探索体力消耗方式」与分支整理两项工作 |
+| 2026-09-11 | 新增 §2「限时贸易所芯片箱：上级类型 ↔ 品质 双向联动」 |

@@ -1,10 +1,19 @@
 diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/TaskOptionGenerator.cs
 --- a/MFAAvalonia/Helper/TaskOptionGenerator.cs
 +++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
-@@ -37,6 +37,13 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
- 
-     private static bool UseChipTaskCheckBox(string? name) =>
-         name == "根据自定义设置锁定/解锁仓库内芯片";
+@@ -1,4 +1,4 @@
+-﻿using Avalonia;
++using Avalonia;
+ using Avalonia.Controls;
+ using Avalonia.Controls.Primitives;
+ using Avalonia.Controls.Templates;
+@@ -34,6 +34,72 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+     private static readonly Thickness OptionRowMargin = new(10, 3, 10, 3);
+     private static readonly Thickness NestedOptionMargin = new(14, 2, 4, 4);
+     private static readonly Thickness NestedOptionPadding = new(8, 4, 6, 4);
++
++    private static bool UseChipTaskCheckBox(string? name) =>
++        name == "根据自定义设置锁定/解锁仓库内芯片";
 +
 +    private static bool IsLimitedTradeChipTypeOption(string? name) =>
 +        name == "限时贸易_芯片箱类型";
@@ -12,10 +21,66 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
 +    private static bool IsLimitedTradeChipQualityOption(string? name) =>
 +        name?.StartsWith("限时贸易_", StringComparison.Ordinal) == true &&
 +        name.EndsWith("芯片箱品质", StringComparison.Ordinal);
- 
-     // LAA: daily chip-stage availability is evaluated from the computer's
-     // local calendar whenever the task settings panel is generated.
-@@ -268,7 +275,14 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
++
++    /// <summary>
++    /// LAA: 从「限时贸易_特防芯片箱品质」取出对应的类型 case 名「特防」。
++    /// 联动需要用它回到上级「限时贸易_芯片箱类型」的对应按钮。
++    /// </summary>
++    private static string? LimitedTradeChipTypeNameOf(string? qualityOptionName)
++    {
++        const string prefix = "限时贸易_";
++        const string suffix = "芯片箱品质";
++        if (qualityOptionName == null ||
++            !qualityOptionName.StartsWith(prefix, StringComparison.Ordinal) ||
++            !qualityOptionName.EndsWith(suffix, StringComparison.Ordinal))
++            return null;
++        var typeName = qualityOptionName.Substring(prefix.Length,
++            qualityOptionName.Length - prefix.Length - suffix.Length);
++        return typeName.Length == 0 ? null : typeName;
++    }
++
++    // LAA: daily chip-stage availability is evaluated from the computer's
++    // local calendar whenever the task settings panel is generated.
++    private static readonly Dictionary<string, DayOfWeek[]> DailyChipStageSchedule = new()
++    {
++        ["鼓军嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Thursday, DayOfWeek.Friday],
++        ["光杵嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Friday],
++        ["注刈嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday],
++        ["链接嵌合"] = [DayOfWeek.Monday, DayOfWeek.Saturday, DayOfWeek.Sunday],
++        ["体魄嵌合"] = [DayOfWeek.Tuesday, DayOfWeek.Saturday, DayOfWeek.Sunday],
++        ["侵蚀嵌合"] = [DayOfWeek.Wednesday],
++        ["迅刃嵌合"] = [DayOfWeek.Thursday],
++        ["矛盾嵌合"] = [DayOfWeek.Friday],
++    };
++
++    private static bool IsChipStage(string? caseName) =>
++        caseName?.Contains("嵌合（", StringComparison.Ordinal) == true;
++
++    private static List<MaaInterface.MaaInterfaceOptionCase>? GetVisibleCases(
++        string? optionName,
++        List<MaaInterface.MaaInterfaceOptionCase>? allCases)
++    {
++        if (allCases == null || optionName != "关卡选择")
++            return allCases;
++
++        var today = DateTime.Now.DayOfWeek;
++        if (today is DayOfWeek.Saturday or DayOfWeek.Sunday)
++            return allCases;
++
++        return allCases.Where(item =>
++        {
++            if (!IsChipStage(item.Name))
++                return true;
++
++            var stageName = DailyChipStageSchedule.Keys.FirstOrDefault(name =>
++                item.Name?.StartsWith(name, StringComparison.Ordinal) == true);
++            return stageName == null || DailyChipStageSchedule[stageName].Contains(today);
++        }).ToList();
++    }
+     
+     public void GeneratePanelContent(StackPanel panel, DragItemViewModel dragItem)
+     {
+@@ -225,13 +291,25 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
      /// </summary>
      private Control CreateCheckboxControl(MaaInterface.MaaInterfaceSelectOption option, MaaInterface.MaaInterfaceOption interfaceOption, DragItemViewModel source)
      {
@@ -31,7 +96,6 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
  
          interfaceOption.InitializeIcon();
  
-@@ -276,6 +290,11 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
          // Header（显示 option 名称和图标）
          var header = CreateOptionHeader(interfaceOption);
          header.Margin = new Thickness(0); // 外层 container 已提供垂直间距，去掉 header 内部多余的上下 margin
@@ -43,7 +107,7 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
          container.Children.Add(header);
  
          // 初始化 SelectedCases（任务 9）
-@@ -284,7 +303,7 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+@@ -241,12 +319,31 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
          var wrapPanel = new WrapPanel
          {
              Margin = new Thickness(0, 2, 0, 2),
@@ -52,7 +116,31 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
          };
  
          // Sub-options container（显示所有被勾选 case 的子选项）
-@@ -298,6 +317,8 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+         var subOptionsContainer = new StackPanel();
+ 
++        // LAA: 品质勾选框 -> 上级类型按钮。
++        // 上级类型被选中时，这里记下它自己的 ToggleButton；品质勾选框全不勾时
++        // 用它把上级一起取消，避免出现「选了类型但一个品质都没勾」的空档。
++        var chipQualityParentToggles = new Dictionary<string, ToggleButton>(StringComparer.Ordinal);
++        // LAA: case 名 -> 对应 ToggleButton（上级类型的按钮就靠它找）
++        var toggleButtonsByCaseName = new Dictionary<string, ToggleButton>(StringComparer.Ordinal);
++
++        // LAA: 把某个品质选项对应的上级类型同步到目标勾选状态。
++        // 只在状态确实要变时才动，否则会触发上级自身的联动而递归。
++        bool SyncChipQualityParent(string qualityOptionName, bool shouldCheck)
++        {
++            if (!chipQualityParentToggles.TryGetValue(qualityOptionName, out var parentToggle))
++                return false;
++            if ((parentToggle.IsChecked == true) == shouldCheck)
++                return false;
++            parentToggle.IsChecked = shouldCheck;
++            return true;
++        }
++
+         // Sub-option update logic for checkbox（与 select/switch 不同，需要显示所有已勾选 case 的子选项）
+         void UpdateSubOptions()
+         {
+@@ -256,6 +353,8 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
              option.SubOptions ??= new List<MaaInterface.MaaInterfaceSelectOption>();
              var selectedCases = option.SelectedCases ?? new List<string>();
  
@@ -61,13 +149,15 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
              foreach (var caseItem in interfaceOption.Cases)
              {
                  if (caseItem.Name == null || !selectedCases.Contains(caseItem.Name)) continue;
-@@ -311,8 +332,30 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
-                     {
+@@ -269,7 +368,32 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
                          existing = CreateDefaultSelectOption(subOptionName);
                          option.SubOptions.Add(existing);
                      }
 -                    AddSubOption(subOptionsContainer, existing, source);
 +                    var control = CreateSubOptionControl(existing, source);
++                    // LAA: 记下这个品质勾选框的上级按钮，供「两个品质都取消 -> 取消类型」使用
++                    if (isChipType && toggleButtonsByCaseName.TryGetValue(caseItem.Name, out var parentToggle))
++                        chipQualityParentToggles[subOptionName] = parentToggle;
 +                    if (isChipType)
 +                    {
 +                        if (compactRow == null || compactColumn == 2)
@@ -93,7 +183,7 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
                  }
              }
          }
-@@ -327,8 +370,10 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+@@ -285,8 +409,10 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
                  var toggleBtn = new ToggleButton
                  {
                      IsChecked = isChecked,
@@ -106,7 +196,7 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
                      HorizontalAlignment = HorizontalAlignment.Stretch,
                      HorizontalContentAlignment = HorizontalAlignment.Center,
                  };
-@@ -357,6 +402,7 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+@@ -314,6 +440,7 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
  
                  var marqueeText = new MarqueeTextBlock
                  {
@@ -114,7 +204,52 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
                      VerticalContentAlignment = VerticalAlignment.Center,
                      HorizontalAlignment = HorizontalAlignment.Stretch,
                  };
-@@ -407,7 +453,7 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+@@ -327,17 +454,38 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+                 BindIdleEnabled(toggleBtn);
+ 
+                 var capturedCaseName = caseName;
++                // LAA: 品质勾选框（如「限时贸易_特防芯片箱品质」）从上级类型选项传入，
++                // 用它就能回到上级「限时贸易_芯片箱类型」的对应按钮。
++                var parentChipTypeName = isChipQuality
++                    ? LimitedTradeChipTypeNameOf(option.Name)
++                    : null;
+                 toggleBtn.IsCheckedChanged += (_, _) =>
+                 {
+                     if (toggleBtn.IsChecked == true)
+                     {
+                         if (!option.SelectedCases.Contains(capturedCaseName))
+                             option.SelectedCases.Add(capturedCaseName);
++                        // LAA: 选中上级类型时，下方品质默认全勾
++                        // （正常情况下默认就是 R4+R5 全勾，这里只兜住被取消过的情形）
++                        if (isChipType)
++                        {
++                            foreach (var qualityName in caseOption.Option ?? new List<string>())
++                            {
++                                if (chipQualityParentToggles.TryGetValue(qualityName, out var qualityToggle) &&
++                                    qualityToggle.IsChecked != true)
++                                    qualityToggle.IsChecked = true;
++                            }
++                        }
+                     }
+                     else
+                     {
+                         option.SelectedCases.Remove(capturedCaseName);
+                     }
++                    // LAA: 品质全不勾时，上级类型一起取消选
++                    // （此时子选项控件会在下面的 UpdateSubOptions 里被清掉）
++                    if (parentChipTypeName != null && toggleBtn.IsChecked != true &&
++                        option.SelectedCases.Count == 0)
++                        SyncChipQualityParent(option.Name ?? string.Empty, false);
+                     UpdateSubOptions();
+                     saveConfigurationAction();
+                 };
+@@ -359,11 +507,13 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+                 }
+ 
+                 wrapPanel.Children.Add(toggleBtn);
++                if (isChipType)
++                    toggleButtonsByCaseName[caseName] = toggleBtn;
+             }
          }
  
          // 首次布局后测量所有按钮自然宽度，取最大值统一设置 MinWidth（等宽效果）
@@ -123,7 +258,136 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
          {
              wrapPanel.LayoutUpdated += EqualizeOnce;
              void EqualizeOnce(object? s, EventArgs ev)
-@@ -964,24 +1010,30 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+@@ -613,31 +763,54 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+         DragItemViewModel source)
+     {
+         var wrapper = new StackPanel();
++        var useChipTaskCheckBox = UseChipTaskCheckBox(option.Name);
++        var useCompactChipTaskCheckBox = useChipTaskCheckBox;
+ 
+         var grid = new Grid
+         {
+             ColumnDefinitions =
+             {
+                 new ColumnDefinition { Width = GridLength.Auto },
+-                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+-                new ColumnDefinition { Width = GridLength.Auto }
++                new ColumnDefinition { Width = useChipTaskCheckBox ? GridLength.Auto : new GridLength(1, GridUnitType.Star) },
++                new ColumnDefinition { Width = useChipTaskCheckBox ? new GridLength(1, GridUnitType.Star) : GridLength.Auto }
+             },
+             Margin = OptionRowMargin
+         };
+         
+         interfaceOption.InitializeIcon();
+ 
+-        var toggleSwitch = new ToggleSwitch
++        ToggleButton toggleSwitch;
++        if (useChipTaskCheckBox)
+         {
+-            IsChecked = option.Index == yesValue,
+-            Classes = { "Switch" },
+-            MaxHeight = 60,
+-            MaxWidth = 100,
+-            Margin = new Thickness(0, 4, 0, 4),
+-            HorizontalAlignment = HorizontalAlignment.Right,
+-            VerticalAlignment = VerticalAlignment.Center,
+-            Tag = option.Name
+-        };
++            toggleSwitch = new CheckBox
++            {
++                IsChecked = option.Index == yesValue,
++                Width = useCompactChipTaskCheckBox ? 18 : 24,
++                Height = useCompactChipTaskCheckBox ? 18 : 24,
++                MinWidth = useCompactChipTaskCheckBox ? 18 : 24,
++                MinHeight = useCompactChipTaskCheckBox ? 18 : 24,
++                Margin = useCompactChipTaskCheckBox
++                    ? new Thickness(4, 4, 0, 4)
++                    : new Thickness(0, 4, 0, 4),
++                HorizontalAlignment = HorizontalAlignment.Right,
++                VerticalAlignment = VerticalAlignment.Center,
++                Tag = option.Name
++            };
++        }
++        else
++        {
++            toggleSwitch = new ToggleSwitch
++            {
++                IsChecked = option.Index == yesValue,
++                Classes = { "Switch" },
++                MaxHeight = 60,
++                MaxWidth = 100,
++                Margin = new Thickness(0, 4, 0, 4),
++                HorizontalAlignment = HorizontalAlignment.Right,
++                VerticalAlignment = VerticalAlignment.Center,
++                Tag = option.Name
++            };
++        }
+ 
+         BindIdleEnabled(toggleSwitch);
+         toggleSwitch.Bind(ToolTip.TipProperty, new ResourceBindingWithFallback(option.DisplayName, option.Name));
+@@ -680,12 +853,28 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+ 
+         // Label with Icon
+         var labelPanel = CreateLabelPanel(option.DisplayName, option.Name, interfaceOption.Description, interfaceOption.Document);
++        if (useChipTaskCheckBox)
++        {
++            labelPanel.Orientation = Orientation.Vertical;
++            labelPanel.MinWidth = 0;
++            labelPanel.HorizontalAlignment = HorizontalAlignment.Stretch;
++            labelPanel.ClipToBounds = useCompactChipTaskCheckBox;
++            labelPanel.Margin = useCompactChipTaskCheckBox
++                ? new Thickness(0, 0, 4, 0)
++                : new Thickness(0, 0, 10, 0);
++
++            foreach (var textBlock in labelPanel.Children.OfType<TextBlock>())
++            {
++                textBlock.TextWrapping = TextWrapping.Wrap;
++                textBlock.TextTrimming = TextTrimming.None;
++            }
++        }
+         var icon = CreateIcon(interfaceOption);
+         icon.Margin = new Thickness(0, 0, 6, 0);
+         labelPanel.Children.Insert(0, icon);
+ 
+         Grid.SetColumn(labelPanel, 0);
+-        Grid.SetColumn(toggleSwitch, 2);
++        Grid.SetColumn(toggleSwitch, useChipTaskCheckBox ? 1 : 2);
+         
+         grid.Children.Add(labelPanel);
+         grid.Children.Add(toggleSwitch);
+@@ -708,13 +897,29 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+         interfaceOption.Cases?.ForEach(c => c.InitializeDisplayName());
+         interfaceOption.InitializeIcon();
+ 
++        var visibleCases = GetVisibleCases(option.Name, interfaceOption.Cases);
++        var selectedCase = interfaceOption.Cases != null && option.Index >= 0 && option.Index < interfaceOption.Cases.Count
++            ? interfaceOption.Cases[option.Index.Value]
++            : null;
++        var visibleIndex = selectedCase == null || visibleCases == null
++            ? -1
++            : visibleCases.FindIndex(item => item.Name == selectedCase.Name);
++        if (visibleIndex < 0 && visibleCases is { Count: > 0 })
++        {
++            visibleIndex = visibleCases.FindIndex(item => IsChipStage(item.Name));
++            if (visibleIndex < 0)
++                visibleIndex = 0;
++            if (interfaceOption.Cases != null)
++                option.Index = interfaceOption.Cases.FindIndex(item => item.Name == visibleCases[visibleIndex].Name);
++        }
++
+         var comboBox = new ComboBox
+         {
+             MinWidth = 120,
+             Classes = { "LimitWidth" },
+             Margin = new Thickness(0, 2, 0, 2),
+-            ItemsSource = interfaceOption.Cases,
+-            SelectedIndex = option.Index ?? 0,
++            ItemsSource = visibleCases,
++            SelectedIndex = Math.Max(0, visibleIndex),
+             HorizontalAlignment = HorizontalAlignment.Stretch
+         };
+         
+@@ -867,9 +1072,10 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
          }
      }
  
@@ -136,14 +400,7 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
           
           Control control;
           if (subInterfaceOption.IsHotkey)
-             control = CreateHotkeyControl(subOption, subInterfaceOption);
-          else if (subInterfaceOption.IsInput)
-             control = CreateInputControl(subOption, subInterfaceOption);
-          else if (subInterfaceOption.IsCheckbox)
-             control = CreateCheckboxControl(subOption, subInterfaceOption, source);
-          else if ((subInterfaceOption.IsSwitch && subInterfaceOption.Cases.ShouldSwitchButton(out var yes, out var no)) ||
-                   subInterfaceOption.Cases.ShouldSwitchButton(out yes, out no))
-             control = CreateToggleControl(subOption, yes, no, subInterfaceOption, source);
+@@ -884,7 +1090,12 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
           else
              control = CreateComboBoxControl(subOption, subInterfaceOption, source);
  

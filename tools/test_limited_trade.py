@@ -156,6 +156,141 @@ def test_interface_exposes_nested_chip_box_controls():
     assert "FontSize = isCompactChipChoice ? 12 : 14" in compact_patch
 
 
+def test_chip_quality_controls_default_to_both_rarities():
+    """上级类型默认勾选时，下方品质必须默认 R4+R5 全勾。
+
+    否则会出现「选了特防但一个品质都没勾」的空档（用户报的 UI 逻辑问题）。
+    """
+    interface = json.loads((ROOT / "assets" / "interface.json").read_text(encoding="utf-8-sig"))
+    options = interface["option"]
+    chip_types = options["限时贸易_芯片箱类型"]
+    assert set(chip_types["default_case"]) == set(CHIP_TYPES)
+    for case in chip_types["cases"]:
+        quality = options[case["option"][0]]
+        assert quality["default_case"] == ["R4", "R5"], case["name"]
+
+
+def test_ui_patch_keeps_parent_child_chip_sync():
+    """UI 补丁必须保留「品质全不勾 -> 取消上级类型」的联动。
+
+    联动是 C# 侧实现的（见 TaskOptionGenerator.CreateCheckboxControl），
+    这里钉住补丁里确实有这段逻辑，避免重新生成补丁时被漏掉。
+    """
+    patch = (
+        ROOT / "ui_custom" / "MFAAvalonia" / "laa-limited-trade-chip-options.patch"
+    ).read_text(encoding="utf-8-sig")
+    assert "LimitedTradeChipTypeNameOf" in patch
+    assert "chipQualityParentToggles" in patch
+    assert "SyncChipQualityParent" in patch
+    assert "LAA: 选中上级类型时，下方品质默认全勾" in patch
+    assert "LAA: 品质全不勾时，上级类型一起取消选" in patch
+
+
+def test_unchecked_chip_qualities_never_reach_the_whitelist():
+    """核对购买侧：品质全不勾 -> 该芯片箱不进白名单，因而不会被购买。
+
+    「UI 联动」与「实际购买」一致的关键就在白名单：
+    没勾品质的箱子不白名单，扫描阶段 (`scan_items` 只回白名单内的名字)
+    就扫不到它，购买计划里自然不会有它。
+    """
+    settings = {
+        "materials": False,
+        "training": False,
+        "skill_books": set(),
+        "modules": False,
+        "chip_boxes": True,
+        "chip_types": {"特防"},
+        "chip_rarities": {"特防": set()},
+    }
+    assert build_whitelist(settings) == []
+
+    # 对比：同样选特防，但品质勾了 R5 -> 只有 R5 那个箱子进白名单
+    settings["chip_rarities"] = {"特防": {"R5"}}
+    assert build_whitelist(settings) == ["R5特防芯片箱"]
+
+
+def test_purchase_plan_trusts_the_scanned_items():
+    """边界说明：白名单过滤发生在 `scan_items`，不在 `select_purchase_plan`。
+
+    所以用白名单外的商品直接喂进来，计划会照样选中它 —— 这是**预期行为**，
+    因为生产路径下 `ordered` 只可能来自 `scan_items(..., whitelist, ...)`。
+    这条测试把这个边界写下来，避免以后误以为计划层会兜白名单。
+    """
+    settings = {
+        "materials": False, "training": False, "skill_books": set(), "modules": False,
+        "chip_boxes": True, "chip_types": {"特防"}, "chip_rarities": {"特防": {"R5"}},
+        "strategies": dict(DEFAULT_SETTINGS["strategies"]),
+    }
+    assert settings["strategies"]["chip_boxes"] == STRATEGY_ALL
+
+    # 直接喂入未过滤的商店商品：计划会全部选中（不做白名单裁剪）
+    store = [
+        {"name": "R4特防芯片箱", "page": "first", "x": 100, "y": 200, "world_x": 100},
+        {"name": "R5特防芯片箱", "page": "first", "x": 300, "y": 200, "world_x": 300},
+    ]
+    second, first = select_purchase_plan(store, [], settings)
+    assert (second, first) == ([], ["R4特防芯片箱", "R5特防芯片箱"])
+
+    # 生产路径：扫描结果已按白名单过滤，此时只剩 R5
+    filtered = [item for item in store if item["name"] in build_whitelist(settings)]
+    second, first = select_purchase_plan(filtered, [], settings)
+    assert (second, first) == ([], ["R5特防芯片箱"])
+
+
+def test_purchase_path_only_ever_sees_whitelist_items():
+    """购买侧的不变量：进入购买计划的商品一定来自白名单。
+
+    三道闸（都在 agent/limited_trade.py）：
+      1. 初始化时 `load_settings()` 只读一次配置，白名单随之固定；
+      2. 白名单为空时直接进 done 阶段，根本不做扫描；
+      3. `scan_items` 用 `_canonical_item(text, choices)` 过滤，只回白名单内的名字。
+
+    所以「品质全不勾 -> 该芯片箱不在白名单 -> 不会被买」是成立的，
+    UI 联动与购买行为一致。这里把这三道闸钉住，避免以后被改掉。
+    """
+    source = (ROOT / "agent" / "limited_trade.py").read_text(encoding="utf-8")
+
+    # 2) 空白名单直接结束，不做扫描
+    assert "if not whitelist:" in source
+    assert '_SESSION["stage"] = "done"' in source
+
+    # 3) 扫描按白名单过滤（只回白名单内的名字）
+    assert 'name = _canonical_item(getattr(result, "text", ""), choices)' in source
+
+    # 1) 白名单只在初始化阶段构建一次（1 处 def + 1 处调用），扫描时复用 _SESSION 里那份
+    assert source.count("build_whitelist") == 2
+    assert 'whitelist = list(_SESSION.get("whitelist") or [])' in source
+
+    # 兜底策略也只在扫描结果（= 白名单内商品）里挑
+    assert "item for item in ordered" in source
+    assert "select_purchase_plan(" in source
+
+
+def test_empty_chip_quality_is_not_a_purchase_candidate():
+    """白名单为空时，select_purchase_plan 不会凭空选中商店里的同类商品。
+
+    注意：生产路径下 `ordered` 只可能含白名单内商品（见上一条测试），
+    这里直接喂入白名单外商品，是用来钉住「兜底分支不得放宽白名单」这个意图。
+    """
+    settings = {
+        "materials": True,
+        "training": False,
+        "skill_books": set(),
+        "modules": False,
+        "chip_boxes": True,
+        "chip_types": {"特防"},
+        "chip_rarities": {"特防": set()},
+        "strategies": dict(DEFAULT_SETTINGS["strategies"]),
+    }
+    settings["strategies"]["chip_boxes"] = STRATEGY_FALLBACK
+    whitelist = build_whitelist(settings)
+    assert not any(is_chip_box(name) for name in whitelist)
+
+    # 生产路径：扫描结果为空 -> 没有候选 -> 无购买计划
+    second, first = select_purchase_plan([], [], settings)
+    assert (second, first) == ([], [])
+
+
 def test_pipeline_delegates_item_location_to_original_fullscreen_ocr():
     pipeline = json.loads(
         (ROOT / "assets" / "resource" / "pipeline" / "base" / "限时贸易.json").read_text(
