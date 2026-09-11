@@ -22,6 +22,7 @@ from limited_trade import (  # noqa: E402
     PURCHASE_STRATEGIES,
     LimitedTradeRecognition,
     LimitedTradeChipRewardFlow,
+    LimitedTradeEngine,
     SKILL_BOOK_TYPES,
     STORE_SWIPE_LEFT,
     STORE_SWIPE_RIGHT,
@@ -235,6 +236,70 @@ def test_purchase_plan_trusts_the_scanned_items():
     filtered = [item for item in store if item["name"] in build_whitelist(settings)]
     second, first = select_purchase_plan(filtered, [], settings)
     assert (second, first) == ([], ["R5特防芯片箱"])
+
+
+def test_scan_items_only_returns_whitelisted_chip_boxes():
+    """端到端：商店摆了全部 14 个箱子，只有勾选类型的那几个会被扫到并购买。
+
+    这条把「UI 勾选 -> 白名单 -> 扫描 -> 购买计划」整条链固定下来：
+    未勾选类型（精力/重击/痛击/特防）的箱子即便在售也不会进入购买计划。
+    """
+    settings = {
+        "materials": False,
+        "training": False,
+        "skill_books": set(),
+        "modules": False,
+        "chip_boxes": True,
+        "chip_types": {"连击", "装填", "扩大"},
+        "chip_rarities": {"连击": {"R4", "R5"}, "装填": {"R4", "R5"}, "扩大": {"R4", "R5"}},
+        "strategies": dict(DEFAULT_SETTINGS["strategies"]),
+    }
+    whitelist = build_whitelist(settings)
+    assert sorted(whitelist) == sorted([
+        "R4连击芯片箱", "R5连击芯片箱",
+        "R4装填芯片箱", "R5装填芯片箱",
+        "R4扩大芯片箱", "R5扩大芯片箱",
+    ])
+
+    on_sale = ["%s%s芯片箱" % (rarity, chip_type)
+               for chip_type in CHIP_TYPES for rarity in ("R4", "R5")]
+    assert len(on_sale) == 14
+
+    engine = LimitedTradeEngine()
+    pages = {"first": on_sale[:7], "second": on_sale[7:]}
+    served = {"first": False, "second": False}
+
+    def fake_recognize(_context, _image, choices):
+        # choices 就是白名单 —— 生产路径的过滤点
+        page = "first" if not served["first"] else "second"
+        served[page] = True
+        names = pages[page]
+        results = [
+            SimpleNamespace(text=name, box=(100 + 200 * index, 300, 160, 40))
+            for index, name in enumerate(names)
+        ]
+        return SimpleNamespace(hit=bool(results), all_results=results,
+                               best_result=results[0] if results else None)
+
+    class _Image:
+        shape = (720, 1280, 3)
+
+    engine.recognize = fake_recognize
+    original_guard = trade_module.ensure_running
+    trade_module.ensure_running = lambda _context: None
+    try:
+        first_all = engine.scan_items(None, _Image(), whitelist, "first")
+        second_all = engine.scan_items(None, _Image(), whitelist, "second")
+    finally:
+        trade_module.ensure_running = original_guard
+
+    scanned = {item["name"] for item in first_all + second_all}
+    assert scanned == set(whitelist), (sorted(scanned), sorted(whitelist))
+
+    second_plan, first_plan = select_purchase_plan(first_all, second_all, settings)
+    plan = set(second_plan) | set(first_plan)
+    assert plan <= set(whitelist)
+    assert plan == set(whitelist)
 
 
 def test_purchase_path_only_ever_sees_whitelist_items():

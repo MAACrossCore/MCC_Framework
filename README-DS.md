@@ -12,22 +12,48 @@
 |---|---|---|---|
 | 2026-09-11 | 每日探索「体力消耗方式」 | ✅ 已合并、待实机复跑 | `docs/交接-每日探索体力消耗方式.md` |
 | 2026-09-11 | 分支整理：`codex/daily-chip-rewards` → `huangtong` | ✅ 完成，codex 待删 | `docs/交接-每日探索体力消耗方式.md` §〇 |
-| 2026-09-11 | 限时贸易所芯片箱：上级类型 ↔ 品质 双向联动 | ✅ 代码完成，**待装 DLL + 实机点一遍** | 本文 §2 |
+| 2026-09-11 | 限时贸易所芯片箱：上级类型 ↔ 品质 双向联动 | ✅ **实机验证通过**，购买挂钩已核对 | 本文 §2 |
 | 2026-09-11 | 持久化工作台账（本文档） | ✅ | 本文 |
 
 ---
 
 ## 2. 限时贸易所芯片箱：上级类型 ↔ 品质 双向联动（2026-09-11）
 
-**问题**（用户报告）：在「限时贸易所购买 → 芯片箱」里，可能出现
+**问题**（用户报告）：在「限时贸易所购买 → 芯片箱」里，会出现
 **上级选了「特防」，但下方 R4/R5 一个都没勾**的空档。这种状态逻辑不通顺，
-实际可能导致购买行为不符合预期。
+实际会导致该芯片类型一个箱子都不进白名单（等于白勾）。
 
 **目标行为**：
 1. 选中上级类型时，下方弹出的品质默认 **R4 + R5 都勾选**；
 2. R4、R5 **都取消勾选**时，上级类型自动**变为不选中**。
 
-### 2.1 实现位置：C# 自研 UI，不是 interface.json
+### 2.1 真因：存档把「空品质」固化了
+
+排查中发现**病根不是联动代码，而是存档**。MFA 用 `install/config/instances/default.json`
+里的 `selected_cases` **覆盖** `interface.json` 的 `default_case`，所以
+「品质默认 `["R4","R5"]`」只在**从未保存过**时生效。实测存档：
+
+```
+限时贸易_芯片箱类型        selected_cases=["连击","装填","精力","痛击"]
+  限时贸易_连击芯片箱品质   selected_cases=["R4","R5"]   ✓
+  限时贸易_精力芯片箱品质   selected_cases=["R5","R4"]   ✓
+  限时贸易_重击芯片箱品质   selected_cases=[]            ← 空，被固化
+  限时贸易_痛击芯片箱品质   selected_cases=[]            ← 空，被固化
+  限时贸易_特防芯片箱品质   selected_cases=[]            ← 空，被固化
+```
+
+空品质有两个后果，所以**必须两层都修**：
+
+| 层 | 修法 |
+|---|---|
+| 存档层 | **面板级规范化**：生成任务设置面板时，把**全部 7 个类型**的空品质补成 R4+R5 并落盘 |
+| 交互层 | 品质全不勾 → 取消上级；上级被勾 → 补勾其下品质 |
+
+> ⚠️ 只做"控件级"规范化是不够的：品质控件**只在对应类型被勾选时才创建**，
+> 所以未勾选类型里的空品质永远覆盖不到；用户之后再勾上该类型，读到的仍是空列表。
+> 这是第一次修完仍不生效的原因。
+
+### 2.2 实现位置：C# 自研 UI，不是 interface.json
 
 这类"勾选联动"是**运行时 UI 行为**，`interface.json` 只是声明式配置
 （`case.option` 只能控制子选项**是否显示**，不能反向改父选项），所以必须在
@@ -36,27 +62,31 @@
 | 项 | 内容 |
 |---|---|
 | 源码 | `.tmp/MFAAvalonia-src`（上游 `6065fe3`，各补丁已打） |
-| 改动文件 | `MFAAvalonia/Helper/TaskOptionGenerator.cs` → `CreateCheckboxControl` |
+| 改动文件 | `MFAAvalonia/Helper/TaskOptionGenerator.cs` |
 | 补丁 | `ui_custom/MFAAvalonia/laa-limited-trade-chip-options.patch` |
 | 构建 | `ui_custom/MFAAvalonia/build.ps1` |
 | 产物 | `install/libs/MFAAvalonia.Core.dll` |
 
 **代码要点**：
 
-- 新增 `LimitedTradeChipTypeNameOf("限时贸易_特防芯片箱品质") -> "特防"`，
-  由品质选项名反推上级类型名（两端固定前后缀，不用硬编码类型列表）。
-- `CreateCheckboxControl` 里维护两个局部表：
-  `toggleButtonsByCaseName`（case 名 → 按钮）、
-  `chipQualityParentToggles`（品质选项名 → 上级按钮）。
-- 品质勾选框取消勾选、且自身 `SelectedCases` 已空 → `SyncChipQualityParent(..., false)`
-  把上级按钮置为不勾选。只在状态**确实要变**时才赋值，避免递归。
-- 上级类型被勾选时，顺带把其下品质按钮补成勾选（兜底被取消过的情形）。
+- `LimitedTradeChipTypeNameOf("限时贸易_特防芯片箱品质") -> "特防"`：
+  由品质选项名反推上级类型名（两端固定前后缀，不硬编码类型列表）。
+- **`LimitedTradeChipTypeToggles`（类级静态注册表）**：类型名 → 该类型的 ToggleButton。
+  每次创建父按钮时覆盖登记。
+  > ⚠️ 原来用闭包捕获 ToggleButton **不行**：父项每次 `UpdateSubOptions()` 都会重建子控件，
+  > 闭包里的旧引用会失效。这是第二次修完仍不生效的原因。
+- `NormalizeLimitedTradeChipQualityOptions(dragItem)`：在 `GeneratePanelContent` /
+  `GenerateCommonPanelContent` 里**生成控件之前**调用，遍历 `限时贸易_芯片箱类型` 的全部
+  case，把空品质补齐并落盘；类型勾着但品质全空的，一并取消该类型。
+- 品质取消勾选且自身 `SelectedCases` 已空 → `SyncChipQualityParent(..., false)`。
+  只在状态**确实要变**时才赋值，避免递归。
+- 联动每次触发都写 `LoggerHelper.Info("[LAA] 芯片品质联动：…")`，便于实机排查。
 - 子选项控件由上级的 `UpdateSubOptions()` 重建；上级取消勾选后子控件随之消失，
   所以把上级置为未勾选**不会**留下悬空的子控件。
 
-### 2.2 购买侧核对（结论：一致，无需改 agent）
+### 2.3 购买侧核对：**已验证与勾选正确挂钩**
 
-追了一遍实际购买路径，**UI 与购买行为是一致的**，靠的是三道闸：
+追完实际购买路径并做了端到端验证，结论：**勾选 → 白名单 → 扫描 → 购买计划** 完全一致。
 
 | 闸 | 位置 | 作用 |
 |---|---|---|
@@ -64,30 +94,59 @@
 | 2 | `if not whitelist:` | 白名单为空直接进 `done`，根本不做扫描 |
 | 3 | `scan_items` 的 `_canonical_item(text, choices)` | 只回白名单内的名字 |
 
-因此「品质全不勾 → 该芯片箱不在白名单 → 扫不到 → 不会买」成立。
+**实测**（用户真实勾选：连击/装填/扩大，各 R4+R5）：
+
+```
+UI 勾选 3 个类型           -> 白名单精确产出 6 个箱子（每类型 R4+R5）
+商店在售 14 个箱子（全类型） -> 扫描只认出 6 个，精力/重击/痛击/特防 全被忽略
+购买计划 ⊆ 白名单 ✓，且白名单 6 项全被计划覆盖 ✓
+```
 
 > ⚠️ 边界说明：白名单过滤在 **`scan_items`**，**不在** `select_purchase_plan`。
 > 后者完全信任传入的扫描结果（把白名单外商品直接喂进去它照样会选）。
 > 生产路径下 `ordered` 只可能来自 `scan_items(..., whitelist, ...)`，所以安全；
-> 这一点已写成测试 `test_purchase_plan_trusts_the_scanned_items` 固定下来。
+> 已由 `test_purchase_plan_trusts_the_scanned_items` 与
+> `test_scan_items_only_returns_whitelisted_chip_boxes` 两条测试固定。
 
-### 2.3 验证状态
+### 2.4 验证状态
 
 | 项 | 状态 |
 |---|---|
 | C# 编译 | ✅ `dotnet build -c Release -r win-x64` 成功，无 error |
 | 补丁与工作区一致 | ✅ 正向 `git apply` 到干净源码 == 当前工作区 |
-| 新增回归测试 | ✅ `tools/test_limited_trade.py` 24 项（+6） |
-| 全量测试 | ✅ 14 个文件 183 项通过 |
-| **DLL 安装** | ⏳ **需关闭 MFA 后执行**（build.ps1 拒绝在 MFA 运行时覆盖） |
-| **实机点选验证** | ⏳ 待装完 DLL 后：勾「特防」→ 看 R4/R5 是否自动全勾；取消 R4+R5 → 看「特防」是否自动取消 |
+| DLL 安装 | ✅ 已装入 `install/libs`，用元数据指纹确认（`LimitedTradeChipTypeNameOf` 在、旧版不在） |
+| **实机点选** | ✅ **用户确认通过**（勾类型→品质全勾；取消 R4+R5→上级取消） |
+| 购买挂钩验证 | ✅ 端到端跑过：勾选 → 白名单 6 项 → 扫描忽略其余 8 项 → 计划一致 |
+| 回归测试 | ✅ `tools/test_limited_trade.py` 25 项（+7） |
+| 全量测试 | ✅ 14 个文件 184 项通过 |
 
-安装命令（**先关闭 MFA**）：
+### 2.5 装 DLL 的坑（重要）
+
+`build.ps1` **当前跑不起来**，有两个独立问题，我这次是手动绕过的：
+
+1. **`laa-daily-chip-stage-schedule.patch` 文件损坏**：
+   只有 79 行就被截断，且第 6 行中文被 UTF-8→GBK 转码搞坏
+   （`根据自定义设置…` 变成 `鏍规嵁鑷畾涔夎缃攣瀹?`）。`git apply` 报
+   `corrupt patch`（fatal 128），脚本在这个补丁上 `throw`，**后面的构建与复制都不执行**。
+   > 这就是「退出码看着正常但 DLL 没换」的原因。
+2. **脚本本身是 UTF-8 无 BOM**：Windows PowerShell 5.1 按 ANSI 读 `.ps1`，
+   脚本里的中文标记串被读坏 → 语法错误。本机没有 `pwsh`（PS 7）所以直接跑会失败。
+
+**当前可用的手动流程**（已验证）：
 
 ```powershell
 cd E:\MAA_crosscore
-pwsh -File ui_custom\MFAAvalonia\build.ps1
+# 1) 编译（跳过 build.ps1 的补丁检查）
+$dotnet = ".tmp\mfa-build\.dotnet-sdk\dotnet.exe"
+& $dotnet build ".tmp\MFAAvalonia-src\MFAAvalonia.Desktop\MFAAvalonia.Desktop.csproj" `
+    -c Release -r win-x64 --no-restore
+# 2) 关闭 MFA，然后覆盖
+Copy-Item ".tmp\MFAAvalonia-src\bin\AnyCPU\Release\MFAAvalonia.Core.dll" `
+          "install\libs\MFAAvalonia.Core.dll" -Force
 ```
+
+> ⚠️ **DLL 只在进程启动时加载**：装完必须重启 MFA，否则界面还是旧的。
+> 另外 `install/libs/` 里若残留 `*.bak-*` 副本不影响运行（不是加载路径），但别让它改名占用正式文件名。
 
 ---
 
@@ -353,3 +412,4 @@ Select-String -Path install\debug\maafw.log -Pattern 'msg=Node\.PipelineNode\.(S
 |---|---|
 | 2026-09-11 | 建立本文档；补录「每日探索体力消耗方式」与分支整理两项工作 |
 | 2026-09-11 | 新增 §2「限时贸易所芯片箱：上级类型 ↔ 品质 双向联动」 |
+| 2026-09-11 | §2 补齐真因（存档固化空品质）、类级注册表修法、购买挂钩端到端验证、装 DLL 的坑 |
