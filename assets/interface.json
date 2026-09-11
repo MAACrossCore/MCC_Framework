@@ -789,7 +789,7 @@
         "添加订单群好友": {
             "type": "switch",
             "label": "添加订单群好友",
-            "doc": "勾选后：基建前先加订单群好友，基建后再拉黑全部 held。须配置 config/orders_source.json（url），否则无法启动此功能。",
+            "description": "勾选后：基建前先加订单群好友，基建后再拉黑全部 held。须配置 config/orders_source.json（url），否则无法启动此功能。",
             "default_case": "No",
             "cases": [
                 {
