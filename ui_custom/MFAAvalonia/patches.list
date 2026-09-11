@@ -1,10 +1,10 @@
 # MFAAvalonia UI patches — apply in this order (pin: commit 6065fe3 @ v2.15.2).
-# Single source of truth: build.ps1 and .github/workflows/install.yml both read this file.
+# Single source of truth: build.ps1, apply-patches.sh, and install.yml read this file.
 laa-chip-filter.patch
 laa-chip-filter-total-level.patch
-laa-chip-task-checkbox.patch
-laa-daily-chip-stage-schedule.patch
+# TaskOptionGenerator changes live in laa-limited-trade-chip-options.patch (apply before TaskQueueView checkbox UI).
 laa-limited-trade-chip-options.patch
+laa-chip-task-checkbox.patch
 laa-pretask-path-resolution.patch
 laa-pretask-config-sync.patch
 laa-stop-on-task-failure.patch

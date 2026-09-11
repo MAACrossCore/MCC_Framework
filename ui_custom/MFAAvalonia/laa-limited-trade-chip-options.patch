@@ -1,12 +1,6 @@
 diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/TaskOptionGenerator.cs
 --- a/MFAAvalonia/Helper/TaskOptionGenerator.cs
 +++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
-@@ -1,4 +1,4 @@
--﻿using Avalonia;
-+using Avalonia;
- using Avalonia.Controls;
- using Avalonia.Controls.Primitives;
- using Avalonia.Controls.Templates;
 @@ -34,7 +34,205 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
      private static readonly Thickness OptionRowMargin = new(10, 3, 10, 3);
      private static readonly Thickness NestedOptionMargin = new(14, 2, 4, 4);
@@ -575,3 +569,12 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
      }
  
      // Helper Creation Methods
+@@ -1423,7 +1778,7 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+ 
+         var titleBox = new TextBox
+         {
+-            Text = (string?)param["title"] ?? "MFAAvalonia",
++            Text = (string?)param["title"] ?? "MCC",
+             MinWidth = 120,
+             Margin = new Thickness(0, 2, 0, 2),
+             VerticalAlignment = VerticalAlignment.Center,

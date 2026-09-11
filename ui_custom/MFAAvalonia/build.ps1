@@ -61,8 +61,7 @@ if (-not (Test-Path -LiteralPath $hostExe)) {
 $patchMarkers = @{
     'laa-chip-filter.patch' = @{ MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'ChipFilterCatalog' }
     'laa-chip-filter-total-level.patch' = @{ MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'MinimumTotalLevel' }
-    'laa-chip-task-checkbox.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'UseChipTaskCheckBox' }
-    'laa-daily-chip-stage-schedule.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'DailyChipStageSchedule' }
+    'laa-chip-task-checkbox.patch' = @{ MarkerFile = 'MFAAvalonia\Views\Pages\TaskQueueView.axaml.cs'; Marker = 'UseChipTaskCheckBox' }
     'laa-limited-trade-chip-options.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'IsLimitedTradeChipTypeOption' }
     'laa-pretask-path-resolution.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'localPythonCandidates' }
     'laa-pretask-config-sync.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'MFA_INSTANCE_CONFIG_PATH' }
@@ -94,16 +93,16 @@ $patches = Get-Content -LiteralPath $patchesList |
 
 foreach ($patchSpec in $patches) {
     $patch = Join-Path $PSScriptRoot $patchSpec.File
-    $code = Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', '--check', $patch) -Quiet
+    $code = Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', '--ignore-space-change', '--check', $patch) -Quiet
     if ($code -eq 0) {
-        Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', $patch) -Quiet | Out-Null
+        Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', '--ignore-space-change', $patch) -Quiet | Out-Null
     } else {
         $markerPath = Join-Path $source $patchSpec.MarkerFile
         if ((Test-Path -LiteralPath $markerPath) -and
             (Select-String -LiteralPath $markerPath -Pattern $patchSpec.Marker -Quiet)) {
             continue
         }
-        $reverse = Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', '--reverse', '--check', $patch) -Quiet
+        $reverse = Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', '--ignore-space-change', '--reverse', '--check', $patch) -Quiet
         if ($reverse -ne 0) {
             throw "MFAAvalonia source does not match patch: $patch"
         }
