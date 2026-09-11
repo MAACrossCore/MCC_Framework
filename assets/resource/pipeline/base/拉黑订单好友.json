@@ -3,32 +3,32 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1788109425052,
+            "lastSyncTime": 1789136030624,
             "isModifiedExternally": false,
             "isDeleted": false,
-            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MaaXXX-win-x86_64-v0.3.0\\resource\\pipeline\\base\\拉黑订单好友.json",
+            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MAAlocalhost\\resource\\pipeline\\base\\拉黑订单好友.json",
             "savedViewport": {
-                "x": 627,
-                "y": -1214,
-                "zoom": 0.75
+                "x": 354,
+                "y": -721,
+                "zoom": 0.46
             },
             "filename": "拉黑订单好友",
-            "version": "v1.9.2"
+            "version": "v1.10.0"
         }
     },
     "$__mpe_external_子任务_进入个人配置_拉黑订单好友": {
         "$__mpe_code": {
             "position": {
-                "x": 572,
-                "y": 2450
+                "x": 536,
+                "y": 2440
             }
         }
     },
     "$__mpe_external_子任务_进入首页_拉黑订单好友": {
         "$__mpe_code": {
             "position": {
-                "x": 542,
-                "y": 2138
+                "x": 534,
+                "y": 2062
             }
         }
     },
@@ -44,8 +44,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1896,
-                "y": 2300
+                "x": 1932,
+                "y": 2298
             }
         }
     },
@@ -61,8 +61,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 961,
-                "y": 2279
+                "x": 822,
+                "y": 2285
             }
         }
     },
@@ -93,8 +93,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1214,
-                "y": 1839
+                "x": 1087,
+                "y": 2002
             }
         }
     },
@@ -151,8 +151,8 @@
     "拉黑好友流程": {
         "doc": "入口：按 orders_state.friends 从头逐个屏蔽并移出登记",
         "next": [
+            "寻找好友",
             "[JumpBack]子任务_进入个人配置",
-            "取下一待删好友",
             "[JumpBack]子任务_进入首页"
         ],
         "$__mpe_code": {

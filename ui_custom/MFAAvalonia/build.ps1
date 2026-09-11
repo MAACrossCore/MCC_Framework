@@ -57,27 +57,40 @@ if (-not (Test-Path -LiteralPath $hostExe)) {
     throw "缺少宿主 exe：$hostExe`n（先构建本地 install 运行镜像再跑本脚本）"
 }
 
-$patches = @(
-    @{ File = 'laa-chip-filter.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'ChipFilterCatalog' },
-    @{ File = 'laa-chip-filter-total-level.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'MinimumTotalLevel' },
-    @{ File = 'laa-chip-task-checkbox.patch'; MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'UseChipTaskCheckBox' },
-    @{ File = 'laa-daily-chip-stage-schedule.patch'; MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'DailyChipStageSchedule' },
-    @{ File = 'laa-limited-trade-chip-options.patch'; MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'IsLimitedTradeChipTypeOption' },
-    @{ File = 'laa-pretask-path-resolution.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'localPythonCandidates' },
-    @{ File = 'laa-pretask-config-sync.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'MFA_INSTANCE_CONFIG_PATH' },
-    @{ File = 'laa-stop-on-task-failure.patch'; MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'ContinueOnError = false' },
-    @{ File = 'laa-no-autostart.patch'; MarkerFile = 'MFAAvalonia\Views\Windows\RootView.axaml.cs'; Marker = 'if \(!noAutoStart\)|suppressAutoStartOnce' },
-    @{ File = 'laa-reset-task-confirmation.patch'; MarkerFile = 'MFAAvalonia\ViewModels\Pages\TaskQueueViewModel.cs'; Marker = '当前操作会重置任务列表中所有已有设置' },
-    @{ File = 'laa-simplified-settings.patch'; MarkerFile = 'MFAAvalonia\Views\Pages\SettingsView.axaml'; Marker = 'LAA: simplified settings' },
-    @{ File = 'laa-project-profiles-scheduler.patch'; MarkerFile = 'MFAAvalonia\ViewModels\Other\SystemScheduledTaskManager.cs'; Marker = 'SystemScheduledTaskManager' },
-    @{ File = 'laa-emulator-minimize-setting.patch'; MarkerFile = 'MFAAvalonia\Configuration\ConfigurationKeys.cs'; Marker = 'MinimizeEmulatorAfterLaunch' },
-    @{ File = 'laa-simplified-start-end-actions.patch'; MarkerFile = 'MFAAvalonia\ViewModels\UsersControls\Settings\StartSettingsUserControlModel.cs'; Marker = 'NormalizeBeforeTask' },
-    @{ File = 'laa-settings-runtime-fixes.patch'; MarkerFile = 'MFAAvalonia\Extensions\GlobalStartManager.cs'; Marker = '未进入运行状态' },
-    # MCC 品牌：界面文案 MFA -> MCC（改的是 resx 的 value 与硬编码标题，键名/标识符不动）
-    @{ File = 'laa-rebrand-mcc-text.patch'; MarkerFile = 'MFAAvalonia\Assets\Localization\Strings.resx'; Marker = 'MCC 任务管理器' },
-    # MCC 品牌：图标（Assets/logo.ico 与 MFAUpdater/logo.ico）
-    @{ File = 'laa-rebrand-mcc-logo.patch'; MarkerFile = 'ui_custom\MFAAvalonia\laa-rebrand-mcc-logo.applied'; Marker = 'MCC branding: logo.ico replaced' }
-)
+# Idempotency markers keyed by patch filename — order comes from patches.list.
+$patchMarkers = @{
+    'laa-chip-filter.patch' = @{ MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'ChipFilterCatalog' }
+    'laa-chip-filter-total-level.patch' = @{ MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'MinimumTotalLevel' }
+    'laa-chip-task-checkbox.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'UseChipTaskCheckBox' }
+    'laa-daily-chip-stage-schedule.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'DailyChipStageSchedule' }
+    'laa-limited-trade-chip-options.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'IsLimitedTradeChipTypeOption' }
+    'laa-pretask-path-resolution.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'localPythonCandidates' }
+    'laa-pretask-config-sync.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'MFA_INSTANCE_CONFIG_PATH' }
+    'laa-stop-on-task-failure.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'ContinueOnError = false' }
+    'laa-no-autostart.patch' = @{ MarkerFile = 'MFAAvalonia\Views\Windows\RootView.axaml.cs'; Marker = 'if \(!noAutoStart\)|suppressAutoStartOnce' }
+    'laa-reset-task-confirmation.patch' = @{ MarkerFile = 'MFAAvalonia\ViewModels\Pages\TaskQueueViewModel.cs'; Marker = '当前操作会重置任务列表中所有已有设置' }
+    'laa-simplified-settings.patch' = @{ MarkerFile = 'MFAAvalonia\Views\Pages\SettingsView.axaml'; Marker = 'LAA: simplified settings' }
+    'laa-project-profiles-scheduler.patch' = @{ MarkerFile = 'MFAAvalonia\ViewModels\Other\SystemScheduledTaskManager.cs'; Marker = 'SystemScheduledTaskManager' }
+    'laa-emulator-minimize-setting.patch' = @{ MarkerFile = 'MFAAvalonia\Configuration\ConfigurationKeys.cs'; Marker = 'MinimizeEmulatorAfterLaunch' }
+    'laa-simplified-start-end-actions.patch' = @{ MarkerFile = 'MFAAvalonia\ViewModels\UsersControls\Settings\StartSettingsUserControlModel.cs'; Marker = 'NormalizeBeforeTask' }
+    'laa-settings-runtime-fixes.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\GlobalStartManager.cs'; Marker = '未进入运行状态' }
+    'laa-rebrand-mcc-text.patch' = @{ MarkerFile = 'MFAAvalonia\Assets\Localization\Strings.resx'; Marker = 'MCC 任务管理器' }
+    'laa-rebrand-mcc-logo.patch' = @{ MarkerFile = 'ui_custom\MFAAvalonia\laa-rebrand-mcc-logo.applied'; Marker = 'MCC branding: logo.ico replaced' }
+}
+
+$patchesList = Join-Path $PSScriptRoot 'patches.list'
+$patches = Get-Content -LiteralPath $patchesList |
+    ForEach-Object { $_.Trim() } |
+    Where-Object { $_ -and -not $_.StartsWith('#') } |
+    ForEach-Object {
+        $file = $_
+        if (-not $patchMarkers.ContainsKey($file)) {
+            throw "patches.list entry missing marker map in build.ps1: $file"
+        }
+        $spec = $patchMarkers[$file].Clone()
+        $spec['File'] = $file
+        $spec
+    }
 
 foreach ($patchSpec in $patches) {
     $patch = Join-Path $PSScriptRoot $patchSpec.File

@@ -3,17 +3,17 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1788611518493,
+            "lastSyncTime": 1789139116832,
             "isModifiedExternally": false,
             "isDeleted": false,
             "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MAAlocalhost\\resource\\pipeline\\base\\基建.json",
             "savedViewport": {
-                "x": -4621,
-                "y": -214,
-                "zoom": 0.4
+                "x": -8843,
+                "y": -1339,
+                "zoom": 0.7
             },
             "filename": "基建",
-            "version": "v1.9.3"
+            "version": "v1.10.0"
         }
     },
     "$__mpe_external_子任务_点击返回_基建": {
@@ -118,6 +118,21 @@
     },
     "基建": {
         "next": [
+            "基建_前置_添加订单群好友",
+            "基建_主体"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6732,
+                "y": 335
+            }
+        }
+    },
+    "基建_主体": {
+        "on_error": [
+            "基建_错误收尾"
+        ],
+        "next": [
             "基地",
             "基建_收取资源",
             "[JumpBack]子任务_进入首页"
@@ -125,6 +140,84 @@
         "$__mpe_code": {
             "position": {
                 "x": 6732,
+                "y": 335
+            }
+        }
+    },
+    "基建_前置_添加订单群好友": {
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "基建_订单群_检查配置"
+            }
+        },
+        "next": [
+            "订单好友添加流程"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6400,
+                "y": 335
+            }
+        }
+    },
+    "基建_订单群_添加后衔接": {
+        "next": [
+            "[JumpBack]子任务_进入首页",
+            "基建_主体"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6520,
+                "y": 480
+            }
+        }
+    },
+    "基建_订单群_拉黑后衔接": {
+        "next": [
+            "[JumpBack]子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6960,
+                "y": 480
+            }
+        }
+    },
+    "基建_收尾": {
+        "next": [
+            "[JumpBack]通用-返回主页",
+            "基建_后置_拉黑订单群好友"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6840,
+                "y": 335
+            }
+        }
+    },
+    "基建_错误收尾": {
+        "next": [
+            "基建_后置_拉黑订单群好友",
+            "通用-返回主页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6840,
+                "y": 480
+            }
+        }
+    },
+    "基建_后置_拉黑订单群好友": {
+        "enabled": false,
+        "next": [
+            "拉黑好友流程"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7080,
                 "y": 335
             }
         }
@@ -218,7 +311,7 @@
             "[JumpBack]基建_拜访下一位好友"
         ],
         "on_error": [
-            "通用-返回主页"
+            "基建_错误收尾"
         ],
         "$__mpe_code": {
             "position": {
@@ -468,7 +561,9 @@
             }
         },
         "post_delay": 1000,
-        "next": "基建_制作素材_材料充足_确定",
+        "next": [
+            "基建_制作素材_材料充足_确定"
+        ],
         "$__mpe_code": {
             "position": {
                 "x": 10582,
@@ -609,8 +704,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 13272,
-                "y": 1905
+                "x": 12239,
+                "y": 2146
             }
         }
     },
@@ -645,8 +740,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 12643,
-                "y": 1795
+                "x": 12541,
+                "y": 2007
             }
         }
     },
@@ -683,8 +778,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 12940,
-                "y": 1812
+                "x": 12853,
+                "y": 2073
             }
         }
     },
@@ -692,24 +787,18 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [
-                    75,
-                    474,
-                    106,
-                    76
-                ],
                 "template": "好友交付记录.png",
                 "threshold": 0.9
             }
         },
         "post_delay": 1000,
         "next": [
-            "通用-返回主页"
+            "基建_收尾"
         ],
         "$__mpe_code": {
             "position": {
-                "x": 13782,
-                "y": 2064
+                "x": 13371,
+                "y": 2207
             }
         }
     },
@@ -1599,17 +1688,17 @@
                     {
                         "recognition": {
                             "param": {
+                                "expected": [
+                                    "^[xX×]?[ ]*10$"
+                                ],
+                                "only_rec": true,
                                 "roi": "icon",
                                 "roi_offset": [
                                     -117,
                                     133,
                                     119,
                                     -29
-                                ],
-                                "expected": [
-                                    "^[xX×]?[ ]*10$"
-                                ],
-                                "only_rec": true
+                                ]
                             },
                             "type": "OCR"
                         },
@@ -1682,17 +1771,17 @@
                     {
                         "recognition": {
                             "param": {
+                                "expected": [
+                                    "^[xX×]?[ ]*16$"
+                                ],
+                                "only_rec": true,
                                 "roi": "icon",
                                 "roi_offset": [
                                     -117,
                                     133,
                                     119,
                                     -29
-                                ],
-                                "expected": [
-                                    "^[xX×]?[ ]*16$"
-                                ],
-                                "only_rec": true
+                                ]
                             },
                             "type": "OCR"
                         },
@@ -1765,17 +1854,17 @@
                     {
                         "recognition": {
                             "param": {
+                                "expected": [
+                                    "^[xX×]?[ ]*18$"
+                                ],
+                                "only_rec": true,
                                 "roi": "icon",
                                 "roi_offset": [
                                     -117,
                                     133,
                                     119,
                                     -29
-                                ],
-                                "expected": [
-                                    "^[xX×]?[ ]*18$"
-                                ],
-                                "only_rec": true
+                                ]
                             },
                             "type": "OCR"
                         },
@@ -1848,17 +1937,17 @@
                     {
                         "recognition": {
                             "param": {
+                                "expected": [
+                                    "^[xX×]?[ ]*6$"
+                                ],
+                                "only_rec": true,
                                 "roi": "icon",
                                 "roi_offset": [
                                     -117,
                                     133,
                                     119,
                                     -29
-                                ],
-                                "expected": [
-                                    "^[xX×]?[ ]*6$"
-                                ],
-                                "only_rec": true
+                                ]
                             },
                             "type": "OCR"
                         },
@@ -1931,17 +2020,17 @@
                     {
                         "recognition": {
                             "param": {
+                                "expected": [
+                                    "^[xX×]?[ ]*8$"
+                                ],
+                                "only_rec": true,
                                 "roi": "icon",
                                 "roi_offset": [
                                     -117,
                                     133,
                                     119,
                                     -29
-                                ],
-                                "expected": [
-                                    "^[xX×]?[ ]*8$"
-                                ],
-                                "only_rec": true
+                                ]
                             },
                             "type": "OCR"
                         },
@@ -2081,7 +2170,7 @@
             "[JumpBack]基建_经验_可交付",
             "[JumpBack]基建_星币_可交付",
             "基建_拜访好友",
-            "通用-返回主页"
+            "基建_收尾"
         ],
         "$__mpe_code": {
             "position": {
