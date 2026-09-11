@@ -14,6 +14,7 @@
 | 2026-09-11 | 分支整理：`codex/daily-chip-rewards` → `huangtong` | ✅ 完成，codex 待删 | `docs/交接-每日探索体力消耗方式.md` §〇 |
 | 2026-09-11 | 限时贸易所芯片箱：上级类型 ↔ 品质 双向联动 | ✅ **实机验证通过**，购买挂钩已核对 | 本文 §2 |
 | 2026-09-11 | 持久化工作台账（本文档） | ✅ | 本文 |
+| 2026-09-11 | MFA → MCC 品牌化（Logo / 文案 / exe 图标 / 顶部去 `MaaXXX`） | ✅ 全部生效 | 本文 §2.6 |
 
 ---
 
@@ -151,6 +152,63 @@ cd E:\MAA_crosscore
 （`TaskOptionGenerator.cs` 的那份是从上游直接生成到最终状态的），所以对已打过补丁的源码
 它们「打不上」是**正常**的，脚本靠 marker 跳过。判断链条是否健康，看的是
 **有没有 throw**，而不是「每个补丁都 apply 成功」。
+
+---
+
+### 2.6 MFA → MCC 品牌化（2026-09-11）
+
+**用户要求**：Logo 换成 `桌面\logo.png`；界面所有**显示**文案 MFA → MCC；
+**代码内标识符先不改**；顶部只留 `v0.4.2`，去掉 `MaaXXX`。
+
+| 位置 | 改法 | 生效条件 |
+|---|---|---|
+| 窗口 / 托盘 / 各子窗口图标 | `MFAAvalonia/Assets/logo.ico`、`MFAUpdater/logo.ico` 换成 7 尺寸 ICO（16/24/32/48/64/128/256） | 重编 `Core.dll` + 重启 MFA |
+| 界面文案 | 4 份 `Strings*.resx` **只改 `<value>` 文本** | 同上 |
+| 硬编码标题 | `App.axaml.cs`（3 处）、`TaskOptionGenerator.cs`、`SystemScheduledTaskManager.cs` | 同上 |
+| **exe 内嵌图标** | `rcedit-x64.exe --set-icon`（`build.ps1` 已自动化） | 重启 MFA |
+| 顶部 `MaaXXX` | `interface.json` 加 `"label": "\u200B"` | 重启 MFA |
+
+**① resx 只能改 `<value>`**：第一遍把 key 名也替换了（`AutomaticUpdateMFA` → `AutomaticUpdateMCC`），
+直接把 `Strings.Designer.cs` 打断。**key 名必须原样保留**，只替换 `<value>` 内容。
+
+**② 顶部 `MaaXXX` 为什么不能直接删**：`deps/tools/interface.schema.json` 根 `required` 里有
+`name`，删掉 `validate_schema` 直接红。而显示链路是：
+
+```
+MaaProcessor.cs:2561   name(显示) = Interface.Label ,  back(回退) = Interface.Name
+LanguageHelper.GetLocalizedDisplayName(label, name):
+    label 空 / 以 $ 开头且查不到  -> 用 name
+    其它                          -> 原样返回 label
+RootView.axaml:181/184  ResourceName 与 ResourceVersion 共用 IsResourceNameVisible
+```
+
+`IsResourceNameVisible=false` 会把 **`v0.4.2` 一起藏掉**（同一个绑定），
+所以只能让「显示的文本」零宽：
+
+```json
+"name": "MaaXXX",     // 内部 ID，保留（用户要求代码内名字先不改）
+"label": "\u200B",    // 零宽空格：Unicode 类别 Cf，IsNullOrWhiteSpace=false
+```
+
+→ 显示开关照常打开、渲染出来看不见，结果是 `MCC 任务管理器    v0.4.2`。
+
+> 残留：Windows 窗口标题由 `TitleConverter.cs:31` 拼 `"{app} {ver} | {name} {ver}"`，
+> 会多一个空格 → `MCC 任务管理器 v2.15.2 |  v0.4.2`。程序内标题栏看不到，
+> 只影响任务栏悬浮 / Alt-Tab。
+> **2026-09-11 用户决定暂不处理**——别自作主张去改那个转换器。
+
+**③ exe 图标必须单独换**：`install/` 的 exe 来自 `dotnet publish`（NetBeauty 打包过 `libs/`），
+`build.ps1` 原来只复制 `Core.dll`，所以**重编译后任务栏图标会退回旧 logo**。
+现在脚本结尾用 `tools/rcedit-x64.exe --set-icon` 只改图标资源，不动打包结构。
+
+这一步刻意做成**失败关闭**：`rcedit` 或宿主 exe 缺失时在**编译前**就 `throw`
+（实测 0.3 秒、退出码 1，不会白等编译）。原来是 `Write-Warning` 后继续，
+会造出「构建成功、图标却悄悄退回旧 logo」的假象——正是这轮最花时间的那类 bug。
+
+> `rcedit-x64.exe` 会被 `.gitignore:39` 那段通用模板规则 `*.exe` 当成编译产物误伤，
+> 已按仓库既有惯例（`deps/tools/` 的 `!` 反例写法）单独开了例外。
+> ⚠️ 它**全仓库只有这一份**（`.tmp` 下那份同样被忽略，不算备份），
+> 而 `git clean -xdf` 会连同它一起删掉 `.venv/`、`.cache/`、`.tmp/mfa-build` 等 110 项。
 
 ---
 
@@ -380,6 +438,35 @@ Python 源码 `py_compile` 报 `invalid non-printable character U+FEFF`。
 - `git show` / `Format-Hex` 输出中文会被转义 → 用 Python 走 `subprocess` 读字节
 - 文件名含中文时 `Select-String -Path` 会部分失败 → 用 Python 遍历
 
+### 5.7 Windows 图标缓存会把换好的图标盖住
+
+换完 exe 图标后「看起来没变」，**先别怀疑 rcedit**。按证据链逐个排除：
+
+| 证据 | 结果 |
+|---|---|
+| 从 `install\MFAAvalonia.exe` 抽出 256×256 条目，与 `logo-mcc.ico` 比对 | **字节相同**（指纹 + 整段都命中）|
+| `MFAAvalonia.exe.bak-before-mcc-icon` 同法抽取 | 命中 0（确认确实换了）|
+| `MFAAvalonia.Core.dll` 里内嵌的 `avares://MFAAvalonia.Core/Assets/logo.ico` | 命中 |
+| 窗口标题栏截图 | 新 logo |
+| `SHGetFileInfo`（Shell 自己取图标） | 新 logo |
+
+全都对、用户却还看到旧图 → **Explorer 的图标缓存**是换图标**之前**建的。
+清缓存 + 重启 explorer 后正常：
+
+```powershell
+Stop-Process -Name explorer -Force
+Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Explorer" -Force -File |
+    Where-Object { $_.Name -like 'iconcache*' -or $_.Name -like 'thumbcache*' } |
+    Remove-Item -Force
+Remove-Item "$env:LOCALAPPDATA\IconCache.db" -Force -ErrorAction SilentlyContinue
+Start-Process explorer.exe
+& "$env:SystemRoot\System32\ie4uinit.exe" -show
+```
+
+> **排查手法比结论更值钱**：`Add-Type` 拉 `user32!PrintWindow` 能截任意窗口，
+> `shell32!SHGetFileInfo` 能拿到 Shell 真正会渲染的图标——比盯着屏幕猜快得多。
+> 附带代价：清缓存会**关掉用户当时开着的所有资源管理器窗口**，动手前先说一声。
+
 ---
 
 ## 6. 常用命令速查
@@ -418,3 +505,6 @@ Select-String -Path install\debug\maafw.log -Pattern 'msg=Node\.PipelineNode\.(S
 | 2026-09-11 | 新增 §2「限时贸易所芯片箱：上级类型 ↔ 品质 双向联动」 |
 | 2026-09-11 | §2 补齐真因（存档固化空品质）、类级注册表修法、购买挂钩端到端验证 |
 | 2026-09-11 | 修复 build.ps1 三个 bug（stderr 终止脚本、补丁损坏、脚本无 BOM），端到端跑通 |
+| 2026-09-11 | MFA → MCC 品牌化：Logo、resx 文案、硬编码标题、隐藏顶部 `MaaXXX`（§2.6）|
+| 2026-09-11 | `build.ps1` 结尾自动用 rcedit 换 exe 内嵌图标；踩到 Windows 图标缓存（§5.7）|
+| 2026-09-11 | 图标步骤改为失败关闭（编译前 throw）；`.gitignore` 给 rcedit 开 `!` 例外（§2.6 ③）|

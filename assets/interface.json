@@ -1,6 +1,7 @@
 {
     "interface_version": 2,
     "name": "MaaXXX",
+    "label": "\u200B",
     "description": "交错战线助手（基于 MCCA 任务结构）",
     "version": "v0.4.2",
     "pretask": {

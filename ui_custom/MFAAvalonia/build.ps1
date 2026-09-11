@@ -44,6 +44,19 @@ function Invoke-Native {
     }
 }
 
+# 换 exe 图标的两样必需品，缺任何一个都直接失败（失败关闭）：
+# 静默跳过会造出「构建成功、图标却悄悄退回旧 logo」的假象。
+# 放在编译之前，避免白等几分钟才报错。
+# rcedit 全仓库只有这一份，.gitignore 里专门为它开了 ! 反例。
+$rcedit = Join-Path $PSScriptRoot 'tools\rcedit-x64.exe'
+$hostExe = Join-Path $projectRoot 'install\MFAAvalonia.exe'
+if (-not (Test-Path -LiteralPath $rcedit)) {
+    throw "缺少 rcedit：$rcedit`n（Windows 任务栏 / 资源管理器读的是宿主 exe 的内嵌图标，没有它换不了）"
+}
+if (-not (Test-Path -LiteralPath $hostExe)) {
+    throw "缺少宿主 exe：$hostExe`n（先构建本地 install 运行镜像再跑本脚本）"
+}
+
 $patches = @(
     @{ File = 'laa-chip-filter.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'ChipFilterCatalog' },
     @{ File = 'laa-chip-filter-total-level.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'MinimumTotalLevel' },
@@ -59,7 +72,11 @@ $patches = @(
     @{ File = 'laa-project-profiles-scheduler.patch'; MarkerFile = 'MFAAvalonia\ViewModels\Other\SystemScheduledTaskManager.cs'; Marker = 'SystemScheduledTaskManager' },
     @{ File = 'laa-emulator-minimize-setting.patch'; MarkerFile = 'MFAAvalonia\Configuration\ConfigurationKeys.cs'; Marker = 'MinimizeEmulatorAfterLaunch' },
     @{ File = 'laa-simplified-start-end-actions.patch'; MarkerFile = 'MFAAvalonia\ViewModels\UsersControls\Settings\StartSettingsUserControlModel.cs'; Marker = 'NormalizeBeforeTask' },
-    @{ File = 'laa-settings-runtime-fixes.patch'; MarkerFile = 'MFAAvalonia\Extensions\GlobalStartManager.cs'; Marker = '未进入运行状态' }
+    @{ File = 'laa-settings-runtime-fixes.patch'; MarkerFile = 'MFAAvalonia\Extensions\GlobalStartManager.cs'; Marker = '未进入运行状态' },
+    # MCC 品牌：界面文案 MFA -> MCC（改的是 resx 的 value 与硬编码标题，键名/标识符不动）
+    @{ File = 'laa-rebrand-mcc-text.patch'; MarkerFile = 'MFAAvalonia\Assets\Localization\Strings.resx'; Marker = 'MCC 任务管理器' },
+    # MCC 品牌：图标（Assets/logo.ico 与 MFAUpdater/logo.ico）
+    @{ File = 'laa-rebrand-mcc-logo.patch'; MarkerFile = 'ui_custom\MFAAvalonia\laa-rebrand-mcc-logo.applied'; Marker = 'MCC branding: logo.ico replaced' }
 )
 
 foreach ($patchSpec in $patches) {
@@ -113,3 +130,14 @@ if (-not (Test-Path -LiteralPath (Split-Path $targetCore -Parent))) {
 }
 Copy-Item -LiteralPath $builtCore -Destination $targetCore -Force
 Write-Output "Installed customized UI core: $targetCore"
+
+# exe 内嵌图标单独替换：
+# Windows 任务栏与资源管理器读的是宿主 exe 的图标资源，与 Core.dll 无关，
+# 而 install 里的 exe 来自 dotnet publish（NetBeauty 打包过 libs 目录），
+# 直接用 build 输出替换 exe 会丢打包结构，所以只改图标资源。
+$iconFile = Join-Path $source 'MFAAvalonia\Assets\logo.ico'
+$iconCode = Invoke-Native -FilePath $rcedit -Arguments @($hostExe, '--set-icon', $iconFile)
+if ($iconCode -ne 0) {
+    throw "rcedit 替换 exe 图标失败（退出码 $iconCode）"
+}
+Write-Output "Installed exe icon: $hostExe"

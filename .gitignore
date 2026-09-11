@@ -453,6 +453,11 @@ install
 # Tools
 tools/ImageCropper/**/*.png
 
+# rcedit：build.ps1 靠它替换宿主 exe 的内嵌图标（任务栏 / 资源管理器读的是这个，
+# 不是 Core.dll）。上面「# Executables  *.exe」会把它一起忽略掉，这里开例外。
+# 注意：它只有这一份，`git clean -xdf` 会连同 .tmp 下的副本一起删掉。
+!ui_custom/MFAAvalonia/tools/rcedit-x64.exe
+
 config
 debug
 

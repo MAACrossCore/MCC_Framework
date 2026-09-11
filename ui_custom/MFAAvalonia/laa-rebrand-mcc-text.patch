@@ -1,0 +1,1056 @@
+diff --git a/MFAAvalonia/Assets/Localization/Strings.resx b/MFAAvalonia/Assets/Localization/Strings.resx
+index 6034778..a80c2c6 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.resx
+@@ -96,7 +96,7 @@
+         <value>正在应用更新.....</value>
+     </data>
+     <data name="AppTitle" xml:space="preserve">
+-        <value>MFA 任务管理器</value>
++        <value>MCC 任务管理器</value>
+     </data>
+     <data name="AutoDetect" xml:space="preserve">
+         <value>AutoDetect (自动检测)</value>
+@@ -105,10 +105,10 @@
+         <value>自动检测更新</value>
+     </data>
+     <data name="AutomaticHide" xml:space="preserve">
+-        <value>启动 MFA 后直接隐藏</value>
++        <value>启动 MCC 后直接隐藏</value>
+     </data>
+     <data name="AutomaticMinimize" xml:space="preserve">
+-        <value>启动 MFA 后直接最小化</value>
++        <value>启动 MCC 后直接最小化</value>
+     </data>
+     <data name="AutomaticUpdateMFA" xml:space="preserve">
+         <value>自动更新软件</value>
+@@ -421,7 +421,7 @@
+         <value>创建 GitHub issue</value>
+     </data>
+     <data name="ErrorProlog" xml:space="preserve">
+-        <value>MFA 遇到了问题</value>
++        <value>MCC 遇到了问题</value>
+     </data>
+     <data name="ExeFilter" xml:space="preserve">
+         <value>可运行文件</value>
+@@ -862,7 +862,7 @@
+         <value>正在尝试重启 ADB Server</value>
+     </data>
+     <data name="RestartMFA" xml:space="preserve">
+-        <value>重启MFA</value>
++        <value>重启MCC</value>
+     </data>
+     <data name="RestartPC" xml:space="preserve">
+         <value>重启电脑</value>
+@@ -1514,7 +1514,7 @@
+         <value>请删除整个文件夹重新下载，或联系项目维护者。</value>
+     </data>
+     <data name="NoEmulatorFoundDetail" xml:space="preserve">
+-        <value>请确保模拟器的ADB功能打开状态，桥接模式为关闭状态，重启MFA和模拟器后重新尝试连接。</value>
++        <value>请确保模拟器的ADB功能打开状态，桥接模式为关闭状态，重启MCC和模拟器后重新尝试连接。</value>
+     </data>
+     <data name="Reset" xml:space="preserve">
+         <value>重置</value>
+@@ -1734,7 +1734,7 @@
+             <value>缺少系统组件</value>
+         </data>
+         <data name="RuntimeMissingDescription" xml:space="preserve">
+-            <value>MFAAvalonia 需要 Microsoft Visual C++ Redistributable (x64) 才能运行。</value>
++            <value>MCC 需要 Microsoft Visual C++ Redistributable (x64) 才能运行。</value>
+         </data>
+         <data name="DownloadAndInstall" xml:space="preserve">
+             <value>下载并安装</value>
+@@ -1770,7 +1770,7 @@
+             <value>程序现在在临时目录里跑着呢，一关掉可能就没了。先把压缩包解压到一个文件夹里，再打开里面的程序吧。</value>
+         </data>
+         <data name="TempDirWarningHint" xml:space="preserve">
+-            <value>小提示：建议解压到一个专门的文件夹，比如「D:\MFA」，别放桌面或者下载文件夹，那样更方便管理。</value>
++            <value>小提示：建议解压到一个专门的文件夹，比如「D:\MCC」，别放桌面或者下载文件夹，那样更方便管理。</value>
+         </data>
+     <data name="ExitProgram" xml:space="preserve">
+         <value>退出程序</value>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.en-US.resx b/MFAAvalonia/Assets/Localization/Strings.en-US.resx
+index 8e97d98..4f78bcd 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.en-US.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.en-US.resx
+@@ -88,7 +88,7 @@
+         <value>Applying update...</value>
+     </data>
+     <data name="AppTitle" xml:space="preserve">
+-        <value>MFA Task Manager</value>
++        <value>MCC Task Manager</value>
+     </data>
+     <data name="AutoDetect" xml:space="preserve">
+         <value>AutoDetect (Automatic Detection)</value>
+@@ -412,7 +412,7 @@
+         <value>Create a GitHub issue</value>
+     </data>
+     <data name="ErrorProlog" xml:space="preserve">
+-        <value>MFA has encountered an error</value>
++        <value>MCC has encountered an error</value>
+     </data>
+     <data name="ExeFilter" xml:space="preserve">
+         <value>Executable files</value>
+@@ -853,7 +853,7 @@
+         <value>Trying to restart the ADB Server</value>
+     </data>
+     <data name="RestartMFA" xml:space="preserve">
+-        <value>Restart MFA</value>
++        <value>Restart MCC</value>
+     </data>
+     <data name="RestartPC" xml:space="preserve">
+         <value>Restart computer</value>
+@@ -1102,10 +1102,10 @@
+         <value>Connection retry window after launch (seconds)</value>
+     </data>
+     <data name="WaitSoftwareDescription" xml:space="preserve">
+-        <value>After launching the software, MFA will keep trying to connect within this time. Once connected, it waits 5 more seconds and starts the task automatically.</value>
++        <value>After launching the software, MCC will keep trying to connect within this time. Once connected, it waits 5 more seconds and starts the task automatically.</value>
+     </data>
+     <data name="WaitSoftwareTime" xml:space="preserve">
+-        <value>After launching {0}, MFA will keep trying to connect for {1} seconds</value>
++        <value>After launching {0}, MCC will keep trying to connect for {1} seconds</value>
+     </data>
+     <data name="StartupConnectRetrying" xml:space="preserve">
+         <value>Trying to connect to {0}, {1} seconds remaining</value>
+@@ -1501,7 +1501,7 @@
+         <value>Please delete the entire folder and redownload, or contact the project maintainer.</value>
+     </data>
+     <data name="NoEmulatorFoundDetail" xml:space="preserve">
+-        <value>Please ensure that the emulator's ADB function is enabled, bridge mode is disabled, and try connecting again after restarting MFA and the emulator.</value>
++        <value>Please ensure that the emulator's ADB function is enabled, bridge mode is disabled, and try connecting again after restarting MCC and the emulator.</value>
+     </data>
+     <data name="Reset" xml:space="preserve">
+         <value>Reset</value>
+@@ -1724,7 +1724,7 @@ Please do not copy only the main executable by itself.</value>
+             <value>System Component Missing</value>
+         </data>
+         <data name="RuntimeMissingDescription" xml:space="preserve">
+-            <value>MFAAvalonia requires Microsoft Visual C++ Redistributable (x64) to run.</value>
++            <value>MCC requires Microsoft Visual C++ Redistributable (x64) to run.</value>
+         </data>
+         <data name="DownloadAndInstall" xml:space="preserve">
+             <value>Download and Install</value>
+@@ -1760,7 +1760,7 @@ Please do not copy only the main executable by itself.</value>
+             <value>The program is running in a temporary directory and may be lost when closed. Please extract the zip file to a folder first, then run the program inside.</value>
+         </data>
+         <data name="TempDirWarningHint" xml:space="preserve">
+-            <value>Tip: It is recommended to extract to a dedicated folder, e.g. "D:\MFA", avoid Desktop or Download folders for better management.</value>
++            <value>Tip: It is recommended to extract to a dedicated folder, e.g. "D:\MCC", avoid Desktop or Download folders for better management.</value>
+         </data>
+     <data name="ExitProgram" xml:space="preserve">
+         <value>Exit Program</value>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx b/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
+index 9bfc49e..3ed5e70 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.zh-Hant.resx
+@@ -88,7 +88,7 @@
+         <value>正在套用更新.....</value>
+     </data>
+     <data name="AppTitle" xml:space="preserve">
+-        <value>MFA 任務管理器</value>
++        <value>MCC 任務管理器</value>
+     </data>
+     <data name="AutoDetect" xml:space="preserve">
+         <value>AutoDetect (自動偵測)</value>
+@@ -97,10 +97,10 @@
+         <value>自動檢測更新</value>
+     </data>
+     <data name="AutomaticHide" xml:space="preserve">
+-        <value>啟動 MFA 後直接隱藏</value>
++        <value>啟動 MCC 後直接隱藏</value>
+     </data>
+     <data name="AutomaticMinimize" xml:space="preserve">
+-        <value>啟動 MFA 後直接最小化</value>
++        <value>啟動 MCC 後直接最小化</value>
+     </data>
+     <data name="AutomaticUpdateMFA" xml:space="preserve">
+         <value>自動更新軟體</value>
+@@ -412,7 +412,7 @@
+         <value>建立 GitHub issue</value>
+     </data>
+     <data name="ErrorProlog" xml:space="preserve">
+-        <value>MFA 遇到了問題</value>
++        <value>MCC 遇到了問題</value>
+     </data>
+     <data name="ExeFilter" xml:space="preserve">
+         <value>可執行檔案</value>
+@@ -853,7 +853,7 @@
+         <value>正在嘗試重開 ADB 伺服器</value>
+     </data>
+     <data name="RestartMFA" xml:space="preserve">
+-        <value>重啟MFA</value>
++        <value>重啟MCC</value>
+     </data>
+     <data name="RestartPC" xml:space="preserve">
+         <value>重啟電腦</value>
+@@ -1504,7 +1504,7 @@
+         <value>請刪除整個資料夾重新下載，或聯絡專案維護者。</value>
+     </data>
+     <data name="NoEmulatorFoundDetail" xml:space="preserve">
+-        <value>請確保模擬器的ADB功能開啟，橋接模式為關閉狀態，重啟MFA和模擬器後重新嘗試連線。</value>
++        <value>請確保模擬器的ADB功能開啟，橋接模式為關閉狀態，重啟MCC和模擬器後重新嘗試連線。</value>
+     </data>
+     <data name="Reset" xml:space="preserve">
+         <value>重置</value>
+@@ -1677,7 +1677,7 @@
+         <value>程式現在在暫存目錄裡執行著呢，一關掉可能就沒了。先把壓縮檔解壓到一個資料夾裡，再開啟裡面的程式吧。</value>
+     </data>
+     <data name="TempDirWarningHint" xml:space="preserve">
+-        <value>小提示：建議解壓到一個專門的資料夾，比如「D:\MFA」，別放桌面或者下載資料夾，那樣更方便管理。</value>
++        <value>小提示：建議解壓到一個專門的資料夾，比如「D:\MCC」，別放桌面或者下載資料夾，那樣更方便管理。</value>
+     </data>
+     <data name="ExitProgram" xml:space="preserve">
+         <value>退出程式</value>
+@@ -1709,7 +1709,7 @@
+         <value>缺少系統組件</value>
+     </data>
+     <data name="RuntimeMissingDescription" xml:space="preserve">
+-        <value>MFAAvalonia 需要 Microsoft Visual C++ Redistributable (x64) 才能運行。</value>
++        <value>MCC 需要 Microsoft Visual C++ Redistributable (x64) 才能運行。</value>
+     </data>
+     <data name="DownloadAndInstall" xml:space="preserve">
+         <value>下載並安裝</value>
+diff --git a/MFAAvalonia/Assets/Localization/Strings.ja-JP.resx b/MFAAvalonia/Assets/Localization/Strings.ja-JP.resx
+index 5da1614..851816b 100644
+--- a/MFAAvalonia/Assets/Localization/Strings.ja-JP.resx
++++ b/MFAAvalonia/Assets/Localization/Strings.ja-JP.resx
+@@ -47,7 +47,7 @@
+     <value>更新を適用しています...</value>
+   </data>
+   <data name="AppTitle" xml:space="preserve">
+-    <value>MFA タスクマネージャー</value>
++    <value>MCC タスクマネージャー</value>
+   </data>
+   <data name="AutoDetect" xml:space="preserve">
+     <value>自動検出</value>
+@@ -815,7 +815,7 @@
+     <value>プログラムは一時ディレクトリで実行されており、終了時に消える可能性があります。まず zip ファイルをフォルダーへ展開してから、その中のプログラムを実行してください。</value>
+   </data>
+   <data name="TempDirWarningHint" xml:space="preserve">
+-    <value>ヒント: 管理しやすいように、Desktop や Download ではなく "D:\MFA" のような専用フォルダーへ展開することをおすすめします。</value>
++    <value>ヒント: 管理しやすいように、Desktop や Download ではなく "D:\MCC" のような専用フォルダーへ展開することをおすすめします。</value>
+   </data>
+   <data name="InstanceSelectTooltip" xml:space="preserve">
+     <value>インスタンスを選択</value>
+@@ -953,7 +953,7 @@
+         <value>GitHub の問題を作成する</value>
+     </data>
+   <data name="ErrorProlog" xml:space="preserve">
+-        <value>MFA でエラーが発生しました</value>
++        <value>MCC でエラーが発生しました</value>
+     </data>
+   <data name="CustomWebhook" xml:space="preserve">
+             <value>カスタム Webhook</value>
+@@ -1235,7 +1235,7 @@
+         <value>ADBサーバーを再起動しようとしています</value>
+     </data>
+   <data name="RestartMFA" xml:space="preserve">
+-        <value>MFAを再起動する</value>
++        <value>MCCを再起動する</value>
+     </data>
+   <data name="RestartPC" xml:space="preserve">
+         <value>コンピュータを再起動します</value>
+@@ -1406,10 +1406,10 @@
+         <value>起動後の接続再試行ウィンドウ (秒)</value>
+     </data>
+   <data name="WaitSoftwareDescription" xml:space="preserve">
+-        <value>ソフトウェアの起動後、MFA はこの時間内に接続を試行し続けます。接続されると、さらに 5 秒待って、タスクが自動的に開始されます。</value>
++        <value>ソフトウェアの起動後、MCC はこの時間内に接続を試行し続けます。接続されると、さらに 5 秒待って、タスクが自動的に開始されます。</value>
+     </data>
+   <data name="WaitSoftwareTime" xml:space="preserve">
+-        <value>{0} を起動した後、MFA は {1} 秒間接続を試行し続けます</value>
++        <value>{0} を起動した後、MCC は {1} 秒間接続を試行し続けます</value>
+     </data>
+   <data name="StartupConnectRetrying" xml:space="preserve">
+         <value>{0} に接続しようとしています。残り {1} 秒です</value>
+@@ -1754,7 +1754,7 @@
+         <value>フォルダー全体を削除して再ダウンロードするか、プロジェクト管理者に連絡してください。</value>
+     </data>
+   <data name="NoEmulatorFoundDetail" xml:space="preserve">
+-        <value>エミュレータの ADB 機能が有効であること、ブリッジ モードが無効であることを確認し、MFA とエミュレータを再起動した後、再度接続してみてください。</value>
++        <value>エミュレータの ADB 機能が有効であること、ブリッジ モードが無効であることを確認し、MCC とエミュレータを再起動した後、再度接続してみてください。</value>
+     </data>
+   <data name="Reset" xml:space="preserve">
+         <value>リセット</value>
+@@ -1920,7 +1920,7 @@
+             <value>ランタイムがありません</value>
+         </data>
+   <data name="RuntimeMissingDescription" xml:space="preserve">
+-            <value>MFAAvalonia を実行するには、Microsoft Visual C++ 再頒布可能パッケージ (x64) が必要です。</value>
++            <value>MCC を実行するには、Microsoft Visual C++ 再頒布可能パッケージ (x64) が必要です。</value>
+         </data>
+   <data name="DownloadAndInstall" xml:space="preserve">
+             <value>ダウンロードしてインストールする</value>
+diff --git a/MFAAvalonia/App.axaml.cs b/MFAAvalonia/App.axaml.cs
+index 4859f4d..2d21aaa 100644
+--- a/MFAAvalonia/App.axaml.cs
++++ b/MFAAvalonia/App.axaml.cs
+@@ -801,7 +801,7 @@ public partial class App : Application
+                         if (downloadUrl != null)
+                         {
+                             // MB_YESNO | MB_ICONERROR = 0x04 | 0x10 = 0x14
+-                            if (MessageBox(IntPtr.Zero, shortMessage, $"MFAAvalonia {title}", 0x14) == 6) // IDYES = 6
++                            if (MessageBox(IntPtr.Zero, shortMessage, $"MCC {title}", 0x14) == 6) // IDYES = 6
+                             {
+                                 Process.Start(new ProcessStartInfo(downloadUrl)
+                                 {
+@@ -811,7 +811,7 @@ public partial class App : Application
+                         }
+                         else
+                         {
+-                            MessageBox(IntPtr.Zero, shortMessage, $"MFAAvalonia {title}", 0x10); // MB_ICONERROR
++                            MessageBox(IntPtr.Zero, shortMessage, $"MCC {title}", 0x10); // MB_ICONERROR
+                         }
+                     }
+                 }
+@@ -821,7 +821,7 @@ public partial class App : Application
+                         ? message.Substring(0, 2048) + "...\n\n(Log truncated)"
+                         : message;
+ 
+-                    MessageBox(IntPtr.Zero, shortMessage, $"MFAAvalonia {title}", 0x10); // MB_ICONERROR
++                    MessageBox(IntPtr.Zero, shortMessage, $"MCC {title}", 0x10); // MB_ICONERROR
+                 }
+             }
+             else
+diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/TaskOptionGenerator.cs
+index ed3a642..d315cc6 100644
+--- a/MFAAvalonia/Helper/TaskOptionGenerator.cs
++++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
+@@ -34,7 +34,205 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+     private static readonly Thickness OptionRowMargin = new(10, 3, 10, 3);
+     private static readonly Thickness NestedOptionMargin = new(14, 2, 4, 4);
+     private static readonly Thickness NestedOptionPadding = new(8, 4, 6, 4);
++
++    private static bool UseChipTaskCheckBox(string? name) =>
++        name == "根据自定义设置锁定/解锁仓库内芯片";
++
++    private static bool IsLimitedTradeChipTypeOption(string? name) =>
++        name == "限时贸易_芯片箱类型";
++
++    private static bool IsLimitedTradeChipQualityOption(string? name) =>
++        name?.StartsWith("限时贸易_", StringComparison.Ordinal) == true &&
++        name.EndsWith("芯片箱品质", StringComparison.Ordinal);
++
++    /// <summary>
++    /// LAA: 从「限时贸易_特防芯片箱品质」取出对应的类型 case 名「特防」。
++    /// 联动需要用它回到上级「限时贸易_芯片箱类型」的对应按钮。
++    /// </summary>
++    /// <summary>
++    /// LAA: 芯片箱类型名（如「特防」）-> 该类型的 ToggleButton。
++    ///
++    /// 用类级注册表而不是闭包捕获，是因为品质按钮可能在父按钮之后被反复重建
++    /// （父项每次 UpdateSubOptions 都会重建子控件），闭包里的旧引用会失效。
++    /// 每次创建父按钮时覆盖登记，保证品质回调拿到的是当前有效的那一个。
++    /// </summary>
++    private static readonly Dictionary<string, ToggleButton> LimitedTradeChipTypeToggles =
++        new(StringComparer.Ordinal);
++
++    private static string? LimitedTradeChipTypeNameOf(string? qualityOptionName)
++    {
++        const string prefix = "限时贸易_";
++        const string suffix = "芯片箱品质";
++        if (qualityOptionName == null ||
++            !qualityOptionName.StartsWith(prefix, StringComparison.Ordinal) ||
++            !qualityOptionName.EndsWith(suffix, StringComparison.Ordinal))
++            return null;
++        var typeName = qualityOptionName.Substring(prefix.Length,
++            qualityOptionName.Length - prefix.Length - suffix.Length);
++        return typeName.Length == 0 ? null : typeName;
++    }
++
++    /// <summary>
++    /// LAA: 空品质勾选状态会被存档固化成「一个都不勾」，而且界面上无法回到默认。
++    /// MFA 用存档覆盖接口 default_case，所以接口里的 ["R4","R5"] 只在从未保存过时生效。
++    /// 这里在生成面板时把空的品质列表规范化成「全部品质」（R4+R5）。
++    /// </summary>
++    private static void NormalizeLimitedTradeChipQualitySelection(
++        MaaInterface.MaaInterfaceSelectOption option, MaaInterface.MaaInterfaceOption interfaceOption)
++    {
++        if (!IsLimitedTradeChipQualityOption(option.Name))
++            return;
++        if (option.SelectedCases == null)
++            option.SelectedCases = new List<string>(interfaceOption.DefaultCases ?? new List<string>());
++        if (option.SelectedCases.Count > 0)
++            return;
++        var all = (interfaceOption.Cases ?? new List<MaaInterface.MaaInterfaceOptionCase>())
++            .Select(item => item.Name)
++            .Where(name => !string.IsNullOrEmpty(name))
++            .Select(name => name!)
++            .ToList();
++        if (all.Count > 0)
++            option.SelectedCases.AddRange(all);
++    }
++
++    // LAA: daily chip-stage availability is evaluated from the computer's
++    // local calendar whenever the task settings panel is generated.
++    private static readonly Dictionary<string, DayOfWeek[]> DailyChipStageSchedule = new()
++    {
++        ["鼓军嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Thursday, DayOfWeek.Friday],
++        ["光杵嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Friday],
++        ["注刈嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday],
++        ["链接嵌合"] = [DayOfWeek.Monday, DayOfWeek.Saturday, DayOfWeek.Sunday],
++        ["体魄嵌合"] = [DayOfWeek.Tuesday, DayOfWeek.Saturday, DayOfWeek.Sunday],
++        ["侵蚀嵌合"] = [DayOfWeek.Wednesday],
++        ["迅刃嵌合"] = [DayOfWeek.Thursday],
++        ["矛盾嵌合"] = [DayOfWeek.Friday],
++    };
++
++    private static bool IsChipStage(string? caseName) =>
++        caseName?.Contains("嵌合（", StringComparison.Ordinal) == true;
++
++    private static List<MaaInterface.MaaInterfaceOptionCase>? GetVisibleCases(
++        string? optionName,
++        List<MaaInterface.MaaInterfaceOptionCase>? allCases)
++    {
++        if (allCases == null || optionName != "关卡选择")
++            return allCases;
++
++        var today = DateTime.Now.DayOfWeek;
++        if (today is DayOfWeek.Saturday or DayOfWeek.Sunday)
++            return allCases;
++
++        return allCases.Where(item =>
++        {
++            if (!IsChipStage(item.Name))
++                return true;
++
++            var stageName = DailyChipStageSchedule.Keys.FirstOrDefault(name =>
++                item.Name?.StartsWith(name, StringComparison.Ordinal) == true);
++            return stageName == null || DailyChipStageSchedule[stageName].Contains(today);
++        }).ToList();
++    }
+     
++    /// <summary>
++    /// LAA: 一次性规范化「限时贸易_芯片箱类型」下所有品质的存档状态。
++    ///
++    /// 为什么必须独立于控件生成：品质控件只在**对应类型被勾选时**才会创建，
++    /// 所以未勾选类型里的空品质（存档遗留）永远不会被规范化到。
++    /// 用户之后再勾上该类型，读到的仍是空列表 —— 就是「一个品质都不勾」的复现路径。
++    ///
++    /// 这里对全部类型做两件事：
++    ///   * 品质存档为空的 -> 填成全部品质（R4+R5）并落盘；
++    ///   * 类型已勾选、但其品质一个都没勾 -> 取消该类型（避免界面自相矛盾）。
++    /// </summary>
++    private void NormalizeLimitedTradeChipQualityOptions(DragItemViewModel dragItem)
++    {
++        if (MaaProcessor.Interface?.Option?.TryGetValue("限时贸易_芯片箱类型", out var chipTypes) != true)
++            return;
++        if (chipTypes.Cases == null)
++            return;
++
++        var selected = new HashSet<string>(StringComparer.Ordinal);
++        CollectLimitedTradeSelections(dragItem, selected);
++
++        var dirty = false;
++        foreach (var caseItem in chipTypes.Cases)
++        {
++            if (caseItem.Option == null || caseItem.Option.Count == 0)
++                continue;
++            var onlyQualityEmpty = true;
++            foreach (var qualityName in caseItem.Option)
++            {
++                if (!MaaProcessor.Interface.Option.TryGetValue(qualityName, out var qualityInterface))
++                    continue;
++                var qualityOption = FindLimitedTradeOption(dragItem, qualityName);
++                if (qualityOption == null)
++                    continue;
++                if (qualityOption.SelectedCases == null)
++                {
++                    qualityOption.SelectedCases = new List<string>(
++                        qualityInterface.DefaultCases ?? new List<string>());
++                }
++                if (qualityOption.SelectedCases.Count == 0)
++                {
++                    var all = (qualityInterface.Cases ?? new List<MaaInterface.MaaInterfaceOptionCase>())
++                        .Select(item => item.Name)
++                        .Where(name => !string.IsNullOrEmpty(name))
++                        .Select(name => name!)
++                        .ToList();
++                    if (all.Count > 0)
++                    {
++                        qualityOption.SelectedCases.AddRange(all);
++                        dirty = true;
++                    }
++                }
++                if (qualityOption.SelectedCases.Count > 0)
++                    onlyQualityEmpty = false;
++            }
++            // 类型勾着但品质全空：取消该类型，让界面不再出现空档
++            if (onlyQualityEmpty && selected.Contains(caseItem.Name ?? string.Empty))
++            {
++                var typeOption = FindLimitedTradeOption(dragItem, "限时贸易_芯片箱类型");
++                if (typeOption?.SelectedCases?.Remove(caseItem.Name ?? string.Empty) == true)
++                    dirty = true;
++            }
++        }
++
++        if (dirty)
++            saveConfigurationAction();
++    }
++
++    private static IEnumerable<MaaInterface.MaaInterfaceSelectOption> WalkLimitedTradeOptions(
++        DragItemViewModel dragItem)
++    {
++        var roots = dragItem.InterfaceItem?.Option;
++        if (roots == null)
++            yield break;
++        var stack = new Stack<MaaInterface.MaaInterfaceSelectOption>(roots);
++        while (stack.Count > 0)
++        {
++            var option = stack.Pop();
++            yield return option;
++            foreach (var sub in option.SubOptions ?? new List<MaaInterface.MaaInterfaceSelectOption>())
++                stack.Push(sub);
++        }
++    }
++
++    private static void CollectLimitedTradeSelections(DragItemViewModel dragItem, HashSet<string> selected)
++    {
++        foreach (var option in WalkLimitedTradeOptions(dragItem))
++        {
++            if (option.Name != "限时贸易_芯片箱类型")
++                continue;
++            foreach (var name in option.SelectedCases ?? new List<string>())
++                selected.Add(name);
++        }
++    }
++
++    private static MaaInterface.MaaInterfaceSelectOption? FindLimitedTradeOption(
++        DragItemViewModel dragItem, string optionName) =>
++        WalkLimitedTradeOptions(dragItem).FirstOrDefault(item => item.Name == optionName);
++
+     public void GeneratePanelContent(StackPanel panel, DragItemViewModel dragItem)
+     {
+         // 检测是否为特殊任务，如果是则生成特殊任务选项面板
+@@ -46,6 +244,8 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+         }
+ 
+         AddRepeatOption(panel, dragItem);
++        // LAA: 先把限时贸易芯片箱的空品质状态补齐，再生成控件（否则未勾选类型覆盖不到）
++        NormalizeLimitedTradeChipQualityOptions(dragItem);
+ 
+         if (dragItem.InterfaceItem?.Option != null)
+         {
+@@ -75,6 +275,8 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+         }
+ 
+         AddRepeatOption(panel, dragItem);
++        // LAA: 先把限时贸易芯片箱的空品质状态补齐，再生成控件（否则未勾选类型覆盖不到）
++        NormalizeLimitedTradeChipQualityOptions(dragItem);
+ 
+         if (dragItem.InterfaceItem?.Option != null)
+         {
+@@ -225,28 +427,63 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+     /// </summary>
+     private Control CreateCheckboxControl(MaaInterface.MaaInterfaceSelectOption option, MaaInterface.MaaInterfaceOption interfaceOption, DragItemViewModel source)
+     {
+-        var container = new StackPanel { Margin = new Thickness(10, 10, 10, 6), Spacing = 4 };
++        var isChipType = IsLimitedTradeChipTypeOption(option.Name);
++        var isChipQuality = IsLimitedTradeChipQualityOption(option.Name);
++        var isCompactChipChoice = isChipType || isChipQuality;
++        var container = new StackPanel
++        {
++            Margin = isCompactChipChoice ? new Thickness(4, 3, 4, 2) : new Thickness(10, 10, 10, 6),
++            Spacing = isCompactChipChoice ? 1 : 4
++        };
+ 
+         interfaceOption.InitializeIcon();
+ 
+         // Header（显示 option 名称和图标）
+         var header = CreateOptionHeader(interfaceOption);
+         header.Margin = new Thickness(0); // 外层 container 已提供垂直间距，去掉 header 内部多余的上下 margin
++        if (isCompactChipChoice && header is StackPanel headerPanel)
++        {
++            foreach (var text in headerPanel.Children.OfType<TextBlock>())
++                text.FontSize = 12;
++        }
+         container.Children.Add(header);
+ 
+         // 初始化 SelectedCases（任务 9）
+         option.SelectedCases ??= new List<string>(interfaceOption.DefaultCases ?? new List<string>());
++        // LAA: 存档里的空品质状态要规范化成 R4+R5，否则会永远「一个都不勾」
++        NormalizeLimitedTradeChipQualitySelection(option, interfaceOption);
+ 
+         // WrapPanel of ToggleButtons（等宽按钮，自然换行）
+         var wrapPanel = new WrapPanel
+         {
+             Margin = new Thickness(0, 2, 0, 2),
+-            HorizontalAlignment = HorizontalAlignment.Left
++            HorizontalAlignment = isChipType ? HorizontalAlignment.Stretch : HorizontalAlignment.Left
+         };
+ 
+         // Sub-options container（显示所有被勾选 case 的子选项）
+         var subOptionsContainer = new StackPanel();
+ 
++        // LAA: 品质勾选框 -> 上级类型按钮（按类型名查类级注册表，见 LimitedTradeChipTypeToggles）。
++        // 只在状态确实要变时才动，否则会触发上级自身的联动而递归。
++        bool SyncChipQualityParent(string qualityOptionName, bool shouldCheck)
++        {
++            var typeName = LimitedTradeChipTypeNameOf(qualityOptionName);
++            if (typeName == null ||
++                !LimitedTradeChipTypeToggles.TryGetValue(typeName, out var parentToggle))
++            {
++                LoggerHelper.Info($"[LAA] 芯片品质联动：未找到上级按钮 quality={qualityOptionName} type={typeName}");
++                return false;
++            }
++            if ((parentToggle.IsChecked == true) == shouldCheck)
++            {
++                LoggerHelper.Info($"[LAA] 芯片品质联动：上级已是目标状态 type={typeName} checked={shouldCheck}");
++                return false;
++            }
++            LoggerHelper.Info($"[LAA] 芯片品质联动：把上级 {typeName} 置为 checked={shouldCheck}");
++            parentToggle.IsChecked = shouldCheck;
++            return true;
++        }
++
+         // Sub-option update logic for checkbox（与 select/switch 不同，需要显示所有已勾选 case 的子选项）
+         void UpdateSubOptions()
+         {
+@@ -256,6 +493,8 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+             option.SubOptions ??= new List<MaaInterface.MaaInterfaceSelectOption>();
+             var selectedCases = option.SelectedCases ?? new List<string>();
+ 
++            Grid? compactRow = null;
++            var compactColumn = 0;
+             foreach (var caseItem in interfaceOption.Cases)
+             {
+                 if (caseItem.Name == null || !selectedCases.Contains(caseItem.Name)) continue;
+@@ -269,7 +508,29 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+                         existing = CreateDefaultSelectOption(subOptionName);
+                         option.SubOptions.Add(existing);
+                     }
+-                    AddSubOption(subOptionsContainer, existing, source);
++                    var control = CreateSubOptionControl(existing, source);
++                    if (isChipType)
++                    {
++                        if (compactRow == null || compactColumn == 2)
++                        {
++                            compactRow = new Grid
++                            {
++                                ColumnDefinitions =
++                                {
++                                    new ColumnDefinition { Width = GridLength.Star },
++                                    new ColumnDefinition { Width = GridLength.Star },
++                                }
++                            };
++                            subOptionsContainer.Children.Add(compactRow);
++                            compactColumn = 0;
++                        }
++                        Grid.SetColumn(control, compactColumn++);
++                        compactRow.Children.Add(control);
++                    }
++                    else
++                    {
++                        subOptionsContainer.Children.Add(control);
++                    }
+                 }
+             }
+         }
+@@ -285,8 +546,10 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+                 var toggleBtn = new ToggleButton
+                 {
+                     IsChecked = isChecked,
+-                    Margin = new Thickness(2,2,6,6),
+-                    Padding = new Thickness(6, 4, 6, 4),
++                    Margin = isCompactChipChoice ? new Thickness(1, 1, 3, 2) : new Thickness(2,2,6,6),
++                    Padding = isCompactChipChoice ? new Thickness(4, 2, 4, 2) : new Thickness(6, 4, 6, 4),
++                    MinHeight = isCompactChipChoice ? 26 : 0,
++                    MinWidth = isChipQuality ? 42 : 0,
+                     HorizontalAlignment = HorizontalAlignment.Stretch,
+                     HorizontalContentAlignment = HorizontalAlignment.Center,
+                 };
+@@ -314,6 +577,7 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+ 
+                 var marqueeText = new MarqueeTextBlock
+                 {
++                    FontSize = isCompactChipChoice ? 12 : 14,
+                     VerticalContentAlignment = VerticalAlignment.Center,
+                     HorizontalAlignment = HorizontalAlignment.Stretch,
+                 };
+@@ -327,17 +591,45 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+                 BindIdleEnabled(toggleBtn);
+ 
+                 var capturedCaseName = caseName;
++                // LAA: 品质勾选框（如「限时贸易_特防芯片箱品质」）从上级类型选项传入，
++                // 用它就能回到上级「限时贸易_芯片箱类型」的对应按钮。
++                var parentChipTypeName = isChipQuality
++                    ? LimitedTradeChipTypeNameOf(option.Name)
++                    : null;
+                 toggleBtn.IsCheckedChanged += (_, _) =>
+                 {
+                     if (toggleBtn.IsChecked == true)
+                     {
+                         if (!option.SelectedCases.Contains(capturedCaseName))
+                             option.SelectedCases.Add(capturedCaseName);
++                        // LAA: 选中上级类型时，下方品质默认全勾。
++                        // 面板级规范化已经保证品质不会为空，这里只兜住「历史上被取消过」的情形。
++                        if (isChipType)
++                        {
++                            foreach (var qualityName in caseOption.Option ?? new List<string>())
++                            {
++                                var qualityOption = option.SubOptions?.FirstOrDefault(o => o.Name == qualityName);
++                                if (qualityOption?.SelectedCases is not { Count: 0 })
++                                    continue;
++                                if (MaaProcessor.Interface?.Option?.TryGetValue(qualityName, out var qualityInterface) != true)
++                                    continue;
++                                foreach (var item in qualityInterface.Cases ?? new List<MaaInterface.MaaInterfaceOptionCase>())
++                                {
++                                    if (!string.IsNullOrEmpty(item.Name))
++                                        qualityOption.SelectedCases.Add(item.Name!);
++                                }
++                            }
++                        }
+                     }
+                     else
+                     {
+                         option.SelectedCases.Remove(capturedCaseName);
+                     }
++                    // LAA: 品质全不勾时，上级类型一起取消选
++                    // （此时子选项控件会在下面的 UpdateSubOptions 里被清掉）
++                    if (parentChipTypeName != null && toggleBtn.IsChecked != true &&
++                        option.SelectedCases.Count == 0)
++                        SyncChipQualityParent(option.Name ?? string.Empty, false);
+                     UpdateSubOptions();
+                     saveConfigurationAction();
+                 };
+@@ -359,11 +651,13 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+                 }
+ 
+                 wrapPanel.Children.Add(toggleBtn);
++                if (isChipType && caseName.Length > 0)
++                    LimitedTradeChipTypeToggles[caseName] = toggleBtn;
+             }
+         }
+ 
+         // 首次布局后测量所有按钮自然宽度，取最大值统一设置 MinWidth（等宽效果）
+-        if (wrapPanel.Children.Count > 0)
++        if (wrapPanel.Children.Count > 0 && !isCompactChipChoice)
+         {
+             wrapPanel.LayoutUpdated += EqualizeOnce;
+             void EqualizeOnce(object? s, EventArgs ev)
+@@ -613,31 +907,54 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+         DragItemViewModel source)
+     {
+         var wrapper = new StackPanel();
++        var useChipTaskCheckBox = UseChipTaskCheckBox(option.Name);
++        var useCompactChipTaskCheckBox = useChipTaskCheckBox;
+ 
+         var grid = new Grid
+         {
+             ColumnDefinitions =
+             {
+                 new ColumnDefinition { Width = GridLength.Auto },
+-                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+-                new ColumnDefinition { Width = GridLength.Auto }
++                new ColumnDefinition { Width = useChipTaskCheckBox ? GridLength.Auto : new GridLength(1, GridUnitType.Star) },
++                new ColumnDefinition { Width = useChipTaskCheckBox ? new GridLength(1, GridUnitType.Star) : GridLength.Auto }
+             },
+             Margin = OptionRowMargin
+         };
+         
+         interfaceOption.InitializeIcon();
+ 
+-        var toggleSwitch = new ToggleSwitch
++        ToggleButton toggleSwitch;
++        if (useChipTaskCheckBox)
+         {
+-            IsChecked = option.Index == yesValue,
+-            Classes = { "Switch" },
+-            MaxHeight = 60,
+-            MaxWidth = 100,
+-            Margin = new Thickness(0, 4, 0, 4),
+-            HorizontalAlignment = HorizontalAlignment.Right,
+-            VerticalAlignment = VerticalAlignment.Center,
+-            Tag = option.Name
+-        };
++            toggleSwitch = new CheckBox
++            {
++                IsChecked = option.Index == yesValue,
++                Width = useCompactChipTaskCheckBox ? 18 : 24,
++                Height = useCompactChipTaskCheckBox ? 18 : 24,
++                MinWidth = useCompactChipTaskCheckBox ? 18 : 24,
++                MinHeight = useCompactChipTaskCheckBox ? 18 : 24,
++                Margin = useCompactChipTaskCheckBox
++                    ? new Thickness(4, 4, 0, 4)
++                    : new Thickness(0, 4, 0, 4),
++                HorizontalAlignment = HorizontalAlignment.Right,
++                VerticalAlignment = VerticalAlignment.Center,
++                Tag = option.Name
++            };
++        }
++        else
++        {
++            toggleSwitch = new ToggleSwitch
++            {
++                IsChecked = option.Index == yesValue,
++                Classes = { "Switch" },
++                MaxHeight = 60,
++                MaxWidth = 100,
++                Margin = new Thickness(0, 4, 0, 4),
++                HorizontalAlignment = HorizontalAlignment.Right,
++                VerticalAlignment = VerticalAlignment.Center,
++                Tag = option.Name
++            };
++        }
+ 
+         BindIdleEnabled(toggleSwitch);
+         toggleSwitch.Bind(ToolTip.TipProperty, new ResourceBindingWithFallback(option.DisplayName, option.Name));
+@@ -680,12 +997,28 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+ 
+         // Label with Icon
+         var labelPanel = CreateLabelPanel(option.DisplayName, option.Name, interfaceOption.Description, interfaceOption.Document);
++        if (useChipTaskCheckBox)
++        {
++            labelPanel.Orientation = Orientation.Vertical;
++            labelPanel.MinWidth = 0;
++            labelPanel.HorizontalAlignment = HorizontalAlignment.Stretch;
++            labelPanel.ClipToBounds = useCompactChipTaskCheckBox;
++            labelPanel.Margin = useCompactChipTaskCheckBox
++                ? new Thickness(0, 0, 4, 0)
++                : new Thickness(0, 0, 10, 0);
++
++            foreach (var textBlock in labelPanel.Children.OfType<TextBlock>())
++            {
++                textBlock.TextWrapping = TextWrapping.Wrap;
++                textBlock.TextTrimming = TextTrimming.None;
++            }
++        }
+         var icon = CreateIcon(interfaceOption);
+         icon.Margin = new Thickness(0, 0, 6, 0);
+         labelPanel.Children.Insert(0, icon);
+ 
+         Grid.SetColumn(labelPanel, 0);
+-        Grid.SetColumn(toggleSwitch, 2);
++        Grid.SetColumn(toggleSwitch, useChipTaskCheckBox ? 1 : 2);
+         
+         grid.Children.Add(labelPanel);
+         grid.Children.Add(toggleSwitch);
+@@ -708,13 +1041,29 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+         interfaceOption.Cases?.ForEach(c => c.InitializeDisplayName());
+         interfaceOption.InitializeIcon();
+ 
++        var visibleCases = GetVisibleCases(option.Name, interfaceOption.Cases);
++        var selectedCase = interfaceOption.Cases != null && option.Index >= 0 && option.Index < interfaceOption.Cases.Count
++            ? interfaceOption.Cases[option.Index.Value]
++            : null;
++        var visibleIndex = selectedCase == null || visibleCases == null
++            ? -1
++            : visibleCases.FindIndex(item => item.Name == selectedCase.Name);
++        if (visibleIndex < 0 && visibleCases is { Count: > 0 })
++        {
++            visibleIndex = visibleCases.FindIndex(item => IsChipStage(item.Name));
++            if (visibleIndex < 0)
++                visibleIndex = 0;
++            if (interfaceOption.Cases != null)
++                option.Index = interfaceOption.Cases.FindIndex(item => item.Name == visibleCases[visibleIndex].Name);
++        }
++
+         var comboBox = new ComboBox
+         {
+             MinWidth = 120,
+             Classes = { "LimitWidth" },
+             Margin = new Thickness(0, 2, 0, 2),
+-            ItemsSource = interfaceOption.Cases,
+-            SelectedIndex = option.Index ?? 0,
++            ItemsSource = visibleCases,
++            SelectedIndex = Math.Max(0, visibleIndex),
+             HorizontalAlignment = HorizontalAlignment.Stretch
+         };
+         
+@@ -867,9 +1216,10 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+         }
+     }
+ 
+-    private void AddSubOption(StackPanel container, MaaInterface.MaaInterfaceSelectOption subOption, DragItemViewModel source)
++    private Control CreateSubOptionControl(MaaInterface.MaaInterfaceSelectOption subOption, DragItemViewModel source)
+     {
+-         if (MaaProcessor.Interface?.Option?.TryGetValue(subOption.Name ?? string.Empty, out var subInterfaceOption) != true) return;
++         if (MaaProcessor.Interface?.Option?.TryGetValue(subOption.Name ?? string.Empty, out var subInterfaceOption) != true)
++             return new Border { IsVisible = false };
+          
+          Control control;
+          if (subInterfaceOption.IsHotkey)
+@@ -884,7 +1234,12 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+          else
+             control = CreateComboBoxControl(subOption, subInterfaceOption, source);
+ 
+-         container.Children.Add(control);
++         return control;
++    }
++
++    private void AddSubOption(StackPanel container, MaaInterface.MaaInterfaceSelectOption subOption, DragItemViewModel source)
++    {
++         container.Children.Add(CreateSubOptionControl(subOption, source));
+     }
+ 
+     // Helper Creation Methods
+@@ -1423,7 +1778,7 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+ 
+         var titleBox = new TextBox
+         {
+-            Text = (string?)param["title"] ?? "MFAAvalonia",
++            Text = (string?)param["title"] ?? "MCC",
+             MinWidth = 120,
+             Margin = new Thickness(0, 2, 0, 2),
+             VerticalAlignment = VerticalAlignment.Center,
+diff --git a/MFAAvalonia/ViewModels/Other/SystemScheduledTaskManager.cs b/MFAAvalonia/ViewModels/Other/SystemScheduledTaskManager.cs
+new file mode 100644
+index 0000000..5b625d6
+--- /dev/null
++++ b/MFAAvalonia/ViewModels/Other/SystemScheduledTaskManager.cs
+@@ -0,0 +1,154 @@
++using MFAAvalonia.Extensions;
++using MFAAvalonia.Helper;
++using MFAAvalonia.Helper.ValueType;
++using System;
++using System.Collections.Generic;
++using System.IO;
++using System.Linq;
++using System.Security.Cryptography;
++using System.Text;
++using System.Threading;
++using System.Threading.Tasks;
++
++namespace MFAAvalonia.ViewModels.Other;
++
++/// <summary>
++/// Mirrors MFA timers into Windows Task Scheduler so they still fire while MFA is closed.
++/// The registered task starts MFA with its existing single-instance/autostart command line.
++/// </summary>
++internal static class SystemScheduledTaskManager
++{
++    internal sealed record TimerDefinition(
++        int TimerId,
++        bool IsEnabled,
++        TimeSpan Time,
++        string Schedule,
++        string InstanceId);
++
++    private static readonly SemaphoreSlim SyncGate = new(1, 1);
++    private static long _requestedRevision;
++
++    private static readonly string InstallId = Convert.ToHexString(SHA256.HashData(
++        Encoding.UTF8.GetBytes(Path.GetFullPath(AppContext.BaseDirectory).ToUpperInvariant())))[..12];
++
++    private static string TaskPrefix => $"MFA-LAA-{InstallId}-Timer-";
++
++    public static async Task ReplaceAllAsync(IReadOnlyCollection<TimerDefinition> definitions)
++    {
++        if (!OperatingSystem.IsWindows()) return;
++
++        var revision = Interlocked.Increment(ref _requestedRevision);
++        await SyncGate.WaitAsync();
++        try
++        {
++            // Rapid UI changes are coalesced; the newest snapshot will run after this call.
++            if (revision != Volatile.Read(ref _requestedRevision)) return;
++            await Task.Run(() => ReplaceAllCore(definitions));
++        }
++        catch (Exception ex)
++        {
++            LoggerHelper.Warning($"同步 Windows 定时任务失败：{ex.Message}");
++        }
++        finally
++        {
++            SyncGate.Release();
++        }
++    }
++
++    private static void ReplaceAllCore(IReadOnlyCollection<TimerDefinition> definitions)
++    {
++        var serviceType = Type.GetTypeFromProgID("Schedule.Service")
++            ?? throw new PlatformNotSupportedException("Windows Task Scheduler service is unavailable.");
++        dynamic service = Activator.CreateInstance(serviceType)
++            ?? throw new InvalidOperationException("Unable to create Windows Task Scheduler service.");
++        service.Connect();
++        dynamic root = service.GetFolder("\\");
++
++        var enabled = definitions
++            .Where(IsValid)
++            .ToDictionary(item => TaskName(item.TimerId));
++
++        foreach (dynamic registeredTask in root.GetTasks(1))
++        {
++            string name = registeredTask.Name;
++            if (name.StartsWith(TaskPrefix, StringComparison.OrdinalIgnoreCase)
++                && !enabled.ContainsKey(name))
++            {
++                root.DeleteTask(name, 0);
++            }
++        }
++
++        foreach (var pair in enabled)
++            RegisterOrUpdate(root, service, pair.Key, pair.Value);
++    }
++
++    private static bool IsValid(TimerDefinition timer)
++    {
++        if (!timer.IsEnabled || string.IsNullOrWhiteSpace(timer.InstanceId)) return false;
++        var schedule = new TimerScheduleConfig(timer.Schedule);
++        return schedule.ScheduleType switch
++        {
++            TimerScheduleType.Daily => true,
++            TimerScheduleType.Weekly => schedule.SelectedDaysOfWeek.Count > 0,
++            TimerScheduleType.Monthly => schedule.SelectedDaysOfMonth.Count > 0,
++            _ => false
++        };
++    }
++
++    private static void RegisterOrUpdate(dynamic root, dynamic service, string name, TimerDefinition timer)
++    {
++        var schedule = new TimerScheduleConfig(timer.Schedule);
++        dynamic definition = service.NewTask(0);
++        definition.RegistrationInfo.Description = "MCC 洛瑟兰战境自动任务";
++        definition.Principal.LogonType = 3; // TASK_LOGON_INTERACTIVE_TOKEN
++        definition.Principal.RunLevel = 0; // Least privilege
++
++        definition.Settings.Enabled = true;
++        definition.Settings.StartWhenAvailable = true;
++        definition.Settings.WakeToRun = true;
++        definition.Settings.DisallowStartIfOnBatteries = false;
++        definition.Settings.StopIfGoingOnBatteries = false;
++        definition.Settings.MultipleInstances = 2; // Ignore a duplicate trigger
++        definition.Settings.ExecutionTimeLimit = "PT0S";
++
++        var triggerType = schedule.ScheduleType switch
++        {
++            TimerScheduleType.Daily => 2,
++            TimerScheduleType.Weekly => 3,
++            TimerScheduleType.Monthly => 4,
++            _ => 2
++        };
++        dynamic trigger = definition.Triggers.Create(triggerType);
++        trigger.Enabled = true;
++        trigger.StartBoundary = DateTime.Today.Add(timer.Time).ToString("yyyy-MM-dd'T'HH:mm:ss");
++
++        if (schedule.ScheduleType == TimerScheduleType.Daily)
++        {
++            trigger.DaysInterval = (short)1;
++        }
++        else if (schedule.ScheduleType == TimerScheduleType.Weekly)
++        {
++            trigger.WeeksInterval = (short)1;
++            trigger.DaysOfWeek = (short)schedule.SelectedDaysOfWeek.Aggregate(
++                0, (mask, day) => mask | (1 << (int)day));
++        }
++        else
++        {
++            trigger.MonthsOfYear = (short)0x0FFF;
++            trigger.DaysOfMonth = schedule.SelectedDaysOfMonth.Aggregate(
++                0, (mask, day) => mask | (1 << (day - 1)));
++        }
++
++        var executable = Environment.ProcessPath
++            ?? Path.Combine(AppContext.BaseDirectory, "MFAAvalonia.exe");
++        dynamic action = definition.Actions.Create(0); // TASK_ACTION_EXEC
++        action.Path = executable;
++        action.WorkingDirectory = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
++        action.Arguments = $"--autostart --instance \"{timer.InstanceId.Replace("\"", "\\\"")}\"";
++
++        // TASK_CREATE_OR_UPDATE + interactive-token logon; no password is stored.
++        root.RegisterTaskDefinition(name, definition, 6, null, null, 3, null);
++    }
++
++    private static string TaskName(int timerId) => $"{TaskPrefix}{timerId + 1}";
++}
