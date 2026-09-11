@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$SourceDir = (Join-Path $PSScriptRoot '..\..\.tmp\MFAAvalonia-src'),
     [string]$DotnetExe = (Join-Path $PSScriptRoot '..\..\.tmp\mfa-build\.dotnet-sdk\dotnet.exe')
 )
@@ -8,6 +8,7 @@ $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $source = (Resolve-Path $SourceDir).Path
 $dotnet = (Resolve-Path $DotnetExe).Path
 $git = (Get-Command git -ErrorAction Stop).Source
+
 if ($git -match '\\Espressif\\tools\\git\\(?:bin|cmd)\\git\.exe$') {
     $mingwGit = Join-Path (Split-Path (Split-Path $git -Parent) -Parent) 'mingw64\bin\git.exe'
     if (Test-Path -LiteralPath $mingwGit) {
@@ -18,6 +19,31 @@ $gitRuntimeDir = Split-Path $git -Parent
 if (($env:Path -split ';') -notcontains $gitRuntimeDir) {
     $env:Path = "$gitRuntimeDir;$env:Path"
 }
+# 原生命令安全执行器：
+# PowerShell 5.1 在 $ErrorActionPreference='Stop' 下，任何原生命令往 stderr 写东西
+# 都会抛 NativeCommandError 并终止脚本（`2>$null` / `2>&1 | Out-Null` 都无效）。
+# git apply --check 在「补丁已打过」时必然写 stderr，所以必须这样包一层：
+# 执行期间放宽为 Continue，成败只看 $LASTEXITCODE。
+function Invoke-Native {
+    param(
+        [Parameter(Mandatory = $true)][string]$FilePath,
+        [string[]]$Arguments = @(),
+        [switch]$Quiet
+    )
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        if ($Quiet) {
+            & $FilePath @Arguments 2>&1 | Out-Null
+        } else {
+            & $FilePath @Arguments 2>&1 | ForEach-Object { Write-Host $_ }
+        }
+        return $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previous
+    }
+}
+
 $patches = @(
     @{ File = 'laa-chip-filter.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'ChipFilterCatalog' },
     @{ File = 'laa-chip-filter-total-level.patch'; MarkerFile = 'MFAAvalonia\Features\ChipFilter\ChipFilterPlan.cs'; Marker = 'MinimumTotalLevel' },
@@ -38,17 +64,17 @@ $patches = @(
 
 foreach ($patchSpec in $patches) {
     $patch = Join-Path $PSScriptRoot $patchSpec.File
-    & $git -C $source apply --check $patch 2>$null
-    if ($LASTEXITCODE -eq 0) {
-        & $git -C $source apply $patch
+    $code = Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', '--check', $patch) -Quiet
+    if ($code -eq 0) {
+        Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', $patch) -Quiet | Out-Null
     } else {
         $markerPath = Join-Path $source $patchSpec.MarkerFile
         if ((Test-Path -LiteralPath $markerPath) -and
             (Select-String -LiteralPath $markerPath -Pattern $patchSpec.Marker -Quiet)) {
             continue
         }
-        & $git -C $source apply --reverse --check $patch 2>$null
-        if ($LASTEXITCODE -ne 0) {
+        $reverse = Invoke-Native -FilePath $git -Arguments @('-C', $source, 'apply', '--reverse', '--check', $patch) -Quiet
+        if ($reverse -ne 0) {
             throw "MFAAvalonia source does not match patch: $patch"
         }
     }
@@ -61,13 +87,18 @@ $env:TEMP = Join-Path $buildRoot 'temp'
 $env:TMP = $env:TEMP
 New-Item -ItemType Directory -Force -Path $env:DOTNET_CLI_HOME, $env:NUGET_PACKAGES, $env:TEMP | Out-Null
 
-& $dotnet restore (Join-Path $source 'MFAAvalonia.Desktop\MFAAvalonia.Desktop.csproj') -r win-x64
-if ($LASTEXITCODE -ne 0) {
-    throw "MFAAvalonia restore failed with exit code $LASTEXITCODE"
+# dotnet 会把警告/进度写到 stderr；在 $ErrorActionPreference='Stop' 下同样会
+# 抛 NativeCommandError 终止脚本，所以统一把输出并进管道流（保留可读输出）。
+$restoreCode = Invoke-Native -FilePath $dotnet -Arguments @(
+    'restore', (Join-Path $source 'MFAAvalonia.Desktop\MFAAvalonia.Desktop.csproj'), '-r', 'win-x64')
+if ($restoreCode -ne 0) {
+    throw "MFAAvalonia restore failed with exit code $restoreCode"
 }
-& $dotnet build (Join-Path $source 'MFAAvalonia.Desktop\MFAAvalonia.Desktop.csproj') -c Release -r win-x64 --no-restore
-if ($LASTEXITCODE -ne 0) {
-    throw "MFAAvalonia build failed with exit code $LASTEXITCODE"
+$buildCode = Invoke-Native -FilePath $dotnet -Arguments @(
+    'build', (Join-Path $source 'MFAAvalonia.Desktop\MFAAvalonia.Desktop.csproj'),
+    '-c', 'Release', '-r', 'win-x64', '--no-restore')
+if ($buildCode -ne 0) {
+    throw "MFAAvalonia build failed with exit code $buildCode"
 }
 
 $running = Get-Process -Name 'MFAAvalonia' -ErrorAction SilentlyContinue

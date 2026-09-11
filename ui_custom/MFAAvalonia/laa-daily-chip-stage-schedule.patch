@@ -1,9 +1,11 @@
 diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/TaskOptionGenerator.cs
 --- a/MFAAvalonia/Helper/TaskOptionGenerator.cs
 +++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
-@@ -37,5 +37,44 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
-     private static bool UseChipTaskCheckBox(string? name) =>
+@@ -39,6 +39,64 @@
          name == "根据自定义设置锁定/解锁仓库内芯片";
+     
+     public void GeneratePanelContent(StackPanel panel, DragItemViewModel dragItem)
++++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
 +
 +    // LAA: daily chip-stage availability is evaluated from the computer's
 +    // local calendar whenever the task settings panel is generated.
@@ -43,13 +45,6 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
 +            return stageName == null || DailyChipStageSchedule[stageName].Contains(today);
 +        }).ToList();
 +    }
-
-     public void GeneratePanelContent(StackPanel panel, DragItemViewModel dragItem)
-     {
-@@ -750,13 +792,29 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
-         interfaceOption.Cases?.ForEach(c => c.InitializeDisplayName());
-         interfaceOption.InitializeIcon();
-
 +        var visibleCases = GetVisibleCases(option.Name, interfaceOption.Cases);
 +        var selectedCase = interfaceOption.Cases != null && option.Index >= 0 && option.Index < interfaceOption.Cases.Count
 +            ? interfaceOption.Cases[option.Index.Value]
@@ -66,14 +61,8 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
 +                option.Index = interfaceOption.Cases.FindIndex(item => item.Name == visibleCases[visibleIndex].Name);
 +        }
 +
-         var comboBox = new ComboBox
-         {
-             MinWidth = 120,
-             Classes = { "LimitWidth" },
-             Margin = new Thickness(0, 2, 0, 2),
--            ItemsSource = interfaceOption.Cases,
--            SelectedIndex = option.Index ?? 0,
 +            ItemsSource = visibleCases,
 +            SelectedIndex = Math.Max(0, visibleIndex),
-             HorizontalAlignment = HorizontalAlignment.Stretch
-         };
+     {
+         // 检测是否为特殊任务，如果是则生成特殊任务选项面板
+         var entry = dragItem.InterfaceItem?.Entry;

@@ -120,33 +120,37 @@ UI 勾选 3 个类型           -> 白名单精确产出 6 个箱子（每类型
 | 回归测试 | ✅ `tools/test_limited_trade.py` 25 项（+7） |
 | 全量测试 | ✅ 14 个文件 184 项通过 |
 
-### 2.5 装 DLL 的坑（重要）
+### 2.5 build.ps1 的三个 Bug（2026-09-11 已修，端到端跑通）
 
-`build.ps1` **当前跑不起来**，有两个独立问题，我这次是手动绕过的：
+`ui_custom/MFAAvalonia/build.ps1` 负责：按序打补丁 → `dotnet restore/build` →
+把 `MFAAvalonia.Core.dll` 装进 `install/libs`。它**此前一直跑不通**，三个独立问题：
 
-1. **`laa-daily-chip-stage-schedule.patch` 文件损坏**：
-   只有 79 行就被截断，且第 6 行中文被 UTF-8→GBK 转码搞坏
-   （`根据自定义设置…` 变成 `鏍规嵁鑷畾涔夎缃攣瀹?`）。`git apply` 报
-   `corrupt patch`（fatal 128），脚本在这个补丁上 `throw`，**后面的构建与复制都不执行**。
-   > 这就是「退出码看着正常但 DLL 没换」的原因。
-2. **脚本本身是 UTF-8 无 BOM**：Windows PowerShell 5.1 按 ANSI 读 `.ps1`，
-   脚本里的中文标记串被读坏 → 语法错误。本机没有 `pwsh`（PS 7）所以直接跑会失败。
+| # | Bug | 现象 | 修法 |
+|---|---|---|---|
+| 1 | **原生命令 stderr 终止脚本** | PS 5.1 在 `$ErrorActionPreference='Stop'` 下，任何原生命令写 stderr 都会抛 `NativeCommandError` 并终止脚本（`2>$null`、`2>&1 \| Out-Null` **都挡不住**）。而 `git apply --check` 在「补丁已打过」时**必然**写 stderr → 脚本在第 1 个补丁就死 | 新增 `Invoke-Native` 包装：执行期间把 `ErrorActionPreference` 放宽为 `Continue`，成败只看 `$LASTEXITCODE`。`git` 与 `dotnet` 的调用都改用它 |
+| 2 | **`laa-daily-chip-stage-schedule.patch` 损坏** | 文件被截断（两个 hunk 各缺末尾上下文行），`git apply` 报 `corrupt patch`，`--reverse --check` 同样 fatal → marker 兜底也走不到 → `throw` | 保留原补丁自己的新增行（58 行，含 marker），重新构造为**合法且可应用**的补丁（应用到「上游 + 前 3 个补丁」的状态）。功能改动本就被 `laa-limited-trade-chip-options.patch`（累积补丁）覆盖，最终结果不变 |
+| 3 | **脚本 UTF-8 无 BOM** | PS 5.1 按 ANSI 读 `.ps1`，脚本里的中文标记串被读坏 → 语法错误。本机无 `pwsh`（PS 7），直接跑必失败 | 给 `build.ps1` 加 **UTF-8 BOM**（5.1 唯一认 UTF-8 的信号） |
 
-**当前可用的手动流程**（已验证）：
+> ⚠️ 改 `build.ps1` 时**务必保留 BOM**。用编辑器（含本仓库的 `edit` 工具）保存常会把
+> BOM 丢掉，之后直接跑就会报语法错误。用 Python 写回并显式加 `\ufeff` 最稳。
+
+**现在可用**：
 
 ```powershell
 cd E:\MAA_crosscore
-# 1) 编译（跳过 build.ps1 的补丁检查）
-$dotnet = ".tmp\mfa-build\.dotnet-sdk\dotnet.exe"
-& $dotnet build ".tmp\MFAAvalonia-src\MFAAvalonia.Desktop\MFAAvalonia.Desktop.csproj" `
-    -c Release -r win-x64 --no-restore
-# 2) 关闭 MFA，然后覆盖
-Copy-Item ".tmp\MFAAvalonia-src\bin\AnyCPU\Release\MFAAvalonia.Core.dll" `
-          "install\libs\MFAAvalonia.Core.dll" -Force
+# 先关闭 MFA（脚本会拒绝在 MFA 运行时覆盖 DLL）
+.\ui_custom\MFAAvalonia\build.ps1
+# 结尾应打印：Installed customized UI core: ...\install\libs\MFAAvalonia.Core.dll
 ```
 
 > ⚠️ **DLL 只在进程启动时加载**：装完必须重启 MFA，否则界面还是旧的。
-> 另外 `install/libs/` 里若残留 `*.bak-*` 副本不影响运行（不是加载路径），但别让它改名占用正式文件名。
+> `install/libs/` 里若残留 `*.bak-*` 副本不影响运行（不是加载路径）。
+
+**补丁链的真相**（排查时踩过的坑）：
+`laa-chip-filter-total-level` 与 `laa-limited-trade-chip-options` 都是**累积补丁**
+（`TaskOptionGenerator.cs` 的那份是从上游直接生成到最终状态的），所以对已打过补丁的源码
+它们「打不上」是**正常**的，脚本靠 marker 跳过。判断链条是否健康，看的是
+**有没有 throw**，而不是「每个补丁都 apply 成功」。
 
 ---
 
@@ -412,4 +416,5 @@ Select-String -Path install\debug\maafw.log -Pattern 'msg=Node\.PipelineNode\.(S
 |---|---|
 | 2026-09-11 | 建立本文档；补录「每日探索体力消耗方式」与分支整理两项工作 |
 | 2026-09-11 | 新增 §2「限时贸易所芯片箱：上级类型 ↔ 品质 双向联动」 |
-| 2026-09-11 | §2 补齐真因（存档固化空品质）、类级注册表修法、购买挂钩端到端验证、装 DLL 的坑 |
+| 2026-09-11 | §2 补齐真因（存档固化空品质）、类级注册表修法、购买挂钩端到端验证 |
+| 2026-09-11 | 修复 build.ps1 三个 bug（stderr 终止脚本、补丁损坏、脚本无 BOM），端到端跑通 |
