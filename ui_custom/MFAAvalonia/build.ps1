@@ -73,6 +73,8 @@ $patchMarkers = @{
     'laa-emulator-minimize-setting.patch' = @{ MarkerFile = 'MFAAvalonia\Configuration\ConfigurationKeys.cs'; Marker = 'MinimizeEmulatorAfterLaunch' }
     'laa-simplified-start-end-actions.patch' = @{ MarkerFile = 'MFAAvalonia\ViewModels\UsersControls\Settings\StartSettingsUserControlModel.cs'; Marker = 'NormalizeBeforeTask' }
     'laa-settings-runtime-fixes.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\GlobalStartManager.cs'; Marker = '未进入运行状态' }
+    'laa-arena-conditional-option.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'ArenaFallbackThresholdOption' }
+    'laa-task-queue-groups.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\ValueType\DragItemViewModel.cs'; Marker = 'IsHiddenByGroup' }
     'laa-rebrand-mcc-text.patch' = @{ MarkerFile = 'MFAAvalonia\Assets\Localization\Strings.resx'; Marker = 'MCC 任务管理器' }
     'laa-rebrand-mcc-logo.patch' = @{ MarkerFile = 'ui_custom\MFAAvalonia\laa-rebrand-mcc-logo.applied'; Marker = 'MCC branding: logo.ico replaced' }
 }

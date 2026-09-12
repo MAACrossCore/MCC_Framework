@@ -181,6 +181,27 @@
             }
         }
     },
+    "ArenaBuyTitle": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    200,
+                    160,
+                    300,
+                    60
+                ],
+                "template": "arena_buy_title.png",
+                "threshold": 0.8
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 326,
+                "y": -330
+            }
+        }
+    },
     "ArenaRefresh": {
         "recognition": {
             "type": "TemplateMatch",
@@ -591,24 +612,52 @@
             }
         },
         "action": {
-            "type": "Click",
+            "type": "Custom",
             "param": {
-                "target": [
-                    463,
-                    206,
-                    34,
-                    34
-                ]
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "click_challenge"
+                }
             }
         },
         "post_delay": 1000,
         "next": [
+            "竞技场_次数购买检测",
             "竞技场_确认挑战"
         ],
         "$__mpe_code": {
             "position": {
                 "x": 1940,
                 "y": -80
+            }
+        }
+    },
+    "竞技场_次数购买检测": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "arena_state",
+                "custom_recognition_param": {
+                    "expected": "page:buy_attempts"
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "arena_atomic",
+                "custom_action_param": {
+                    "operation": "dismiss_buy"
+                }
+            }
+        },
+        "next": [
+            "竞技场_决策完成模拟归零"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2240,
+                "y": -240
             }
         }
     },
@@ -666,15 +715,6 @@
         }
     },
     "竞技场_开始本轮判定": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "arena_state",
-                "custom_recognition_param": {
-                    "expected": "state:own_ready"
-                }
-            }
-        },
         "action": {
             "type": "Custom",
             "param": {
@@ -761,7 +801,7 @@
             }
         },
         "next": [
-            "竞技场_己方战力分派"
+            "竞技场_开始本轮判定"
         ],
         "$__mpe_code": {
             "position": {

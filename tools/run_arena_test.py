@@ -37,12 +37,16 @@ def main() -> int:
     parser.add_argument("--strategy", default="尽量完成挑战")
     parser.add_argument("--repeat", default="自定次数")
     parser.add_argument("--count", type=int, default=1)
-    parser.add_argument("--power-gap", type=int, default=5000)
+    parser.add_argument("--max-power", type=int, default=20000,
+                        help="可挑战的最高战力，对手战力不高于它才挑战")
+    parser.add_argument("--fallback-refresh", default="从不",
+                        help="允许挑战2、3位的刷新次数阈值：从不 / 剩余挑战次数 / 1-16")
     args = parser.parse_args()
     os.environ["ARENA_STRATEGY"] = args.strategy
     os.environ["ARENA_REPEAT"] = args.repeat
     os.environ["ARENA_COUNT"] = str(max(1, args.count))
-    os.environ["ARENA_POWER_GAP"] = str(max(0, args.power_gap))
+    os.environ["ARENA_MAX_POWER"] = str(max(0, args.max_power))
+    os.environ["ARENA_FALLBACK_REFRESH"] = str(args.fallback_refresh)
     os.environ.setdefault(
         "MAA_INSTANCE_CONFIG", str(INSTALL / "config" / "instances" / "default.json")
     )
