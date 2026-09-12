@@ -26,6 +26,8 @@ marker_file_for() {
     laa-emulator-minimize-setting.patch) echo "MFAAvalonia/Configuration/ConfigurationKeys.cs" ;;
     laa-simplified-start-end-actions.patch) echo "MFAAvalonia/ViewModels/UsersControls/Settings/StartSettingsUserControlModel.cs" ;;
     laa-settings-runtime-fixes.patch) echo "MFAAvalonia/Extensions/GlobalStartManager.cs" ;;
+    laa-arena-conditional-option.patch) echo "MFAAvalonia/Helper/TaskOptionGenerator.cs" ;;
+    laa-task-queue-groups.patch) echo "MFAAvalonia/Helper/ValueType/DragItemViewModel.cs" ;;
     laa-rebrand-mcc-text.patch) echo "MFAAvalonia/Assets/Localization/Strings.resx" ;;
     laa-rebrand-mcc-logo.patch) echo "__PATCH_DIR__/laa-rebrand-mcc-logo.applied" ;;
     *) return 1 ;;
@@ -48,6 +50,8 @@ marker_pattern_for() {
     laa-emulator-minimize-setting.patch) echo "MinimizeEmulatorAfterLaunch" ;;
     laa-simplified-start-end-actions.patch) echo "NormalizeBeforeTask" ;;
     laa-settings-runtime-fixes.patch) echo "未进入运行状态" ;;
+    laa-arena-conditional-option.patch) echo "ArenaFallbackThresholdOption" ;;
+    laa-task-queue-groups.patch) echo "IsHiddenByGroup" ;;
     laa-rebrand-mcc-text.patch) echo "MCC 任务管理器" ;;
     laa-rebrand-mcc-logo.patch) echo "MCC branding: logo.ico replaced" ;;
     *) return 1 ;;

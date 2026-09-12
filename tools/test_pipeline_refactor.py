@@ -276,6 +276,93 @@ def test_activity_exchange_stamina_boundary():
         activity_pipeline.ensure_running = original_guard
 
 
+def test_arena_challenge_supports_rank_rows_and_buy_dialog():
+    """第二/第三位挑战，以及次数用完后弹出「模拟次数购买」的分支。"""
+    arena = load_pipeline("模拟军演.json")
+
+    # 挑战点击改为按位次驱动的原子操作，不再写死第一个头像的坐标
+    assert custom_action_name(arena["竞技场_决策挑战"]) == "arena_atomic"
+    assert custom_action_param(arena["竞技场_决策挑战"]) == {"operation": "click_challenge"}
+    assert arena["竞技场_决策挑战"]["action"]["type"] == "Custom"
+    assert "target" not in (arena["竞技场_决策挑战"]["action"].get("param") or {})
+
+    # 购买框检测必须排在确认页之前：次数用完时根本不会出现确认页
+    assert next_list(arena["竞技场_决策挑战"]) == [
+        "竞技场_次数购买检测", "竞技场_确认挑战",
+    ]
+    assert custom_action_name(arena["竞技场_次数购买检测"]) == "arena_atomic"
+    assert custom_action_param(arena["竞技场_次数购买检测"]) == {"operation": "dismiss_buy"}
+    assert recognition_param(arena["竞技场_次数购买检测"], "custom_recognition") == "arena_state"
+    assert (
+        arena["竞技场_次数购买检测"]["recognition"]["param"]["custom_recognition_param"]["expected"]
+        == "page:buy_attempts"
+    )
+    # 只关不买：走既有的「模拟归零」收尾，链路上没有任何购买按钮
+    assert next_list(arena["竞技场_次数购买检测"]) == ["竞技场_决策完成模拟归零"]
+
+    # 购买框识别用模板匹配（该对话框白字黑底，OCR 读不出）
+    assert "ArenaBuyTitle" in arena
+    buy = arena["ArenaBuyTitle"]["recognition"]
+    assert buy["type"] == "TemplateMatch", buy
+    assert buy["param"]["template"] == "arena_buy_title.png"
+    assert buy["param"]["threshold"] >= 0.7
+    x, y, w, h = buy["param"]["roi"]
+    assert x + w <= 1280 and y + h <= 720, [x, y, w, h]
+
+    # 点击之后的链路与第一位完全共用，不能改动
+    assert next_list(arena["竞技场_确认挑战"]) == ["竞技场_等待结算"]
+
+
+def test_arena_skips_own_power_and_uses_max_power_option():
+    """己方战力流程已断开（节点保留但不接入），判定改用「可挑战的最高战力」。"""
+    arena = load_pipeline("模拟军演.json")
+
+    # 到达列表后直接进入判定，不再经过「己方战力分派 -> 打开进攻部署 -> 读取己方战力」
+    assert next_list(arena["竞技场_接续列表"]) == ["竞技场_开始本轮判定"]
+    # 判定节点不再要求 state:own_ready（己方战力已不需要）
+    assert "recognition" not in arena["竞技场_开始本轮判定"]
+    assert custom_action_param(arena["竞技场_开始本轮判定"]) == {"operation": "evaluate"}
+
+    # 旧节点按要求「先不删除」：仍然存在，只是不再被引用
+    for name in ("竞技场_己方战力分派", "竞技场_打开进攻部署",
+                 "竞技场_读取己方战力", "竞技场_部署页返回"):
+        assert name in arena, name
+    assert custom_action_param(arena["竞技场_读取己方战力"]) == {"operation": "capture_own_power"}
+
+    # 没有任何节点的 next 再指向己方战力分派
+    pointing = [
+        name for name, node in arena.items()
+        if not name.startswith("$__") and isinstance(node, dict)
+        and "竞技场_己方战力分派" in next_list(node)
+    ]
+    assert pointing == [], pointing
+
+    # interface.json：两段式判定的五个选项
+    interface = json.loads(
+        (ROOT / "assets" / "interface.json").read_text(encoding="utf-8-sig"))
+    options = interface["option"]
+    assert options["可挑战的最高战力"]["inputs"][0]["default"] == "20000"
+    assert [c["name"] for c in options["最低挑战积分"]["cases"]] == ["26", "28"]
+    assert options["最低挑战积分"]["default_case"] == "26"
+    assert options["放宽后的最低积分"]["inputs"][0]["default"] == "20"
+    threshold_cases = [c["name"] for c in options["刷新次数放宽阈值"]["cases"]]
+    assert threshold_cases == ["从不", "剩余挑战次数"] + [str(i) for i in range(1, 16)], threshold_cases
+    # 输入框的说明放在 inputs 上（放选项级会多出一行标题，和输入框标签重复）；
+    # 下拉框没有输入行，说明必须留在选项级，否则问号会消失。
+    assert not options["放宽后的最低积分"].get("description")
+    assert options["放宽后的最低积分"]["inputs"][0].get("description")
+    assert options["最低挑战积分"].get("description")
+    assert not options["最低挑战积分"].get("inputs")
+    # 被取代的旧选项不能残留在界面里
+    for gone in ("刷取策略", "战力差时依然挑战", "允许挑战二三位的刷新阈值"):
+        assert gone not in options, gone
+    task = next(t for t in interface["task"] if t.get("entry") == "ArenaTask")
+    assert task["option"] == [
+        "可挑战的最高战力", "最低挑战积分", "刷新次数放宽阈值",
+        "放宽后的最低积分", "重复挑战方式",
+    ], task["option"]
+
+
 if __name__ == "__main__":
     tests = [value for name, value in globals().items() if name.startswith("test_")]
     for test in tests:

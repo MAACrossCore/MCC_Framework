@@ -46,6 +46,24 @@ POINTS_MIN_HIGH = 28      # 尽量刷取高分：至少 28 分才挑战
 POINTS_MIN_COMPLETE = 20  # 尽量完成挑战：至少 20 分才挑战
 REPEAT_ZERO   = "重复挑战直到次数归零"
 REPEAT_CUSTOM = "自定次数"
+
+# 可挑战的最高战力：取代原来的「己方战力 + 允许战力差」，对手战力不高于它才挑战。
+MAX_POWER_OPTION = "可挑战的最高战力"
+MAX_POWER_DEFAULT = 20000
+
+# 两段式判定（2026-09-12 定稿）：
+#   第一阶段（挑高分）：只看第 1 位，积分 >= 最低挑战积分 才打，否则刷新。
+#   第二阶段（兜底，为了清完当天次数）：剩余刷新次数 <= 阈值时进入，
+#   按 1 -> 2 -> 3 位找第一个「战力 <= 上限 且 积分 >= 放宽后的最低积分」的对手。
+MIN_POINTS_OPTION = "最低挑战积分"
+MIN_POINTS_CHOICES = (26, 28)   # 与 interface.json 的 cases 顺序一一对应
+MIN_POINTS_DEFAULT = 26
+FALLBACK_OPTION = "刷新次数放宽阈值"
+FALLBACK_NEVER = "从不"
+FALLBACK_REMAINING = "剩余挑战次数"
+FALLBACK_MAX = 15
+FALLBACK_POINTS_OPTION = "放宽后的最低积分"
+FALLBACK_POINTS_DEFAULT = 20
 ACTION_CHALLENGE = "challenge"
 ACTION_REFRESH = "refresh"
 ACTION_RETRY_COUNTER = "retry_counter"
@@ -53,6 +71,44 @@ ACTION_STOP_SIM_EMPTY = "stop_sim_empty"
 ACTION_STOP_REFRESH_EMPTY = "stop_refresh_empty"
 ACTION_STOP_CUSTOM_TARGET = "stop_custom_target"
 TOP_ARENA_ROW = {"name": "顶部第一位", "points_roi": [1693, 211, 164, 70], "power_roi": ROI_OPP, "select": BTN_TOP_CHALLENGE}
+
+# 对手阵容是固定三行，行距 243（1920x1080 参考系，实测 2026-09-12）。
+# 每行的战力/积分位置相同，只是整体下移一个行距。
+ARENA_ROW_HEIGHT = 243
+ARENA_ROW_COUNT = 3
+ARENA_ROWS = {
+    1: {"name": "第一位", "power_roi": ROI_OPP, "points_roi": [1693, 211, 164, 70],
+        "select": BTN_TOP_CHALLENGE},
+    2: {"name": "第二位", "power_roi": [1380, 190 + ARENA_ROW_HEIGHT, 340, 105],
+        "points_roi": [1693, 211 + ARENA_ROW_HEIGHT, 164, 70],
+        "select": (720, 335 + ARENA_ROW_HEIGHT)},
+    3: {"name": "第三位", "power_roi": [1380, 190 + 2 * ARENA_ROW_HEIGHT, 340, 105],
+        "points_roi": [1693, 211 + 2 * ARENA_ROW_HEIGHT, 164, 70],
+        "select": (720, 335 + 2 * ARENA_ROW_HEIGHT)},
+}
+
+# 位次由「第一位是否满足 + 刷新次数阈值」自动决定，不再有固定的位次选项。
+
+# 模拟次数用完后点挑战不会进挑战确认页，而是直接弹「模拟次数购买」。
+# 识别到它就说明点击已生效——此时只关闭对话框，绝不购买。
+#
+# 模板必须是 **1280 基准**的尺寸（MaaFW 在参考分辨率下匹配）：按 1920 截图裁出
+# 336x52 后要缩成 224x35，否则报 "templ size is too large"。
+# 实测命中分 0.9552（框位 1280 基准 [225,175,224,35] ↔ 1920 [338,262]）。
+NODE_BUY_TITLE = "ArenaBuyTitle"
+BUY_TITLE_TEMPLATE = "arena_buy_title.png"
+BUY_TITLE_THRESHOLD = 0.8
+# 仅供定位参考：对话框标题在 1920 截图上的范围。实际匹配用节点自带 roi。
+ROI_BUY_TITLE = [300, 240, 450, 90]
+
+
+def arena_row(index):
+    """按位次（1 基）取对手行定义；越界回落到第一位。"""
+    try:
+        return ARENA_ROWS[int(index)]
+    except (KeyError, TypeError, ValueError):
+        return ARENA_ROWS[1]
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PERSISTED_SETTINGS = PROJECT_ROOT / "config" / "arena_settings.json"
 
@@ -67,17 +123,70 @@ def instance_config_path():
     return next((path for path in candidates if path and path.exists()), candidates[1])
 
 def should_refresh_for_power(own, opponent, allowed_gap):
-    """The gap only limits how much stronger the opponent may be."""
+    """The gap only limits how much stronger the opponent may be.
+
+    仅遗留的整任务实现（ArenaLoop.run）还在用；Pipeline 路径已改为「可挑战的最高战力」。
+    """
     return opponent - own >= allowed_gap
 
 
-def candidate_meets_requirements(own, opponent, points, allowed_gap, strategy):
+def candidate_meets_requirements(max_power, opponent, points, min_points):
+    """对手是否够格挑战。
+
+    战力：对手战力不高于 max_power（不再依赖己方战力）。
+    积分：points 不低于 min_points；积分没读到时不拦（只按战力判断）。
+    """
     if opponent is None:
         return False
-    power_ok = not should_refresh_for_power(own, opponent, allowed_gap)
-    min_points = POINTS_MIN_HIGH if strategy == STRAT_HIGH else POINTS_MIN_COMPLETE
-    points_ok = points is None or points >= min_points
-    return power_ok and points_ok
+    if opponent > max_power:
+        return False
+    return points is None or points >= min_points
+
+
+def allows_fallback_row(refreshes, threshold, simulations=None):
+    """是否进入兜底阶段：剩余刷新次数 <= 阈值。
+
+    threshold:
+        None               -> 下拉框选了「从不」，永远不进入兜底
+                              （也就永远不会挑战第 2、3 位）
+        FALLBACK_REMAINING -> 与当前剩余挑战次数比较（剩余刷新 <= 剩余挑战）
+        int                -> 与用户选的固定数字比较
+
+    剩余刷新次数或剩余挑战次数没读到时不放行，宁可继续刷新。
+    """
+    if threshold is None or refreshes is None:
+        return False
+    if threshold == FALLBACK_REMAINING:
+        if simulations is None:
+            return False
+        return refreshes <= simulations
+    try:
+        limit = int(threshold)
+    except (TypeError, ValueError):
+        return False
+    return refreshes <= limit
+
+
+def choose_challenge_row(rows, max_power, min_points, fallback_points=None):
+    """决定挑战第几位，返回 1/2/3；都不满足返回 None。
+
+    第一阶段：第 1 位达到最低挑战积分就打，否则不动 2、3 位。
+    第二阶段（fallback_points 不为 None 时）：按 1 -> 2 -> 3 位，
+              找第一个「战力 <= 上限 且 积分 >= fallback_points」的。
+              注意这里会重新用放宽后的门槛看第 1 位——兜底阶段第 1 位依然是首选。
+    """
+    first = rows.get(1)
+    if first is not None and candidate_meets_requirements(
+            max_power, first.get("power"), first.get("points"), min_points):
+        return 1
+    if fallback_points is None:
+        return None
+    for index in (1, 2, 3):
+        row = rows.get(index)
+        if row is not None and candidate_meets_requirements(
+                max_power, row.get("power"), row.get("points"), fallback_points):
+            return index
+    return None
 
 
 def decide_arena_action(simulations, refreshes, candidate_ok, repeat, challenged, target):
@@ -127,51 +236,105 @@ class ArenaLoop(CustomAction):
                 if item.get("entry") == "ArenaTask"
             )
             options = {item.get("name"): item for item in task.get("option", [])}
-            strategy_index = int(options.get("刷取策略", {}).get("index", 0))
             repeat_item = options.get("重复挑战方式", {})
             repeat_index = int(repeat_item.get("index", 0))
             sub = repeat_item.get("sub_options", [])
             count_index = int(sub[0].get("index", 0)) if sub else 0
-            gap_item = options.get("战力差时依然挑战", {})
-            gap_data = gap_item.get("data") or gap_item.get("Data") or {}
-            persisted_gap = self._persisted_power_gap()
-            gap_raw = gap_data.get("战力差") if isinstance(gap_data, dict) else None
-            if gap_raw is None or not str(gap_raw).strip():
-                gap_raw = persisted_gap
-            power_gap = max(0, int(str(gap_raw).strip() or "0"))
-            self._save_power_gap(power_gap)
+
+            max_power = self._parse_int_option(options, MAX_POWER_OPTION, MAX_POWER_DEFAULT)
+            self._save_max_power(max_power)
+            min_points = self._parse_min_points(options)
+            fallback_points = self._parse_int_option(
+                options, FALLBACK_POINTS_OPTION, FALLBACK_POINTS_DEFAULT)
+            # 下拉顺序与 interface.json 的 cases 一致：从不 / 1..15
+            fallback_threshold = self._parse_threshold(options)
+
             return {
-                "strategy": STRAT_COMPLETE if strategy_index == 1 else STRAT_HIGH,
                 "repeat": REPEAT_ZERO if repeat_index == 1 else REPEAT_CUSTOM,
                 "target": max(1, min(10, count_index + 1)),
-                "power_gap": power_gap,
+                "max_power": max_power,
+                "min_points": min_points,
+                "fallback_threshold": fallback_threshold,
+                "fallback_points": fallback_points,
             }
         except Exception as e:
             log.warning("读取MFA竞技场选项失败，使用安全默认值：%s", e)
-            return {"strategy": STRAT_HIGH, "repeat": REPEAT_CUSTOM, "target": 1, "power_gap": self._persisted_power_gap()}
+            return {"repeat": REPEAT_CUSTOM, "target": 1,
+                    "max_power": self._persisted_max_power(),
+                    "min_points": MIN_POINTS_DEFAULT,
+                    "fallback_threshold": None,
+                    "fallback_points": FALLBACK_POINTS_DEFAULT}
 
     @staticmethod
-    def _persisted_power_gap():
+    def _option_text(options, name):
+        item = options.get(name) or {}
+        data = item.get("data") or item.get("Data") or {}
+        if not isinstance(data, dict):
+            return None
+        return data.get(name)
+
+    @classmethod
+    def _parse_int_option(cls, options, name, default):
+        """input 型选项：空/非法一律回落到默认值。"""
+        text = str(cls._option_text(options, name) or "").strip()
+        return int(text) if text.isdigit() else default
+
+    @staticmethod
+    def _parse_min_points(options):
+        """最低挑战积分下拉：index 对应 MIN_POINTS_CHOICES 的顺序（26 / 28）。"""
+        raw = (options.get(MIN_POINTS_OPTION) or {}).get("index")
+        try:
+            index = int(raw)
+        except (TypeError, ValueError):
+            index = 0
+        if index < 0 or index >= len(MIN_POINTS_CHOICES):
+            index = MIN_POINTS_CHOICES.index(MIN_POINTS_DEFAULT)
+        return MIN_POINTS_CHOICES[index]
+
+    @staticmethod
+    def _parse_threshold(options):
+        """刷新次数放宽阈值下拉：index 0 -> None（从不），1 -> 剩余挑战次数，2..16 -> 1..15。"""
+        raw = (options.get(FALLBACK_OPTION) or {}).get("index")
+        try:
+            index = int(raw)
+        except (TypeError, ValueError):
+            index = 0
+        if index <= 0:
+            return None
+        if index == 1:
+            return FALLBACK_REMAINING
+        return min(FALLBACK_MAX, index - 1)
+
+    @staticmethod
+    def _parse_max_power(raw):
+        """可挑战的最高战力：空/非法一律回落到默认值。"""
+        text = str(raw).strip() if raw is not None else ""
+        if not text.isdigit():
+            return MAX_POWER_DEFAULT
+        return max(0, int(text))
+
+    @staticmethod
+    def _persisted_max_power():
         try:
             data = json.loads(PERSISTED_SETTINGS.read_text(encoding="utf-8"))
-            return max(0, int(data.get("power_gap", 10000)))
+            return max(0, int(data.get("max_power", MAX_POWER_DEFAULT)))
         except Exception:
-            return 10000
+            return MAX_POWER_DEFAULT
 
     @staticmethod
-    def _save_power_gap(value):
+    def _save_max_power(value):
         try:
             PERSISTED_SETTINGS.parent.mkdir(parents=True, exist_ok=True)
             current = None
             if PERSISTED_SETTINGS.exists():
-                current = json.loads(PERSISTED_SETTINGS.read_text(encoding="utf-8")).get("power_gap")
+                current = json.loads(PERSISTED_SETTINGS.read_text(encoding="utf-8")).get("max_power")
             if current != value:
                 PERSISTED_SETTINGS.write_text(
-                    json.dumps({"power_gap": value}, ensure_ascii=False, indent=2) + "\n",
+                    json.dumps({"max_power": value}, ensure_ascii=False, indent=2) + "\n",
                     encoding="utf-8",
                 )
         except Exception as exc:
-            log.warning("保存竞技场战力差失败：%s", exc)
+            log.warning("保存可挑战的最高战力失败：%s", exc)
 
     def _env(self, *names):
         for n in names:
@@ -181,7 +344,8 @@ class ArenaLoop(CustomAction):
         return None
 
     def _strat(self):
-        return self._env("PI_刷取策略", "ARENA_STRATEGY") or self._saved_options()["strategy"]
+        """遗留：界面上的「刷取策略」已被「最低挑战积分」取代，这里只保留旧实现的取值。"""
+        return self._env("PI_刷取策略", "ARENA_STRATEGY") or STRAT_HIGH
     def _repeat(self):
         return self._env("PI_重复挑战方式", "ARENA_REPEAT") or self._saved_options()["repeat"]
     def _target(self):
@@ -192,15 +356,58 @@ class ArenaLoop(CustomAction):
             return int(v)
         except Exception:
             return 1
-    def _power_gap(self):
-        v = self._env("PI_战力差", "ARENA_POWER_GAP")
+    def _max_power(self):
+        """可挑战的最高战力；环境变量优先，便于单测与集成测试覆盖。"""
+        v = self._env("PI_%s" % MAX_POWER_OPTION, "ARENA_MAX_POWER")
         if v is None:
-            return self._saved_options()["power_gap"]
+            return self._saved_options()["max_power"]
+        return self._parse_max_power(v)
+
+    def _min_points(self):
+        """第一阶段门槛：第 1 位积分达到它才打（26 或 28）。"""
+        v = self._env("PI_%s" % MIN_POINTS_OPTION, "ARENA_MIN_POINTS")
+        if v is None:
+            return self._saved_options()["min_points"]
+        text = str(v).strip()
+        if text.isdigit() and int(text) in MIN_POINTS_CHOICES:
+            return int(text)
+        log.warning("最低挑战积分取值无效，按默认%d处理：%r", MIN_POINTS_DEFAULT, v)
+        return MIN_POINTS_DEFAULT
+
+    def _fallback_points(self):
+        """第二阶段门槛：兜底时能接受的最低积分。"""
+        v = self._env("PI_%s" % FALLBACK_POINTS_OPTION, "ARENA_FALLBACK_POINTS")
+        if v is None:
+            return self._saved_options()["fallback_points"]
+        return self._parse_int_option({FALLBACK_POINTS_OPTION: {"data": {FALLBACK_POINTS_OPTION: v}}},
+                                      FALLBACK_POINTS_OPTION, FALLBACK_POINTS_DEFAULT)
+
+    def _fallback_threshold(self):
+        """进入兜底的刷新次数阈值：None=从不，FALLBACK_REMAINING=跟随剩余挑战次数，int=固定数字。"""
+        v = self._env("PI_%s" % FALLBACK_OPTION, "ARENA_FALLBACK_REFRESH")
+        if v is None:
+            return self._saved_options()["fallback_threshold"]
+        text = str(v).strip()
+        if not text or text == FALLBACK_NEVER:
+            return None
+        if text == FALLBACK_REMAINING:
+            return FALLBACK_REMAINING
+        if text.isdigit():
+            return min(FALLBACK_MAX, int(text))
+        log.warning("刷新次数阈值取值无效，按「从不」处理：%r", v)
+        return None
+
+    def _power_gap(self):
+        """遗留：仅 ArenaLoop.run 的旧判定还在用，Pipeline 路径请用 _max_power。"""
+        return self._persisted_power_gap()
+
+    @staticmethod
+    def _persisted_power_gap():
         try:
-            return max(0, int(v))
+            data = json.loads(PERSISTED_SETTINGS.read_text(encoding="utf-8"))
+            return max(0, int(data.get("power_gap", 10000)))
         except Exception:
-            log.warning("战力差输入无效，按0处理：%r", v)
-            return 0
+            return 10000
 
     def _shot(self, ctx):
         ensure_running(ctx)
@@ -560,16 +767,49 @@ class ArenaLoop(CustomAction):
                 return True
         return self._at_arena(ctx)
 
-    def _read_top_row(self, ctx, img):
-        row = TOP_ARENA_ROW
+    def _read_row(self, ctx, img, index):
+        """读取指定位次的对手战力与积分（1 基）。"""
+        row = arena_row(index)
         pts = self._num(ctx, img, "ArenaReadPoints", row["points_roi"])
         power = self._stable_num(
-            ctx, "ArenaReadOppPower", row["power_roi"], "顶部对手战力",
+            ctx, "ArenaReadOppPower", row["power_roi"], "%s对手战力" % row["name"],
             1, 999999, attempts=6, first_img=img,
         )
-        top = {**row, "points": pts, "power": power}
-        log.info("顶部对手：积分=%s 战力=%s", top["points"], top["power"])
+        top = {**row, "index": int(index), "points": pts, "power": power}
+        log.info("%s对手：积分=%s 战力=%s", row["name"], top["points"], top["power"])
         return top
+
+    def _read_top_row(self, ctx, img):
+        return self._read_row(ctx, img, 1)
+
+    def _is_buy_attempts_dialog(self, ctx, img):
+        """识别「模拟次数购买」对话框（模板匹配，不用 OCR）。
+
+        今日模拟次数用完后，点击对手卡片不会进入挑战确认页，而是直接弹出该框。
+        因此识别到它 = 点击已经生效（只是没次数可打）。
+
+        注意：这里**不能**传 roi。MaaFW 把 override 里的 roi 当 1280 基准再缩放，
+        而 _soft_hit 传入的是 1920 坐标，会被多放大 1.5 倍框到模板外。
+        直接用节点自带 roi（模拟军演.json 里已按 1280 基准写好）。
+        """
+        if self._soft_hit(ctx, NODE_BUY_TITLE, img, threshold=BUY_TITLE_THRESHOLD):
+            log.info("识别到模拟次数购买对话框（标题模板命中）")
+            return True
+        return False
+
+    def _dismiss_buy_dialog(self, ctx):
+        """只关闭购买对话框，绝不点购买。"""
+        log.info("识别到模拟次数购买对话框：点击已生效，仅关闭不购买")
+        self._click(ctx, *BTN_BACK)
+        return self._sleep(ctx, 0.8)
+
+    def _click_challenge_row(self, ctx, index):
+        """点击指定位次对手的卡片，进入挑战流程（与第一位走同一条后续链路）。"""
+        row = arena_row(index)
+        x, y = row["select"]
+        log.info("点击%s对手卡片进入挑战：坐标(%d,%d)", row["name"], x, y)
+        self._click(ctx, x, y)
+        return self._sleep(ctx, 1.0)
 
     def _read_own_power(self, ctx):
         log.info("点击标注的进攻部署，确认进入后读取自己的战力")
@@ -635,9 +875,11 @@ class ArenaLoop(CustomAction):
         return self._shot(ctx)
 
     def run(self, context, argv) -> bool:
-        strat = self._strat(); repeat = self._repeat(); target = self._target(); power_gap = self._power_gap()
+        strat = self._strat(); repeat = self._repeat(); target = self._target(); max_power = self._max_power()
+        min_points = self._min_points()
         ctrl = context.tasker.controller
-        log.info("竞技场开始：策略=%s 重复=%s 目标次数=%s 允许敌方高出战力=%s", strat, repeat, target, power_gap)
+        log.info("竞技场开始：重复=%s 目标次数=%s 可挑战最高战力=%s 最低挑战积分=%s",
+                 repeat, target, max_power, min_points)
         if not self._dismiss_post_battle_overlay(context):
             log.warning("无法清理遗留的竞技场结算页面，中止")
             return False
@@ -709,9 +951,8 @@ class ArenaLoop(CustomAction):
                 if pts is None:
                     log.info("GUI未读到顶部积分，本轮仅按战力条件判断")
 
-                enemy_advantage = opp - own if opp is not None else None
-                power_ok = opp is not None and not should_refresh_for_power(own, opp, power_gap)
-                candidate_ok = candidate_meets_requirements(own, opp, pts, power_gap, strat)
+                power_ok = opp is not None and opp <= max_power
+                candidate_ok = candidate_meets_requirements(max_power, opp, pts, min_points)
                 decision = decide_arena_action(
                     sim_cur, refresh_cur, candidate_ok, repeat, challenged, target
                 )
@@ -739,8 +980,8 @@ class ArenaLoop(CustomAction):
                         log.info("顶部对手战力无法稳定识别，尚有刷新次数，点击刷新")
                     elif not power_ok:
                         log.info(
-                            "顶部对手战力过高（己方=%s 敌方=%s 高出=%s 阈值=%s），点击刷新",
-                            own, opp, enemy_advantage, power_gap,
+                            "顶部对手战力过高（敌方=%s 可挑战最高=%s），点击刷新",
+                            opp, max_power,
                         )
                     else:
                         log.info("顶部积分不足(%s)，点击刷新", pts)

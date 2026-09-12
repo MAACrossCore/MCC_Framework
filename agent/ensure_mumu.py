@@ -13,14 +13,32 @@ import time
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CACHE_FILE = PROJECT_ROOT / "config" / "mumu_runtime.json"
+_STARTED_AT = time.monotonic()
+
+
+def elapsed():
+    """从脚本启动到现在的秒数，用于定位卡在哪一步。"""
+    return time.monotonic() - _STARTED_AT
 START_ENTRIES = {"进入首页", "StartGameTask"}
 INSTANCE_OPTION = "MuMu实例"
 AUTOSTART_OPTION = "模拟器自动启动"
 REDETECT_OPTION = "每次重新检测连接"
 
 
+# MCC 调 pretask 时 stdout 不会进 MFA 日志，所以额外落一份文件日志，
+# 否则每次排查这块都是黑盒（只能看到「卡了 N 秒然后 NOT_STARTED」）。
+LOG_FILE = PROJECT_ROOT / "logs" / "ensure_mumu.log"
+
+
 def log(message):
     print(f"[MuMu pretask] {message}", flush=True)
+    try:
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        stamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        with LOG_FILE.open("a", encoding="utf-8") as handle:
+            handle.write(f"[{stamp}] {message}\n")
+    except Exception:
+        pass  # 日志失败绝不影响 pretask 本身
 
 
 def run(args, timeout=30):
@@ -248,13 +266,57 @@ def manager_info(manager, index):
 
 
 def choose_instance(manager, requested=None, preferred_serial="", cached_index=None, fallback_index=None):
-    found = []
-    for index in range(10):
-        info = manager_info(manager, index)
-        if info:
-            found.append((index, info))
+    # 已知实例编号（配置 / 缓存 / 上次保存）时只查这几个，不要盲扫 0..9。
+    # 盲扫是 10 次 MuMuManager 调用，每次 timeout=12 秒，最坏 120 秒；
+    # 表现为 MCC 启动任务时 pretask 卡 60~70 秒，随后被判 NOT_STARTED 放弃本次任务。
+    targeted = []
+    for candidate in (requested, cached_index, fallback_index):
+        if candidate is None:
+            continue
+        try:
+            value = int(candidate)
+        except (TypeError, ValueError):
+            continue
+        if value not in targeted:
+            targeted.append(value)
+
+    def collect(indices):
+        items = []
+        for index in indices:
+            info = manager_info(manager, index)
+            if info:
+                items.append((index, info))
+        return items
+
+    found = collect(targeted)
+    if not found:
+        # 没有任何已知编号（首次运行），或已知编号全部失效（换实例 / 缓存过期）
+        # —— 都退回全量扫描，保持原有兜底能力
+        if targeted:
+            log(f"已知实例编号 {targeted} 均未命中，回退全量扫描 0-9")
+        found = collect(range(10))
     if not found:
         return None, {}
+
+    # 诊断：把扫到的实例及其关键状态打出来，用于判断「明明在运行却识别不到」这类问题
+    log(
+        "诊断：扫到实例 %s（已耗时 %.1fs）"
+        % (
+            [
+                (
+                    index,
+                    {
+                        "进程已起": info.get("is_process_started"),
+                        "安卓已起": info.get("is_android_started"),
+                        "主实例": info.get("is_main"),
+                        "adb": "%s:%s" % (info.get("adb_host_ip"), info.get("adb_port")),
+                    },
+                )
+                for index, info in found
+            ],
+            elapsed(),
+        )
+    )
 
     def pick(index):
         for item in found:
@@ -301,12 +363,23 @@ def choose_instance(manager, requested=None, preferred_serial="", cached_index=N
 
 def ensure_android(manager, index, info, allow_start=True):
     if not info.get("is_process_started") and not info.get("is_android_started"):
+        # 诊断：这条分支就是「卡 60 秒」的源头，把判断依据的原始值和已耗时打出来
+        log(
+            "诊断：实例 %s 判定为未启动 —— is_process_started=%r is_android_started=%r，"
+            "此时已耗时 %.1fs"
+            % (index, info.get("is_process_started"), info.get("is_android_started"), elapsed())
+        )
         if not allow_start:
             log(f"MuMu 实例 {index} 尚未启动，且已关闭自动启动")
             return {}
         log(f"正在启动 MuMu 12 实例 {index}")
+        launch_started = time.monotonic()
         code, output, error = run(
             [manager, "control", "--vmindex", index, "launch"], timeout=60
+        )
+        log(
+            "诊断：launch 返回 code=%r，耗时 %.1fs（output=%r error=%r）"
+            % (code, time.monotonic() - launch_started, (output or "")[:200], (error or "")[:200])
         )
         if code:
             log(f"启动 MuMu 失败：{error or output}")

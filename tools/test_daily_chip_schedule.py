@@ -6,8 +6,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 INTERFACE = ROOT / "assets" / "interface.json"
-PATCH = ROOT / "ui_custom" / "MFAAvalonia" / "laa-daily-chip-stage-schedule.patch"
-BUILD = ROOT / "ui_custom" / "MFAAvalonia" / "build.ps1"
+PATCH_DIR = ROOT / "ui_custom" / "MFAAvalonia"
+PATCH = PATCH_DIR / "laa-daily-chip-stage-schedule.patch"
+BUILD = PATCH_DIR / "build.ps1"
+PATCHES_LIST = PATCH_DIR / "patches.list"
+SCHEDULE_CARRIER = PATCH_DIR / "laa-limited-trade-chip-options.patch"
 
 
 def test_all_chip_stages_return_to_home():
@@ -43,7 +46,27 @@ def test_ui_patch_contains_complete_computer_weekday_schedule():
 
 
 def test_reproducible_build_includes_schedule_patch():
-    assert "laa-daily-chip-stage-schedule.patch" in BUILD.read_text(encoding="utf-8-sig")
+    """周几排期逻辑必须由 patches.list 里真正会被应用的补丁承载。
+
+    2026-09-12 上游把独立补丁并入了 laa-limited-trade-chip-options.patch
+    （patches.list 里有注释说明），补丁顺序也改为由 patches.list 统一提供，
+    因此不能再断言补丁文件名出现在 build.ps1 里。
+    """
+    order = [
+        line.split("#")[0].strip()
+        for line in PATCHES_LIST.read_text(encoding="utf-8").splitlines()
+    ]
+    order = [line for line in order if line]
+
+    # 承载排期逻辑的补丁必须在应用清单里（否则界面拿不到周几过滤）
+    assert SCHEDULE_CARRIER.name in order, (SCHEDULE_CARRIER.name, order)
+    text = SCHEDULE_CARRIER.read_text(encoding="utf-8")
+    assert "DateTime.Now.DayOfWeek" in text
+    assert "ItemsSource = visibleCases" in text
+
+    # build.ps1 的补丁顺序必须来自 patches.list（单一事实来源）
+    build = BUILD.read_text(encoding="utf-8-sig")
+    assert "patches.list" in build
 
 
 if __name__ == "__main__":

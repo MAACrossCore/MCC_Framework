@@ -21,6 +21,7 @@ from maa.toolkit import Toolkit
 import my_action
 import my_reco
 import number_lt  # noqa: F401  # 注册 number_lt 自定义识别
+import alien_shop  # noqa: F401  # 注册 alien_shop_item（异星灰域 名字+代币 双重核对）
 import order_fetch  # noqa: F401  # 注册 取下一单、输入当前UID
 from arena_pipeline import ArenaPipelineAction, ArenaPipelineRecognition
 from chip_pipeline import ChipPipelineAction, ChipPipelineRecognition

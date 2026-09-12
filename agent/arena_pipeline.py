@@ -17,12 +17,15 @@ from arena_loop import (
     ACTION_STOP_CUSTOM_TARGET,
     ACTION_STOP_REFRESH_EMPTY,
     ACTION_STOP_SIM_EMPTY,
+    FALLBACK_REMAINING,
     REPEAT_CUSTOM,
     ROI_OWN_DEPLOYMENT,
     ROI_REFRESH,
     ROI_SIM,
     ArenaLoop,
+    allows_fallback_row,
     candidate_meets_requirements,
+    choose_challenge_row,
     decide_arena_action,
 )
 from stop_guard import ActionStopped, ensure_running
@@ -60,18 +63,23 @@ class ArenaPipelineAction(CustomAction):
             if operation == "init":
                 engine = ArenaLoop()
                 options = {
-                    "strategy": engine._strat(),
                     "repeat": engine._repeat(),
                     "target": engine._target(),
-                    "power_gap": engine._power_gap(),
+                    "max_power": engine._max_power(),
+                    "min_points": engine._min_points(),
+                    "fallback_threshold": engine._fallback_threshold(),
+                    "fallback_points": engine._fallback_points(),
                 }
                 _SESSION.clear()
                 _SESSION.update({
                     "engine": engine,
-                    "strategy": options["strategy"],
                     "repeat": options["repeat"],
                     "target": options["target"],
-                    "power_gap": options["power_gap"],
+                    "max_power": options["max_power"],
+                    "min_points": options["min_points"],
+                    "fallback_threshold": options["fallback_threshold"],
+                    "fallback_points": options["fallback_points"],
+                    "row": 1,
                     "challenged": 0,
                     "succeeded": 0,
                     "failed": 0,
@@ -85,10 +93,14 @@ class ArenaPipelineAction(CustomAction):
                     "confirm_attempts": 0,
                     "battle_deadline": None,
                 })
+                threshold = options["fallback_threshold"]
                 log.info(
-                    "Pipeline初始化竞技场：策略=%s，重复=%s，目标=%d，战力差=%d",
-                    options["strategy"], options["repeat"], options["target"],
-                    options["power_gap"],
+                    "Pipeline初始化竞技场：重复=%s，目标=%d，可挑战最高战力=%d，最低挑战积分=%d，"
+                    "兜底阈值=%s，兜底最低积分=%d",
+                    options["repeat"], options["target"], options["max_power"],
+                    options["min_points"],
+                    "从不" if threshold is None else "剩余刷新<=%d" % threshold,
+                    options["fallback_points"],
                 )
                 return True
 
@@ -142,11 +154,46 @@ class ArenaPipelineAction(CustomAction):
 
                 _SESSION["target_validated"] = True
 
-                top = engine._read_top_row(context, image)
-                candidate_ok = candidate_meets_requirements(
-                    _SESSION["own"], top["power"], top["points"],
-                    _SESSION["power_gap"], _SESSION["strategy"],
+                max_power = _SESSION["max_power"]
+                min_points = _SESSION["min_points"]
+                row1 = engine._read_row(context, image, 1)
+                rows = {1: row1}
+                row1_ok = candidate_meets_requirements(
+                    max_power, row1["power"], row1["points"], min_points,
                 )
+
+                # 第一段：只看第 1 位，够最低挑战积分就打。
+                # 第二段（兜底）：剩余刷新次数 <= 阈值时进入，按 1 -> 2 -> 3 位
+                # 找第一个满足放宽门槛的对手，目的是把当天次数清完。
+                fallback_points = None
+                if not row1_ok:
+                    threshold = _SESSION["fallback_threshold"]
+                    if allows_fallback_row(refreshes, threshold, simulations):
+                        fallback_points = _SESSION["fallback_points"]
+                        for index in (2, 3):
+                            rows[index] = engine._read_row(context, image, index)
+                        log.info(
+                            "第1位不达标（战力=%s 积分=%s，上限=%s 最低积分=%s），"
+                            "剩余刷新%s<=阈值%s 进入兜底，门槛降为%s分，检查第2、3位",
+                            row1["power"], row1["points"], max_power, min_points,
+                            refreshes,
+                            "剩余挑战%s" % simulations if threshold == FALLBACK_REMAINING
+                            else threshold,
+                            fallback_points,
+                        )
+                    else:
+                        log.info(
+                            "第1位不达标（战力=%s 积分=%s，上限=%s 最低积分=%s），"
+                            "剩余刷新%s 未到兜底阈值%s，只刷新不挑战2、3位",
+                            row1["power"], row1["points"], max_power, min_points,
+                            refreshes, "从不" if threshold is None else threshold,
+                        )
+
+                chosen = choose_challenge_row(rows, max_power, min_points, fallback_points)
+                candidate_ok = chosen is not None
+                _SESSION["row"] = chosen if chosen is not None else 1
+                top = rows.get(_SESSION["row"], row1)
+
                 decision = decide_arena_action(
                     simulations, refreshes, candidate_ok, _SESSION["repeat"],
                     _SESSION["challenged"], _SESSION["target"],
@@ -171,8 +218,10 @@ class ArenaPipelineAction(CustomAction):
                 ):
                     _SESSION["completion_reason"] = decision
                 log.info(
-                    "Pipeline竞技场判定：模拟=%s，刷新=%s，对手战力=%s，积分=%s，结果=%s",
-                    simulations, refreshes, top["power"], top["points"], decision,
+                    "Pipeline竞技场判定：模拟=%s，刷新=%s，%s，对手战力=%s，积分=%s，结果=%s",
+                    simulations, refreshes,
+                    "选定=第%d位" % chosen if chosen is not None else "选定=无（本轮不挑战）",
+                    top["power"], top["points"], decision,
                 )
                 return True
 
@@ -180,6 +229,26 @@ class ArenaPipelineAction(CustomAction):
                 if not engine._click_node(context, "ArenaRefresh"):
                     log.error("未能识别并点击竞技场刷新按钮")
                     return False
+                return True
+
+            if operation == "click_challenge":
+                # 按选定位次点对手卡片；之后的链路（确认页/结算/奖励）与第一位完全一致。
+                row_index = _SESSION.get("row", 1)
+                if not engine._click_challenge_row(context, row_index):
+                    log.error("点击第%s位对手卡片时被用户中止", row_index)
+                    return False
+                return True
+
+            if operation == "dismiss_buy":
+                # 次数用完后点挑战会直接弹「模拟次数购买」：点击已生效，只关不买。
+                row_index = _SESSION.get("row", 1)
+                engine._dismiss_buy_dialog(context)
+                _SESSION["completion_reason"] = ACTION_STOP_SIM_EMPTY
+                _SESSION["decision"] = "stop_sim_empty"
+                log.info(
+                    "第%s位点击已生效但模拟次数已用完（页面为模拟次数购买），按次数归零结束，未做任何购买",
+                    row_index,
+                )
                 return True
 
             if operation == "mark_result":
@@ -276,6 +345,9 @@ class ArenaPipelineRecognition(CustomRecognition):
         image = argv.image
         if expected == "page:arena" and engine._is_arena_list(context, image):
             return _hit({"page": "arena"})
+        if expected == "page:buy_attempts" and engine._is_buy_attempts_dialog(context, image):
+            # 今日模拟次数用完后点挑战会直接弹该框：说明点击已生效。
+            return _hit({"page": "buy_attempts", "row": _SESSION.get("row", 1)})
         if expected == "page:confirm" and engine._is_challenge_confirm(context, image):
             return _hit({"page": "confirm"})
         if expected == "page:victory" and engine._is_victory_page(context, image):

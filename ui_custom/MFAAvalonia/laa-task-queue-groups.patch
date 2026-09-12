@@ -1,0 +1,494 @@
+diff --git a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs b/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
+--- a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
++++ b/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
+@@ -75,6 +75,11 @@
+         _processorField.TaskQueue.CountChanged += OnTaskQueueCountChanged;
+         LanguageHelper.LanguageChanged += OnLanguageChanged;
+ 
++        // LAA: 任务列表分组。TaskItemViewModels 初始化为 [] 之后一直是原地 Clear/Add，
++        // 属性 setter 永远不会触发，所以必须在 Initialize()（里面加载任务）之前就挂上监听，
++        // 否则分组表头一次都不会刷新出来。
++        TaskItemViewModels.CollectionChanged += OnTaskItemsCollectionChanged;
++
+         // Re-initialize with the correct processor since base constructor might have used Current
+         Initialize();
+     }
+@@ -602,8 +607,242 @@
+ 
+     partial void OnTaskItemViewModelsChanged(ObservableCollection<DragItemViewModel> value)
+     {
++        // LAA: 列表任何增删改（含拖拽排序）都重新算一次分组标记
++        value.CollectionChanged -= OnTaskItemsCollectionChanged;
++        value.CollectionChanged += OnTaskItemsCollectionChanged;
++        RefreshTaskGroups();
+         if (ConfigurationManager.IsSwitching) return;
+         Processor.InstanceConfiguration.SetValue(ConfigurationKeys.TaskItems, value.Where(model => !model.IsResourceOptionItem).Select(model => model.InterfaceItem).ToList());
++    }
++
++    // LAA ---------------------------------------------------------------
++    // 任务列表分组：纯显示层的折叠，表头本身没有任何功能，
++    // 组内任务与普通任务完全同级、各自独立勾选与执行。
++    //
++    // 只在「同一组的成员在队列里连续排列」时才成组；一旦被拖散，
++    // 该组自动退回普通显示，避免出现表头和成员分居两处的诡异画面。
++    private readonly Dictionary<string, bool> _taskGroupExpanded = new();
++    // 表头画在哪个成员上。必须是「粘性」的：用户拖的就是这个成员，
++    // 收拢要以它所在的位置为锚点。若每次刷新都重取「当前第一个成员」，
++    // 向下拖拽会被拉回原位（被拖的成员跑到后面，而留在原地的成员成了第一个）。
++    private readonly Dictionary<string, DragItemViewModel> _taskGroupHeaderCarrier = new();
++    private bool _refreshingTaskGroups;
++    private bool _groupCoalesceScheduled;
++
++    private void OnTaskItemsCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
++    {
++        // LAA: 表头拖拽 = 整组移动。被拖的是哪一项，直接从事件里读 —— 这是权威来源。
++        // 之前靠「谁当前排第一」推断载体，渲染与判断会脱节（日志里出现过拖 A 却锚定 B），
++        // 这里改成：谁被拖，谁就成为该组的锚点，整组跟着它落到新位置，组内顺序不变。
++        DragItemViewModel? moved = e.Action switch
++        {
++            System.Collections.Specialized.NotifyCollectionChangedAction.Move
++                when e.NewStartingIndex >= 0 && e.NewStartingIndex < TaskItemViewModels.Count
++                => TaskItemViewModels[e.NewStartingIndex],
++            System.Collections.Specialized.NotifyCollectionChangedAction.Add
++                => e.NewItems?.OfType<DragItemViewModel>().FirstOrDefault(),
++            System.Collections.Specialized.NotifyCollectionChangedAction.Replace
++                => e.NewItems?.OfType<DragItemViewModel>().FirstOrDefault(),
++            _ => null,
++        };
++        // LAA: 表头拖拽 = 整组移动。被拖的是哪一项，直接从事件里读 —— 这是权威来源。
++        // 谁被拖，谁就成为该组的锚点；CoalesceOrder 会在锚点所在位置输出整组，
++        // 于是整组跟着它落到新位置（round 5 定位并验证过：这是"能向下拖"的关键）。
++        if (moved != null && TaskGroupKeyOf(moved) is { } movedKey)
++        {
++            _taskGroupHeaderCarrier[movedKey] = moved;
++        }
++
++        RefreshTaskGroups();
++        ScheduleGroupCoalesce();
++    }
++
++    /// <summary>
++    /// LAA: 把同组成员排到一起（保持组内相对顺序，整体落在首个成员的位置）。
++    /// 纯函数，只算目标顺序，不改集合。
++    /// </summary>
++    private List<DragItemViewModel> CoalesceOrder(IReadOnlyList<DragItemViewModel> items)
++    {
++        var result = new List<DragItemViewModel>(items.Count);
++        var emitted = new HashSet<string>();
++        foreach (var item in items)
++        {
++            var key = TaskGroupKeyOf(item);
++            if (key == null)
++            {
++                result.Add(item);
++                continue;
++            }
++
++            var carrier = CarrierOf(key, items);
++            var hasCarrier = carrier != null && items.Contains(carrier);
++
++            // 关键：整组只在「表头载体」出现的位置输出。
++            // 若在首个遇到的成员处输出，向下拖拽时（顺序变成 另一成员, 其它, 载体）
++            // 锚点会落到没被拖动的那个成员上，整组被拉回原位 —— 表现为下拽无效。
++            if (hasCarrier && !ReferenceEquals(item, carrier)) continue;
++            if (!emitted.Add(key)) continue;
++
++            if (hasCarrier) result.Add(carrier!);
++            foreach (var member in items)
++                if (TaskGroupKeyOf(member) == key && !ReferenceEquals(member, carrier))
++                    result.Add(member);
++        }
++        return result;
++    }
++
++    /// <summary>LAA: 该组的表头载体落在哪个成员上。</summary>
++    private DragItemViewModel? CarrierOf(string key, IReadOnlyList<DragItemViewModel> items)
++    {
++        if (_taskGroupHeaderCarrier.TryGetValue(key, out var carrier)
++            && carrier != null && items.Contains(carrier) && TaskGroupKeyOf(carrier) == key)
++        {
++            return carrier;
++        }
++        var first = items.FirstOrDefault(m => TaskGroupKeyOf(m) == key);
++        if (first != null) _taskGroupHeaderCarrier[key] = first;
++        return first;
++    }
++
++    /// <summary>LAA: 延后一次收拢，避免在 CollectionChanged 处理中直接改集合。</summary>
++    private void ScheduleGroupCoalesce()
++    {
++        if (_groupCoalesceScheduled) return;
++        _groupCoalesceScheduled = true;
++        Dispatcher.UIThread.Post(() =>
++        {
++            _groupCoalesceScheduled = false;
++            ApplyGroupCoalesce();
++        }, DispatcherPriority.Background);
++    }
++
++    /// <summary>
++    /// LAA: 组成员被拖散时自动收回一起。
++    /// 分组表头画在组内第一行上，所以「拖表头」等于拖这个成员，
++    /// 收拢后其余成员会跟过来 —— 效果就是整组一起移动。
++    /// </summary>
++    private void ApplyGroupCoalesce()
++    {
++        if (_refreshingTaskGroups) return;
++
++        var items = TaskItemViewModels.ToList();
++        var desired = CoalesceOrder(items);
++        var same = desired.Count == items.Count;
++        if (same)
++        {
++            for (var i = 0; i < items.Count; i++)
++            {
++                if (ReferenceEquals(items[i], desired[i])) continue;
++                same = false;
++                break;
++            }
++        }
++        if (same) return;
++
++        _refreshingTaskGroups = true;
++        try
++        {
++            for (var target = 0; target < desired.Count; target++)
++            {
++                var current = TaskItemViewModels.IndexOf(desired[target]);
++                if (current >= 0 && current != target) TaskItemViewModels.Move(current, target);
++            }
++        }
++        finally
++        {
++            _refreshingTaskGroups = false;
++        }
++
++        RefreshTaskGroups();
++    }
++
++    private static string? TaskGroupKeyOf(DragItemViewModel item)
++    {
++        var groups = item.InterfaceItem?.Group;
++        if (groups is { Count: > 0 } && !string.IsNullOrWhiteSpace(groups[0])) return groups[0];
++
++        // 兜底：队列项复用的是存档里的旧任务对象，部分加载路径不会把 interface.json 的
++        // group 拷过来。这里按 entry / name 回查一次顶层定义，避免分组静默失效。
++        var entry = item.InterfaceItem?.Entry;
++        var name = item.InterfaceItem?.Name;
++        var def = MaaProcessor.Interface?.Task?.FirstOrDefault(t =>
++            (!string.IsNullOrWhiteSpace(entry) && t.Entry == entry)
++            || (!string.IsNullOrWhiteSpace(name) && t.Name == name));
++        var fallback = def?.Group;
++        return fallback is { Count: > 0 } && !string.IsNullOrWhiteSpace(fallback[0])
++            ? fallback[0]
++            : null;
++    }
++
++    private static string TaskGroupLabelOf(string key)
++    {
++        var def = MaaProcessor.Interface?.Group?.FirstOrDefault(g => g.Name == key);
++        return LanguageHelper.GetLocalizedDisplayName(def?.Label, key);
++    }
++
++    private static void ClearTaskGroupFlags(DragItemViewModel item)
++    {
++        item.GroupKey = null;
++        item.GroupLabel = null;
++        item.HasGroupHeader = false;
++        item.IsHiddenByGroup = false;
++        item.IsTaskContentHidden = false;
++        item.IsGroupExpanded = true;
++    }
++
++    /// <summary>LAA: 按当前队列顺序重算分组表头与折叠可见性。</summary>
++    public void RefreshTaskGroups()
++    {
++        if (_refreshingTaskGroups) return;
++        _refreshingTaskGroups = true;
++        try
++        {
++            var items = TaskItemViewModels.ToList();
++            var index = 0;
++            while (index < items.Count)
++            {
++                var key = TaskGroupKeyOf(items[index]);
++                if (key == null)
++                {
++                    ClearTaskGroupFlags(items[index]);
++                    index++;
++                    continue;
++                }
++
++                var end = index;
++                while (end + 1 < items.Count && TaskGroupKeyOf(items[end + 1]) == key) end++;
++
++                var expanded = !_taskGroupExpanded.TryGetValue(key, out var known) || known;
++                var members = items.GetRange(index, end - index + 1);
++                var carrier = CarrierOf(key, items) ?? members[0];
++                foreach (var member in members)
++                {
++                    var isCarrier = ReferenceEquals(member, carrier);
++                    member.GroupKey = key;
++                    member.HasGroupHeader = isCarrier;
++                    member.GroupLabel = isCarrier ? TaskGroupLabelOf(key) : null;
++                    member.IsGroupExpanded = expanded;
++                    // 载体保留表头、只藏任务内容；其余成员整行隐藏
++                    member.IsHiddenByGroup = !expanded && !isCarrier;
++                    member.IsTaskContentHidden = !expanded;
++                }
++
++                index = end + 1;
++            }
++
++        }
++        finally
++        {
++            _refreshingTaskGroups = false;
++        }
++    }
++
++    /// <summary>LAA: 点击分组表头时切换该组折叠状态。</summary>
++    public void ToggleTaskGroup(string key)
++    {
++        var expanded = !_taskGroupExpanded.TryGetValue(key, out var known) || known;
++        _taskGroupExpanded[key] = !expanded;
++        RefreshTaskGroups();
+     }
+ 
+     [RelayCommand]
+diff --git a/MFAAvalonia/Helper/ValueType/DragItemViewModel.cs b/MFAAvalonia/Helper/ValueType/DragItemViewModel.cs
+--- a/MFAAvalonia/Helper/ValueType/DragItemViewModel.cs
++++ b/MFAAvalonia/Helper/ValueType/DragItemViewModel.cs
+@@ -1,4 +1,4 @@
+-﻿using CommunityToolkit.Mvvm.ComponentModel;
++using CommunityToolkit.Mvvm.ComponentModel;
+ using MFAAvalonia.Configuration;
+ using MFAAvalonia.Extensions;
+ using MFAAvalonia.Extensions.MaaFW;
+@@ -64,6 +64,20 @@
+ 
+     /// <summary>验证不通过时标记为 true，用于 UI 红圈提示</summary>
+     [ObservableProperty] [JsonIgnore] private bool _hasValidationError;
++
++    // LAA: 任务列表的「分组表头」。表头不占用独立行，而是画在组内第一行的顶部；
++    // 折叠时把该行的任务内容一起隐藏，视觉上就等同于只剩一个表头。
++    // 这样完全不改变 TaskItemViewModels 的构成，也就不必去动那 60+ 处
++    // 按 IsResourceOptionItem 过滤的逻辑（漏改一处就可能把 null 存进配置）。
++    // 分组来源：interface.json 顶层的 group 定义 + 各任务自己的 group 字段。
++    [ObservableProperty] [JsonIgnore] private string? _groupKey;
++    [ObservableProperty] [JsonIgnore] private string? _groupLabel;
++    [ObservableProperty] [JsonIgnore] private bool _hasGroupHeader;
++    [ObservableProperty] [JsonIgnore] private bool _isGroupExpanded = true;
++    [ObservableProperty] [JsonIgnore] private bool _isHiddenByGroup;
++    // 折叠时「首成员」那一行要保留表头、只藏任务内容，
++    // 所以不能复用 IsHiddenByGroup（首成员永远是 false），需要单独一个标记。
++    [ObservableProperty] [JsonIgnore] private bool _isTaskContentHidden;
+ 
+     [ObservableProperty]
+     [NotifyPropertyChangedFor(nameof(IsRunStatusVisible))]
+diff --git a/MFAAvalonia/Extensions/MaaFW/TaskLoader.cs b/MFAAvalonia/Extensions/MaaFW/TaskLoader.cs
+--- a/MFAAvalonia/Extensions/MaaFW/TaskLoader.cs
++++ b/MFAAvalonia/Extensions/MaaFW/TaskLoader.cs
+@@ -441,8 +441,7 @@
+     }
+ 
+ 
+-    private void UpdateExistingItem(DragItemViewModel oldItem, MaaInterface.MaaInterfaceTask newItem, bool updateName = false)
+-    {
++    private void UpdateExistingItem(DragItemViewModel oldItem, MaaInterface.MaaInterfaceTask newItem, bool updateName = false)    {
+         if (oldItem.InterfaceItem == null) return;
+         if (updateName) oldItem.InterfaceItem.Name = newItem.Name;
+         else if (oldItem.InterfaceItem.Name != newItem.Name) return;
+@@ -456,6 +455,9 @@
+         oldItem.InterfaceItem.Resource = newItem.Resource;
+         oldItem.InterfaceItem.Controller = newItem.Controller;
+         oldItem.InterfaceItem.Icon = newItem.Icon;
++        // LAA: 队列项复用的是存档里的旧对象，这里逐字段打补丁。
++        // 漏掉 Group 会让任务列表分组静默失效（旧存档里压根没有 group 字段）。
++        oldItem.InterfaceItem.Group = newItem.Group;
+ 
+         // 更新图标
+         oldItem.InterfaceItem.InitializeIcon();
+diff --git a/MFAAvalonia/Views/Pages/TaskQueueView.axaml b/MFAAvalonia/Views/Pages/TaskQueueView.axaml
+--- a/MFAAvalonia/Views/Pages/TaskQueueView.axaml
++++ b/MFAAvalonia/Views/Pages/TaskQueueView.axaml
+@@ -1,4 +1,4 @@
+-﻿<?xml version="1.0" encoding="UTF-8"?>
++<?xml version="1.0" encoding="UTF-8"?>
+ 
+ <UserControl d:DesignHeight="450"
+              d:DesignWidth="800"
+@@ -1197,6 +1197,7 @@
+                              HorizontalAlignment="Stretch"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              SelectionChanged="SelectingItemsControl_OnSelectionChanged"
++                             ContainerPrepared="TaskListBox_OnContainerPrepared"
+                              KeyDown="TaskListBox_OnKeyDown"
+                              x:Name="TaskListBox">
+                         <ListBox.ItemsPanel>
+@@ -1206,11 +1207,48 @@
+                         </ListBox.ItemsPanel>
+                         <ListBox.Styles>
+                             <Style Selector="ListBoxItem">
++                                <!-- LAA: 折叠分组时，组内非表头成员连整个 ListBoxItem 一起隐藏。
++                                     只藏内容的话容器仍在，会留下一个可点选的空行（蓝条+灰底特效）。 -->
++                                <Setter Property="IsVisible" Value="{Binding !IsHiddenByGroup, DataType=valueType:DragItemViewModel}" />
+                             </Style>
+                         </ListBox.Styles>
+                         <ListBox.ItemTemplate>
+                             <DataTemplate>
+-                                <Panel>
++                                <StackPanel>
++                                <!-- LAA: 分组表头（纯显示，无功能）。画在组内第一行顶部；折叠时该行内容一起隐藏。 -->
++                                <Border IsVisible="{Binding HasGroupHeader}"
++                                        Background="#16808080"
++                                        CornerRadius="6"
++                                        Margin="0,5,0,5"
++                                        Padding="4,1">
++                                    <Button Background="Transparent"
++                                            BorderThickness="0"
++                                            Padding="2,3"
++                                            MinWidth="0"
++                                            Cursor="Hand"
++                                            HorizontalAlignment="Stretch"
++                                            HorizontalContentAlignment="Left"
++                                            Click="TaskGroupHeader_OnClick">
++                                        <StackPanel Orientation="Horizontal" Spacing="6">
++                                            <Path Width="10" Height="10" Stretch="Uniform"
++                                                  VerticalAlignment="Center"
++                                                  Fill="{DynamicResource SukiLowText}"
++                                                  Data="{x:Static suki:Icons.ChevronDown}"
++                                                  IsVisible="{Binding IsGroupExpanded}" />
++                                            <Path Width="10" Height="10" Stretch="Uniform"
++                                                  VerticalAlignment="Center"
++                                                  Fill="{DynamicResource SukiLowText}"
++                                                  Data="{x:Static suki:Icons.ChevronRight}"
++                                                  IsVisible="{Binding !IsGroupExpanded}" />
++                                            <TextBlock Text="{Binding GroupLabel}"
++                                                       FontSize="12"
++                                                       FontWeight="SemiBold"
++                                                       Foreground="{DynamicResource SukiLowText}"
++                                                       VerticalAlignment="Center" />
++                                        </StackPanel>
++                                    </Button>
++                                </Border>
++                                <Panel IsVisible="{Binding !IsTaskContentHidden}">
+                                 <Border BorderBrush="#E85D75" BorderThickness="1" CornerRadius="8"
+                                         Margin="-2" Padding="2"
+                                         IsVisible="{Binding HasValidationError}" IsHitTestVisible="False"/>
+@@ -1315,6 +1353,7 @@
+                                     </Grid>
+                                 </Grid>
+                                 </Panel>
++                                </StackPanel>
+                             </DataTemplate>
+                         </ListBox.ItemTemplate>
+                     </ListBox>
+diff --git a/MFAAvalonia/Views/Pages/TaskQueueView.axaml.cs b/MFAAvalonia/Views/Pages/TaskQueueView.axaml.cs
+--- a/MFAAvalonia/Views/Pages/TaskQueueView.axaml.cs
++++ b/MFAAvalonia/Views/Pages/TaskQueueView.axaml.cs
+@@ -1,4 +1,4 @@
+-﻿using Avalonia;
++using Avalonia;
+ using Avalonia.Controls;
+ using Avalonia.Controls.Primitives;
+ using Avalonia.Controls.Templates;
+@@ -239,7 +239,10 @@
+ 
+         foreach (var container in TaskListBox.GetVisualDescendants().OfType<ListBoxItem>())
+         {
+-            container.IsVisible = container.DataContext is not DragItemViewModel item || item.IsTaskSupported;
++            // LAA: 这里原来是无条件 item.IsTaskSupported，会把分组折叠的隐藏结果覆盖掉
++            // （容器变可见、内容却是隐藏的 -> 拖拽后多出一个空行）。
++            // 统一走 ApplyGroupRowVisibility，让它同时考虑 IsTaskSupported 与分组状态。
++            ApplyGroupRowVisibility(container);
+         }
+     }
+ 
+@@ -800,6 +803,86 @@
+ 
+     private void ChipFilterPlanButton_OnClick(object? sender, RoutedEventArgs e) =>
+         OpenChipFilterPlanWindow();
++
++    /// <summary>
++    /// LAA: 折叠分组时，组内非表头成员连整个 ListBoxItem 一起隐藏。
++    /// 只藏模板内容的话容器仍在，主题的 Padding 会撑出一个可 hover 的空行。
++    /// 样式 Setter 绑 IsVisible 在这套主题下不生效，所以在容器生成时直接设。
++    /// </summary>
++    private bool _groupRowSyncHooked;
++
++    private void TaskListBox_OnContainerPrepared(object? sender, ContainerPreparedEventArgs e)
++    {
++        if (e.Container is not ListBoxItem container) return;
++        HookGroupRowSync();
++        ApplyGroupRowVisibility(container);
++        if (container.DataContext is DragItemViewModel vm)
++        {
++            vm.PropertyChanged -= GroupRowVisibility_OnPropertyChanged;
++            vm.PropertyChanged += GroupRowVisibility_OnPropertyChanged;
++        }
++    }
++
++    /// <summary>
++    /// LAA: ListBox 在 Move 之后会回收复用 ListBoxItem（换个 DataContext 接着用），
++    /// 复用的容器既不会触发 ContainerPrepared、也不一定触发项的 PropertyChanged，
++    /// 于是它停在上一次的可见性状态 —— 表现为拖拽后多出一个「容器可见但内容隐藏」的空行
++    /// （折叠再展开时因为重算了标记才消失）。
++    /// 这里在每次集合变化后把所有已生成容器的可见性全量重套一遍，直接消除滞后。
++    /// </summary>
++    private void HookGroupRowSync()
++    {
++        if (_groupRowSyncHooked) return;
++        if (DataContext is not TaskQueueViewModel vm) return;
++        _groupRowSyncHooked = true;
++        vm.TaskItemViewModels.CollectionChanged += (_, _) =>
++            Dispatcher.UIThread.Post(RefreshAllGroupRows, DispatcherPriority.Background);
++    }
++
++    private void RefreshAllGroupRows() => UpdateTaskItemContainerVisibility();
++
++    private void GroupRowVisibility_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
++    {
++        if (e.PropertyName is not (nameof(DragItemViewModel.IsHiddenByGroup)))
++            return;
++        if (sender is not DragItemViewModel vm) return;
++        foreach (var container in TaskListBox.GetVisualDescendants().OfType<ListBoxItem>())
++        {
++            if (ReferenceEquals(container.DataContext, vm)) ApplyGroupRowVisibility(container);
++        }
++    }
++
++    /// <summary>
++    /// LAA: 任务行容器可见性的唯一判定处。
++    /// 空行的特征是「容器可见但里面什么都没画」：内容面板由 IsTaskContentHidden 控制、
++    /// 表头由 HasGroupHeader 控制。把三者与原有的 IsTaskSupported 一起算，
++    /// 无论状态因何产生（容器复用滞后、刷新时序、被别处覆盖）都渲染不出空行。
++    /// </summary>
++    private static void ApplyGroupRowVisibility(ListBoxItem container)
++    {
++        if (container.DataContext is not DragItemViewModel vm)
++        {
++            container.IsVisible = true;
++            return;
++        }
++
++        // 只用两个稳定条件：受支持 + 没被分组折叠隐藏。
++        // 不要依赖 IsTaskContentHidden —— 本方法会在集合变化后被调用，
++        // 那时分组标记可能还是旧的，会误把正常行判成空壳而隐藏（曾把组内任务整行弄没）。
++        container.IsVisible = vm.IsTaskSupported && !vm.IsHiddenByGroup;
++    }
++
++    /// <summary>LAA: 点击分组表头折叠/展开。表头本身没有别的功能。</summary>
++    private void TaskGroupHeader_OnClick(object? sender, RoutedEventArgs e)
++    {
++        if (sender is Control { DataContext: DragItemViewModel item }
++            && !string.IsNullOrEmpty(item.GroupKey)
++            && DataContext is TaskQueueViewModel vm)
++        {
++            vm.ToggleTaskGroup(item.GroupKey);
++        }
++        e.Handled = true;
++    }
+ 
+     private async void OpenChipFilterPlanWindow()
+     {

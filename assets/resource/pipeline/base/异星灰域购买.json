@@ -1,0 +1,1405 @@
+{
+    "$__mpe_config_异星灰域购买": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "filename": "异星灰域购买",
+            "version": "v1.9.2",
+            "savedViewport": {
+                "x": 40,
+                "y": 40,
+                "zoom": 0.62
+            }
+        }
+    },
+    "异星灰域购买": {
+        "next": [
+            "[JumpBack]子任务_关闭公告",
+            "[JumpBack]子任务_获得物品",
+            "异星灰域_点异星灰域页签",
+            "异星灰域_点万物贸易所",
+            "异星灰域_进补给站",
+            "[JumpBack]子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 60,
+                "y": 80
+            }
+        }
+    },
+    "异星灰域_进补给站": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    940,
+                    530,
+                    340,
+                    190
+                ],
+                "expected": [
+                    "补给站"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 3000,
+        "next": [
+            "异星灰域_点万物贸易所",
+            "异星灰域_进补给站"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 380,
+                "y": 280
+            }
+        }
+    },
+    "异星灰域_点万物贸易所": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    320,
+                    720
+                ],
+                "expected": [
+                    "万物贸易所"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": [
+            "异星灰域_点异星灰域页签",
+            "异星灰域_点万物贸易所"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 280
+            }
+        }
+    },
+    "异星灰域_点异星灰域页签": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    130
+                ],
+                "expected": [
+                    "异星灰域"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_页面就绪",
+            "异星灰域_点异星灰域页签"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1020,
+                "y": 280
+            }
+        }
+    },
+    "异星灰域_页面就绪": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    260,
+                    970,
+                    330
+                ],
+                "expected": [
+                    "构建蓝图",
+                    "赤狼星源",
+                    "破碎程式",
+                    "稀有礼物",
+                    "家具币",
+                    "装饰券",
+                    "总队长星源",
+                    "罕见星尘券",
+                    "高纯硅化剂",
+                    "进化之息",
+                    "数据协议"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域_购买分派",
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1340,
+                "y": 280
+            }
+        }
+    },
+    "异星灰域购买_完成": {
+        "action": {
+            "type": "DoNothing"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 280
+            }
+        }
+    },
+    "异星灰域_购买分派": {
+        "next": [
+            "异星灰域_买不起_传说星尘券",
+            "异星灰域_售罄跳过_传说星尘券",
+            "异星灰域_购买_传说星尘券",
+            "异星灰域_买不起_构建蓝图",
+            "异星灰域_售罄跳过_构建蓝图",
+            "异星灰域_购买_构建蓝图",
+            "异星灰域_买不起_赤狼星源",
+            "异星灰域_售罄跳过_赤狼星源",
+            "异星灰域_购买_赤狼星源",
+            "异星灰域_买不起_破碎程式x50",
+            "异星灰域_售罄跳过_破碎程式x50",
+            "异星灰域_购买_破碎程式x50",
+            "异星灰域_买不起_稀有礼物箱",
+            "异星灰域_售罄跳过_稀有礼物箱",
+            "异星灰域_购买_稀有礼物箱",
+            "异星灰域_买不起_家具币x10",
+            "异星灰域_售罄跳过_家具币x10",
+            "异星灰域_购买_家具币x10",
+            "异星灰域_买不起_装饰券x5",
+            "异星灰域_售罄跳过_装饰券x5",
+            "异星灰域_购买_装饰券x5",
+            "异星灰域_买不起_总队长星源",
+            "异星灰域_售罄跳过_总队长星源",
+            "异星灰域_购买_总队长星源",
+            "异星灰域_买不起_罕见星尘券x20",
+            "异星灰域_售罄跳过_罕见星尘券x20",
+            "异星灰域_购买_罕见星尘券x20",
+            "异星灰域_买不起_高纯硅化剂",
+            "异星灰域_售罄跳过_高纯硅化剂",
+            "异星灰域_购买_高纯硅化剂",
+            "异星灰域_买不起_进化之息",
+            "异星灰域_售罄跳过_进化之息",
+            "异星灰域_购买_进化之息",
+            "异星灰域_买不起_数据协议",
+            "异星灰域_售罄跳过_数据协议",
+            "异星灰域_购买_数据协议",
+            "异星灰域_左滑看更多",
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 420
+            }
+        }
+    },
+    "异星灰域_购买_传说星尘券": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "传说星尘券"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_传说星尘券"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 420
+            }
+        }
+    },
+    "异星灰域_数量最大": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "最大"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 800,
+        "next": [
+            "异星灰域_点购买"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2300,
+                "y": 420
+            }
+        },
+        "timeout": 20000
+    },
+    "异星灰域_点购买": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "^购买$"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": [
+            "[JumpBack]子任务_获得物品",
+            "异星灰域_页面就绪"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2620,
+                "y": 420
+            }
+        }
+    },
+    "异星灰域_售罄跳过_传说星尘券": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 560
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_售罄跳过_构建蓝图": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 1120
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_构建蓝图": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "构建蓝图"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_构建蓝图"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 980
+            }
+        }
+    },
+    "异星灰域_售罄跳过_赤狼星源": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 1400
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_赤狼星源": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "赤狼星源"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_赤狼星源"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 1260
+            }
+        }
+    },
+    "异星灰域_售罄跳过_破碎程式x50": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 1680
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_破碎程式x50": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "破碎程式"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_破碎程式x50"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 1540
+            }
+        }
+    },
+    "异星灰域_售罄跳过_稀有礼物箱": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 1960
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_稀有礼物箱": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "稀有礼物"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_稀有礼物箱"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 1820
+            }
+        }
+    },
+    "异星灰域_售罄跳过_家具币x10": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 2240
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_家具币x10": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "家具币"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_家具币x10"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 2100
+            }
+        }
+    },
+    "异星灰域_售罄跳过_装饰券x5": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 2520
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_装饰券x5": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "装饰券"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_装饰券x5"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 2380
+            }
+        }
+    },
+    "异星灰域_售罄跳过_总队长星源": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 2800
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_总队长星源": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "总队长星源"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_总队长星源"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 2660
+            }
+        }
+    },
+    "异星灰域_售罄跳过_罕见星尘券x20": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 3080
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_罕见星尘券x20": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "罕见星尘券"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_罕见星尘券x20"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 2940
+            }
+        }
+    },
+    "异星灰域_售罄跳过_高纯硅化剂": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 3360
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_高纯硅化剂": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "高纯硅化剂"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_高纯硅化剂"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 3220
+            }
+        }
+    },
+    "异星灰域_售罄跳过_进化之息": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 3640
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_进化之息": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    270,
+                    970,
+                    310
+                ],
+                "expected": [
+                    "进化之息"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_进化之息"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 3500
+            }
+        }
+    },
+    "异星灰域_售罄跳过_数据协议": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    140,
+                    240,
+                    970,
+                    360
+                ],
+                "expected": [
+                    "售罄"
+                ],
+                "threshold": 0.2
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "max_hit": 1,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 3920
+            }
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_购买_数据协议": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_item",
+                "custom_recognition_param": {
+                    "name": "数据协议",
+                    "price": "10"
+                }
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "异星灰域_数量最大",
+            "异星灰域_点购买",
+            "异星灰域_购买_数据协议"
+        ],
+        "timeout": 20000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1980,
+                "y": 3780
+            }
+        }
+    },
+    "异星灰域_买不起_传说星尘券": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "传说星尘券",
+                    "price": "50"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_构建蓝图": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "构建蓝图",
+                    "price": "150"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_赤狼星源": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "赤狼星源",
+                    "price": "150"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_破碎程式x50": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "破碎程式x50",
+                    "price": "50"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_稀有礼物箱": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "稀有礼物箱",
+                    "price": "16"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_家具币x10": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "家具币x10",
+                    "price": "10"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_装饰券x5": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "装饰券x5",
+                    "price": "20"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_总队长星源": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "总队长星源",
+                    "price": "300"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_罕见星尘券x20": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "罕见星尘券x20",
+                    "price": "10"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_高纯硅化剂": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "高纯硅化剂",
+                    "price": "75"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_进化之息": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "进化之息",
+                    "price": "40"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_买不起_数据协议": {
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_broke",
+                "custom_recognition_param": {
+                    "name": "数据协议",
+                    "price": "10"
+                }
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 640
+            }
+        }
+    },
+    "异星灰域_左滑看更多": {
+        "max_hit": 4,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1050,
+                    270,
+                    40,
+                    40
+                ],
+                "end": [
+                    [
+                        200,
+                        270,
+                        40,
+                        40
+                    ]
+                ],
+                "duration": 500
+            }
+        },
+        "post_delay": 900,
+        "next": [
+            "异星灰域_购买分派"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1660,
+                "y": 900
+            }
+        }
+    }
+}
