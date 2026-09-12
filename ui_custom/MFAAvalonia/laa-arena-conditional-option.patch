@@ -1,42 +1,40 @@
 diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/TaskOptionGenerator.cs
 --- a/MFAAvalonia/Helper/TaskOptionGenerator.cs
 +++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
-@@ -259,6 +259,13 @@
-         {
-             foreach (var option in dragItem.InterfaceItem.Advanced.ToList())
+@@ -261,8 +261,11 @@
              {
-+               AddAdvancedOption(panel, option);
-+            }
-+        }
+                AddAdvancedOption(panel, option);
+             }
+         }
 +
 +        // LAA: 面板生成完再统一处理选项之间的联动显示
 +        ApplyConditionalOptionVisibility(panel);
-+    }
+     }
  
      public void GenerateCommonPanelContent(StackPanel panel, DragItemViewModel dragItem)
      {
-@@ -278,6 +285,13 @@
-         {
-             foreach (var option in dragItem.InterfaceItem.Option.ToList())
+@@ -284,8 +287,11 @@
              {
-+                AddOption(panel, option, dragItem);
-+            }
-+        }
+                 AddOption(panel, option, dragItem);
+             }
+         }
 +
 +        // LAA: 面板生成完再统一处理选项之间的联动显示
 +        ApplyConditionalOptionVisibility(panel);
-+    }
+     }
  
      public void GenerateAdvancedPanelContent(StackPanel panel, DragItemViewModel dragItem)
      {
-@@ -395,7 +409,45 @@
+@@ -401,11 +407,49 @@
+         else
+         {
              control = CreateComboBoxControl(option, interfaceOption, source);
          }
  
 +        // LAA: 打上选项名标记，供 ApplyConditionalOptionVisibility 这类后处理按名字定位整行
 +        control.Tag = option.Name ?? string.Empty;
          panel.Children.Add(control);
-+    }
+     }
 +
 +    // LAA: 竞技场「放宽后的最低积分」只在启用了兜底时才显示 —— 下拉框选「从不」就藏起来。
 +    // 刻意不做成二级菜单：它是独立的平铺输入框，不是下拉框的子项。
@@ -72,6 +70,8 @@ diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/Task
 +            if (child is Control control && FindDescendant<T>(control) is { } found) return found;
 +        }
 +        return null;
-     }
++    }
  
      /// <summary>
+     /// 检查 option 是否适用于当前控制器和资源（任务 11）
+     /// </summary>
