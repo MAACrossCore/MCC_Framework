@@ -13,7 +13,7 @@ diff --git a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs b/MFAAvalonia/Vi
          // Re-initialize with the correct processor since base constructor might have used Current
          Initialize();
      }
-@@ -602,8 +607,252 @@
+@@ -602,8 +607,242 @@
  
      partial void OnTaskItemViewModelsChanged(ObservableCollection<DragItemViewModel> value)
      {
@@ -55,10 +55,12 @@ diff --git a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs b/MFAAvalonia/Vi
 +                => e.NewItems?.OfType<DragItemViewModel>().FirstOrDefault(),
 +            _ => null,
 +        };
++        // LAA: 表头拖拽 = 整组移动。被拖的是哪一项，直接从事件里读 —— 这是权威来源。
++        // 谁被拖，谁就成为该组的锚点；CoalesceOrder 会在锚点所在位置输出整组，
++        // 于是整组跟着它落到新位置（round 5 定位并验证过：这是"能向下拖"的关键）。
 +        if (moved != null && TaskGroupKeyOf(moved) is { } movedKey)
 +        {
 +            _taskGroupHeaderCarrier[movedKey] = moved;
-+            LoggerHelper.UserAction("分组锚点", $"被拖={moved.InterfaceItem?.Name ?? "?"} 组={movedKey}");
 +        }
 +
 +        RefreshTaskGroups();
@@ -146,13 +148,6 @@ diff --git a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs b/MFAAvalonia/Vi
 +            }
 +        }
 +        if (same) return;
-+
-+        // LAA 诊断：打印收拢前后的实际顺序，用于定位拖拽方向相关的异常
-+        LoggerHelper.UserAction("分组收拢",
-+            "前=[" + string.Join(",", items.Select(m => m.InterfaceItem?.Name ?? "?")) + "] 后=["
-+            + string.Join(",", desired.Select(m => m.InterfaceItem?.Name ?? "?")) + "] 载体="
-+            + string.Join(",", _taskGroupHeaderCarrier.Select(kv =>
-+                $"{kv.Key}:{kv.Value.InterfaceItem?.Name ?? "?"}")));
 +
 +        _refreshingTaskGroups = true;
 +        try
@@ -245,11 +240,6 @@ diff --git a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs b/MFAAvalonia/Vi
 +                index = end + 1;
 +            }
 +
-+            // LAA 诊断：一行打出分组判定实际看到的东西（排查分组不显示时看这条）
-+            LoggerHelper.UserAction("任务列表分组",
-+                $"items={items.Count} 表头行=[{string.Join(",", items.Where(m => m.HasGroupHeader).Select(m => m.InterfaceItem?.Name ?? "?"))}] "
-+                + "键=[" + string.Join(" ",
-+                    items.Select(m => $"{m.InterfaceItem?.Name ?? "(非任务)"}:{(m.InterfaceItem?.Group is { Count: > 0 } gg ? gg[0] : "-")}")) + "]");
 +        }
 +        finally
 +        {
@@ -353,7 +343,7 @@ diff --git a/MFAAvalonia/Views/Pages/TaskQueueView.axaml b/MFAAvalonia/Views/Pag
 +                                <Border IsVisible="{Binding HasGroupHeader}"
 +                                        Background="#16808080"
 +                                        CornerRadius="6"
-+                                        Margin="0,5,0,1"
++                                        Margin="0,5,0,5"
 +                                        Padding="4,1">
 +                                    <Button Background="Transparent"
 +                                            BorderThickness="0"
