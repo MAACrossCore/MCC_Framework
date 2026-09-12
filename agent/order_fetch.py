@@ -96,12 +96,35 @@ def orders_url(param):
         return ""
 
 
+def fetch_page(url: str) -> str:
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Mozilla/5.0 (compatible; LAA-order-fetch/1.0)"},
+    )
+    return urllib.request.urlopen(req, timeout=15).read().decode("utf-8", errors="replace")
+
+
 def fetch_uid_type_list(url):
-    html = urllib.request.urlopen(url, timeout=15).read().decode("utf-8", errors="replace")
-    m = re.search(r'<div class="entry-text"[\s\S]*?<p>([\s\S]*?)</p>', html)
-    if not m:
+    """Return parsed (uid, type) rows. May be empty if page has no lines.
+
+    Raises only on network/HTTP failure. Content-warning / empty body returns []
+    so callers can treat it as「没有可加的单」and continue to 基建.
+    """
+    html = fetch_page(url)
+    if re.search(
+        r"content warnings|Do you wish to continue\?",
+        html,
+        flags=re.I,
+    ) and not re.search(r"\d{6,}\s*\|\s*\S+", html):
+        tip(
+            "订单页带内容警告（Content Warning），正文未展开，读不到 uid|类型；"
+            "将跳过添加好友，继续基建。若要加好友，请去掉 rentry 警告或换可直读的订单页。"
+        )
         return []
-    text = re.sub(r"<br\s*/?>", "\n", m.group(1), flags=re.I)
+
+    m = re.search(r'<div class="entry-text"[\s\S]*?<p>([\s\S]*?)</p>', html)
+    text = m.group(1) if m else html
+    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.I)
     text = re.sub(r"<[^>]+>", "", text)
     rows = []
     for line in text.splitlines():
@@ -111,6 +134,9 @@ def fetch_uid_type_list(url):
         uid, typ = [x.strip() for x in line.split("|", 1)]
         if uid.isdigit() and typ:
             rows.append((uid, typ))
+    if not rows:
+        for uid, typ in re.findall(r"(\d{6,})\s*\|\s*([^\s|<]+)", html):
+            rows.append((uid, typ.strip()))
     return rows
 
 
@@ -120,6 +146,46 @@ def held_types(friends):
 
 def held_friends(friends):
     return [f for f in friends if f.get("status") == "held" and f.get("uid")]
+
+
+def tip(msg: str) -> None:
+    """Print a user-visible tip; MFA surfaces Agent stdout in the run log."""
+    print(f"[提示] {msg}", flush=True)
+
+
+def order_source_ready():
+    """Only require config file + url. Empty/unreadable order pages still allow 基建."""
+    if not SOURCE_PATH.is_file():
+        return (
+            False,
+            "缺少订单源配置文件 config/orders_source.json。"
+            "请复制 config/orders_source.example.json 为 orders_source.json，并填写订单页 url。",
+        )
+    url = orders_url({})
+    if not url:
+        return (
+            False,
+            "config/orders_source.json 里没有有效的 url 字段，无法使用「添加订单群好友」。",
+        )
+    try:
+        fetch_page(url)
+    except Exception as e:
+        return False, f"无法访问订单页（{e}）。url={url}"
+    return True, url
+
+
+@AgentServer.custom_action("基建_订单群_检查配置")
+class BaseOrderGroupCheckConfig(CustomAction):
+    """基建前置：校验 orders_source；配置缺失才整任务退出。"""
+
+    def run(self, context, argv):
+        ok, detail = order_source_ready()
+        if not ok:
+            tip(f"基建·添加订单群好友失败：{detail}")
+            tip("已中止基建（未添加好友、未跑基建、未拉黑）。修好配置后重新勾选再试。")
+            return False
+        tip(f"基建·添加订单群好友：配置正常，开始加好友（url={detail}）")
+        return True
 
 
 @AgentServer.custom_action("取下一单")
@@ -132,24 +198,29 @@ class TakeNextOrder(CustomAction):
 
         url = orders_url(param)
         if not url:
-            print("[取下一单] 未配置 URL（config/orders_source.json）")
+            tip(
+                "添加订单群好友失败：未配置 URL。"
+                "请在 config/orders_source.json 填写 url，或在节点参数里提供 url。"
+            )
             return False
 
         state = load_state()
         friends = state["friends"]
         used = held_types(friends)
-        print(f"[取下一单] friends={friends} held_types={sorted(used)}")
+        print(f"[取下一单] friends={friends} held_types={sorted(used)}", flush=True)
 
         try:
             orders = fetch_uid_type_list(url)
         except Exception as e:
-            print(f"[取下一单] 拉单失败: {e}")
-            return False
-        print(f"[取下一单] orders={orders}")
+            tip(f"添加订单群好友：拉取订单页失败（{e}），跳过添加，继续基建。")
+            save_state(state)
+            context.override_next(argv.node_name, ["加好友完毕"])
+            return True
+        print(f"[取下一单] orders={orders}", flush=True)
 
         pick = next(((u, t) for u, t in orders if t not in used), None)
         if not pick:
-            print("[取下一单] 没有新类型 → 加好友完毕")
+            tip("添加订单群好友：当前没有可加的新订单类型，跳过添加，继续基建。")
             save_state(state)
             context.override_next(argv.node_name, ["加好友完毕"])
             return True
@@ -158,7 +229,7 @@ class TakeNextOrder(CustomAction):
         friends.append({"uid": uid, "type": typ, "status": "held"})
         state["friends"] = friends
         save_state(state)
-        print(f"[取下一单] 追加 held {uid}|{typ}")
+        tip(f"添加订单群好友：已取到 {uid}|{typ}，准备搜索添加。")
         return True
 
 
@@ -167,14 +238,14 @@ class InputCurrentUid(CustomAction):
     def run(self, context, argv):
         held = held_friends(load_state()["friends"])
         if not held:
-            print("[输入当前UID] 没有 held，先取下一单")
+            tip("添加订单群好友失败：本地没有待添加的好友记录，请先成功「取下一单」。")
             return False
         uid = str(held[-1]["uid"])
 
         ctrl = context.tasker.controller
         _clear_search_field(ctrl)
 
-        print(f"[输入当前UID] {uid}")
+        tip(f"添加订单群好友：正在输入 UID {uid}")
         ctrl.post_input_text(uid).wait()
         return True
 
@@ -186,7 +257,7 @@ class TakeNextFriendToDelete(CustomAction):
         pending = held_friends(state["friends"])
 
         if not pending:
-            print("[取下一待删好友] 无 held → 清理完毕退出")
+            tip("拉黑订单群好友：没有需要拉黑的 held 好友，清理结束。")
             save_state(state)
             context.override_next(argv.node_name, ["清理完毕退出"])
             return True
@@ -201,7 +272,10 @@ class TakeNextFriendToDelete(CustomAction):
                 }
             }
         )
-        print(f"[取下一待删好友] {uid}|{target.get('type')} 待清理 {len(pending)}")
+        tip(
+            f"拉黑订单群好友：开始处理 {uid}|{target.get('type')} "
+            f"（剩余 held {len(pending)} 人）"
+        )
         return True
 
 
@@ -215,12 +289,16 @@ class FinishDeleteClaim(CustomAction):
         for f in friends:
             if f.get("status") == "held" and f.get("uid"):
                 f["status"] = "released"
-                print(f"[删除登记完成] {f['uid']}|{f.get('type')} → released（保留记录）")
+                tip(
+                    f"拉黑订单群好友：{f['uid']}|{f.get('type')} 已登记为 released"
+                    f"（仍 held={len(held_friends(friends))}）"
+                )
                 break
         else:
-            print("[删除登记完成] 没有 held 可改")
+            tip("拉黑订单群好友：没有可登记的 held 记录（可能已被清理）。")
 
         state["friends"] = friends
         save_state(state)
-        print(f"[删除登记完成] 仍 held={len(held_friends(friends))}")
+        remaining = len(held_friends(friends))
+        print(f"[删除登记完成] 仍 held={remaining}", flush=True)
         return True

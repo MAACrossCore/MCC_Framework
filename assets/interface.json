@@ -3,18 +3,21 @@
     "name": "MaaXXX",
     "label": "​",
     "description": "交错战线助手（基于 MCCA 任务结构）",
-    "version": "v0.4.2",
+    "version": "v0.5.11",
     "pretask": {
         "name": "自动启动 MuMu 12",
         "label": "仅在选择启动游戏时运行",
         "description": "自动查找 MuMu 12、启动实例并配置 ADB（不打开游戏；开游戏由「启动游戏」任务负责）。",
-        "exec": "ensure_mumu.cmd",
-        "args": []
+        "exec": "./python/python.exe",
+        "args": [
+            "./agent/ensure_mumu.py"
+        ]
     },
     "agent": {
-        "child_exec": "python",
+        "child_exec": "./python/python.exe",
         "child_args": [
-            "{PROJECT_DIR}/agent/main.py"
+            "-u",
+            "./agent/main.py"
         ]
     },
     "controller": [
@@ -789,9 +792,20 @@
         "添加订单群好友": {
             "type": "switch",
             "label": "添加订单群好友",
-            "description": "勾选后：基建前先加订单群好友，基建后再拉黑全部 held。须配置 config/orders_source.json（url），否则无法启动此功能。",
+            "description": "默认关闭。开启后：基建前加订单群好友 → 跑基建 → 结束后拉黑全部 held。须配置 config/orders_source.json（含 url）。配置错误或拉单失败时，日志会提示原因，且不会继续基建。",
             "default_case": "No",
             "cases": [
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "基建_前置_添加订单群好友": {
+                            "enabled": false
+                        },
+                        "基建_后置_拉黑订单群好友": {
+                            "enabled": false
+                        }
+                    }
+                },
                 {
                     "name": "Yes",
                     "pipeline_override": {
@@ -803,24 +817,13 @@
                         },
                         "加好友完毕": {
                             "next": [
-                                "基建_订单群_添加后衔接"
+                                "基建_主体"
                             ]
                         },
                         "清理完毕退出": {
                             "next": [
-                                "基建_订单群_拉黑后衔接"
+                                "基建_完成"
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "pipeline_override": {
-                        "基建_前置_添加订单群好友": {
-                            "enabled": false
-                        },
-                        "基建_后置_拉黑订单群好友": {
-                            "enabled": false
                         }
                     }
                 }

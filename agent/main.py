@@ -53,7 +53,10 @@ AgentServer.custom_action("jdc_build_team")(JdcBuildTeam)
 AgentServer.custom_action("jdc_route_push")(JdcRoutePush)
 AgentServer.custom_action("jdc_reset_state")(JdcResetState)
 
-print("[agent] custom actions ready: 取下一单, 输入当前UID, 取下一待删好友, 删除登记完成")
+print(
+    "[agent] custom actions ready: "
+    "基建_订单群_检查配置, 取下一单, 输入当前UID, 取下一待删好友, 删除登记完成"
+)
 
 
 def main():
