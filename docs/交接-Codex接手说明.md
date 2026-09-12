@@ -238,3 +238,39 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ui_custom\MFAAvalonia\b
    - agent 改动 → 确认 `install/agent/` 已同步
    - UI 改动 → 确认跑过 `build.ps1` 且用 `strings` 在 `install/libs/MFAAvalonia.Core.dll` 里搜到新符号
    - 数据改动 → 确认 `install/interface.json` 已同步且版本号未被改回
+
+---
+
+## 八、2026-09-12 第二轮补充（异星灰域 / pretask / 文档）
+
+### 8.1 本轮的提交
+
+| 提交 | 内容 |
+|---|---|
+| `dc2283b` | 竞技场判定重构 + 任务列表分组折叠 |
+| `8973128` | 新增 codex 接手交接说明（本文档）|
+| `9ce4986` | **异星灰域购买任务** + pretask 修复 + 分组表头间距/日志清理 |
+
+### 8.2 新增能力
+
+- **异星灰域购买**（周常组）：12 商品按「名字 + 消耗代币」双重核对购买；代币不足自动结束；左滑翻页。
+  详见 `README-DS.md` §8
+- **pretask 修复**：MCC 启动任务卡 60 秒后 `NOT_STARTED` 的真因是解析器把
+  `ensure_mumu.cmd` 静默降级成「裸 python.exe 无参数」。详见 `README-DS.md` §9
+- **`agent/alien_shop.py`**：两个自定义识别 `alien_shop_item` / `alien_shop_broke`
+
+### 8.3 明确未完成的事
+
+| # | 事项 | 状态 |
+|---|---|---|
+| 1 | **组内任务自由换序** | ❌ **未修成**，已回退到已验证版本。`docs/任务列表分组实现说明.md` §七 |
+| 2 | **异星灰域「左滑看更多」** | ⚠️ 节点已写并提交，但**未在干净状态实测**（测试时列表已无内容可滑）|
+| 3 | 无限池数据协议 | ✅ 已用「名字+单价双重核对」解决并实测 |
+| 4 | 调试开关 | `install/config/maa_option.json` 里 `show_hit_box`/`recording`/`save_draw` 仍为 true，`install/debug` 会持续增长，**排查完记得关** |
+
+### 8.4 接手时最该先读的
+
+**`README-DS.md` §10「本会话的错误与教训」** —— 记录了 6 个实际犯的错，共同模式是
+**「该量数据的时候在推断」**。同时列了每种问题该用哪个工具去量（调试图 / 离线 OCR / 文件日志 / 节点轨迹）。
+
+这一节比功能说明更有价值：**本轮所有真正的定位都发生在"停止推断、去读数据"之后。**
