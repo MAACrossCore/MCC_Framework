@@ -1,0 +1,137 @@
+{
+    "进入首页": {
+        "next": [
+            "首页标志2",
+            "首页标志1",
+            "[JumpBack]子任务_点击首页按钮",
+            "[JumpBack]子任务_点击返回",
+            "[JumpBack]子任务_获得物品",
+            "[JumpBack]子任务_点击取消",
+            "[JumpBack]子任务_点击确认",
+            "[JumpBack]子任务_关闭公告",
+            "[JumpBack]子任务_关闭周年公告",
+            "签到",
+            "开始游戏",
+            "启动角色界面",
+            "[JumpBack]启动游戏"
+        ]
+    },
+    "启动角色界面": {
+        "recognition": "TemplateMatch",
+        "template": "StartUp/NERI.png",
+        "roi": [
+            325,
+            214,
+            662,
+            354
+        ],
+        "next": [
+            "下载资源",
+            "开始游戏",
+            "启动角色界面"
+        ]
+    },
+    "下载资源": {
+        "recognition": "OCR",
+        "expected": [
+            "下载"
+        ],
+        "roi": [
+            859,
+            645,
+            78,
+            54
+        ],
+        "next": [
+            "开始游戏",
+            "下载资源"
+        ]
+    },
+    "开始游戏": {
+        "recognition": "OCR",
+        "expected": [
+            "开始游戏"
+        ],
+        "roi": [
+            580,
+            462,
+            121,
+            40
+        ],
+        "action": "Click",
+        "next": [
+            "首页标志1",
+            "[JumpBack]子任务_关闭公告",
+            "[JumpBack]子任务_关闭周年公告",
+            "签到",
+            "开始游戏"
+        ]
+    },
+    "签到": {
+        "recognition": "OCR",
+        "expected": [
+            "签到"
+        ],
+        "roi": [
+            1053,
+            554,
+            211,
+            105
+        ],
+        "action": "Click",
+        "next": [
+            "首页标志1",
+            "[JumpBack]子任务_点击首页按钮",
+            "[JumpBack]子任务_点击返回",
+            "[JumpBack]子任务_获得物品",
+            "[JumpBack]子任务_点击取消",
+            "[JumpBack]子任务_关闭公告",
+            "[JumpBack]子任务_关闭周年公告",
+            "签到"
+        ]
+    },
+    "首页标志1": {
+        "recognition": "OCR",
+        "expected": [
+            "补给站"
+        ],
+        "roi": [
+            934,
+            582,
+            176,
+            127
+        ],
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]子任务_点击首页按钮",
+            "[JumpBack]子任务_点击返回",
+            "[JumpBack]子任务_获得物品",
+            "[JumpBack]子任务_点击取消",
+            "[JumpBack]子任务_关闭公告",
+            "签到",
+            "首页标志2",
+            "首页标志1"
+        ]
+    },
+    "首页标志2": {
+        "recognition": "TemplateMatch",
+        "template": "StartUp/HomeFlag1.png",
+        "roi": [
+            118,
+            357,
+            82,
+            317
+        ],
+        "action": "Click",
+        "target": [
+            620,
+            350,
+            20,
+            20
+        ]
+    },
+    "启动游戏": {
+        "action": "StartApp",
+        "package": "com.megagame.crosscore"
+    }
+}

@@ -1,0 +1,1023 @@
+{
+    "$__mpe_config_通用-扫荡": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788449456091,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\workwork\\MAA\\MAA_Practice\\assets\\resource\\pipeline\\base\\通用-扫荡.json",
+            "savedViewport": {
+                "x": -172,
+                "y": -90,
+                "zoom": 0.37
+            },
+            "filename": "通用-扫荡",
+            "version": "v1.9.2"
+        }
+    },
+    "$__mpe_external_通用-返回主页_通用-扫荡": {
+        "$__mpe_code": {
+            "position": {
+                "x": 4172,
+                "y": 1160
+            }
+        }
+    },
+    "$__mpe_external_重连网络_通用-扫荡": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2997,
+                "y": 489
+            }
+        }
+    },
+    "使用10燃料": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    679,
+                    493,
+                    118,
+                    74
+                ],
+                "expected": "使用"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "使用10燃料2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1323,
+                "y": 1084
+            }
+        }
+    },
+    "使用10燃料2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    744,
+                    451,
+                    97,
+                    56
+                ],
+                "expected": "使用"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "燃料补给"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1625,
+                "y": 1056
+            }
+        }
+    },
+    "使用燃料界面": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    229,
+                    136,
+                    130,
+                    65
+                ],
+                "expected": "燃料补给"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "next": [
+            "使用10燃料"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1008,
+                "y": 1084
+            }
+        }
+    },
+    "减少次数": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    204,
+                    534,
+                    93,
+                    50
+                ],
+                "template": "减少次数.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "检查体力-红（次数为1）",
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2887,
+                "y": 1498
+            }
+        }
+    },
+    "增加次数": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "扫荡次数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2077,
+                "y": 45
+            }
+        }
+    },
+    "开启加成": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    761,
+                    416,
+                    83,
+                    66
+                ],
+                "expected": [
+                    "使用"
+                ]
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "每日探索_芯片仓库上限确认",
+            "扫荡成功"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 902,
+                "y": 476
+            }
+        }
+    },
+    "开始战斗": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    946,
+                    541,
+                    127,
+                    39
+                ],
+                "expected": "开始战斗"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "focus": "true",
+        "next": [
+            "每日探索_芯片仓满重试成功",
+            "每日探索_芯片仓库上限确认",
+            "使用燃料界面",
+            "开启加成",
+            "扫荡成功"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 700,
+                "y": 1183
+            }
+        }
+    },
+    "扫荡": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    764,
+                    554,
+                    234,
+                    120
+                ],
+                "expected": "扫荡"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "focus": "true",
+        "next": [
+            "每日探索_按次数扫荡",
+            "扫荡次数选择",
+            "自选扫荡次数"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1542,
+                "y": 662
+            }
+        }
+    },
+    "扫荡-取消界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    164,
+                    21,
+                    112,
+                    51
+                ],
+                "template": "返回主页.png"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "通用-返回主页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3824,
+                "y": 1296
+            }
+        }
+    },
+    "扫荡升级": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    540,
+                    242,
+                    207,
+                    91
+                ],
+                "template": "Combat/DailyExplore_LevelUp.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1281,
+                "y": 441
+            }
+        }
+    },
+    "扫荡成功": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    5,
+                    2,
+                    530,
+                    155
+                ],
+                "expected": "扫荡"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 3000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack]扫荡升级",
+            "扫荡成功-检查",
+            "扫荡结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1288,
+                "y": -26
+            }
+        }
+    },
+    "扫荡成功-检查": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    5,
+                    2,
+                    530,
+                    155
+                ],
+                "expected": "扫荡"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 3000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "扫荡成功-检查",
+            "扫荡结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1681,
+                "y": 207
+            }
+        }
+    },
+    "扫荡次数选择": {
+        "enabled": true,
+        "next": [
+            "每日探索_扫荡弹窗已打开",
+            "[JumpBack]重连网络"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2309,
+                "y": 736
+            }
+        }
+    },
+    "扫荡结束": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    766,
+                    521,
+                    328,
+                    149
+                ],
+                "expected": "扫荡"
+            }
+        },
+        "next": [
+            "每日探索_下一批",
+            "通用-返回主页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3607,
+                "y": 838
+            }
+        }
+    },
+    "检查体力-白-放宽": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    730,
+                    547,
+                    56,
+                    38
+                ],
+                "method": 4,
+                "lower": [
+                    205,
+                    205,
+                    205
+                ],
+                "upper": [
+                    255,
+                    255,
+                    255
+                ]
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "next": [
+            "增加次数"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2689,
+                "y": 228
+            }
+        }
+    },
+
+    "检查体力-白": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    730,
+                    547,
+                    56,
+                    38
+                ],
+                "method": 4,
+                "lower": [
+                    255,
+                    255,
+                    255
+                ],
+                "upper": [
+                    255,
+                    255,
+                    255
+                ]
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "next": [
+            "增加次数"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2649,
+                "y": 8
+            }
+        }
+    },
+    "检查体力-红": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    719,
+                    549,
+                    67,
+                    35
+                ],
+                "template": "扫荡次数.png"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "next": [
+            "减少次数"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2730,
+                "y": 741
+            }
+        }
+    },
+    "检查体力-红（次数为1）": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    719,
+                    549,
+                    67,
+                    35
+                ],
+                "template": "扫荡次数.png"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "focus": "true",
+        "next": [
+            "扫荡-取消界面"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3397,
+                "y": 1452
+            }
+        }
+    },
+    "燃料补给": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    499,
+                    154,
+                    258,
+                    103
+                ],
+                "expected": "燃料补给"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "燃料返回"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1962,
+                "y": 1104
+            }
+        }
+    },
+    "燃料返回": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    744,
+                    451,
+                    97,
+                    56
+                ],
+                "expected": "使用"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    632,
+                    82,
+                    1,
+                    1
+                ]
+            }
+        },
+        "next": [
+            "燃料返回2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2203,
+                "y": 1126
+            }
+        }
+    },
+    "燃料返回2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    229,
+                    136,
+                    130,
+                    65
+                ],
+                "expected": "燃料补给"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    550,
+                    34,
+                    1,
+                    1
+                ]
+            }
+        },
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1963,
+                "y": 953
+            }
+        }
+    },
+    "自选-次数1": {
+        "enabled": false,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    946,
+                    541,
+                    127,
+                    39
+                ],
+                "expected": "开始战斗"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "开启加成",
+            "扫荡成功"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": -101
+            }
+        }
+    },
+    "自选-次数10": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 10
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 2992
+            }
+        }
+    },
+    "自选-次数2": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 2
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 232
+            }
+        }
+    },
+    "自选-次数3": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 3
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 577
+            }
+        }
+    },
+    "自选-次数4": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 4
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 922
+            }
+        }
+    },
+    "自选-次数5": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 5
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1267
+            }
+        }
+    },
+    "自选-次数6": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 6
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1612
+            }
+        }
+    },
+    "自选-次数7": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 7
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1957
+            }
+        }
+    },
+    "自选-次数8": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 8
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 2302
+            }
+        }
+    },
+    "自选-次数9": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    503,
+                    531,
+                    84,
+                    59
+                ],
+                "template": "选择次数.png"
+            }
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "set_sweep_count",
+            "target": 9
+        },
+        "post_delay": 900,
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 2647
+            }
+        }
+    },
+    "自选扫荡次数": {
+        "enabled": false,
+        "next": [
+            "自选-次数1",
+            "自选-次数2",
+            "自选-次数3",
+            "自选-次数4",
+            "自选-次数5",
+            "自选-次数6",
+            "自选-次数7",
+            "自选-次数8",
+            "自选-次数9",
+            "自选-次数10"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -251,
+                "y": 911
+            }
+        }
+    },
+    "次数到10次": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    433,
+                    506,
+                    59,
+                    24
+                ],
+                "expected": [
+                    "10"
+                ]
+            }
+        },
+        "next": [
+            "开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2539,
+                "y": 1544
+            }
+        }
+    }
+}

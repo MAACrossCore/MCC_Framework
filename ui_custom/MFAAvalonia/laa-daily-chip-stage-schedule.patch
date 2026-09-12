@@ -1,0 +1,68 @@
+diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/TaskOptionGenerator.cs
+--- a/MFAAvalonia/Helper/TaskOptionGenerator.cs
++++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
+@@ -39,6 +39,64 @@
+         name == "根据自定义设置锁定/解锁仓库内芯片";
+     
+     public void GeneratePanelContent(StackPanel panel, DragItemViewModel dragItem)
++++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
++
++    // LAA: daily chip-stage availability is evaluated from the computer's
++    // local calendar whenever the task settings panel is generated.
++    private static readonly Dictionary<string, DayOfWeek[]> DailyChipStageSchedule = new()
++    {
++        ["鼓军嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Thursday, DayOfWeek.Friday],
++        ["光杵嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Friday],
++        ["注刈嵌合"] = [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday],
++        ["链接嵌合"] = [DayOfWeek.Monday, DayOfWeek.Saturday, DayOfWeek.Sunday],
++        ["体魄嵌合"] = [DayOfWeek.Tuesday, DayOfWeek.Saturday, DayOfWeek.Sunday],
++        ["侵蚀嵌合"] = [DayOfWeek.Wednesday],
++        ["迅刃嵌合"] = [DayOfWeek.Thursday],
++        ["矛盾嵌合"] = [DayOfWeek.Friday],
++    };
++
++    private static bool IsChipStage(string? caseName) =>
++        caseName?.Contains("嵌合（", StringComparison.Ordinal) == true;
++
++    private static List<MaaInterface.MaaInterfaceOptionCase>? GetVisibleCases(
++        string? optionName,
++        List<MaaInterface.MaaInterfaceOptionCase>? allCases)
++    {
++        if (allCases == null || optionName != "关卡选择")
++            return allCases;
++
++        var today = DateTime.Now.DayOfWeek;
++        if (today is DayOfWeek.Saturday or DayOfWeek.Sunday)
++            return allCases;
++
++        return allCases.Where(item =>
++        {
++            if (!IsChipStage(item.Name))
++                return true;
++
++            var stageName = DailyChipStageSchedule.Keys.FirstOrDefault(name =>
++                item.Name?.StartsWith(name, StringComparison.Ordinal) == true);
++            return stageName == null || DailyChipStageSchedule[stageName].Contains(today);
++        }).ToList();
++    }
++        var visibleCases = GetVisibleCases(option.Name, interfaceOption.Cases);
++        var selectedCase = interfaceOption.Cases != null && option.Index >= 0 && option.Index < interfaceOption.Cases.Count
++            ? interfaceOption.Cases[option.Index.Value]
++            : null;
++        var visibleIndex = selectedCase == null || visibleCases == null
++            ? -1
++            : visibleCases.FindIndex(item => item.Name == selectedCase.Name);
++        if (visibleIndex < 0 && visibleCases is { Count: > 0 })
++        {
++            visibleIndex = visibleCases.FindIndex(item => IsChipStage(item.Name));
++            if (visibleIndex < 0)
++                visibleIndex = 0;
++            if (interfaceOption.Cases != null)
++                option.Index = interfaceOption.Cases.FindIndex(item => item.Name == visibleCases[visibleIndex].Name);
++        }
++
++            ItemsSource = visibleCases,
++            SelectedIndex = Math.Max(0, visibleIndex),
+     {
+         // 检测是否为特殊任务，如果是则生成特殊任务选项面板
+         var entry = dragItem.InterfaceItem?.Entry;

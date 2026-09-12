@@ -1,0 +1,122 @@
+diff --git a/MFAAvalonia/Views/Pages/TaskQueueView.axaml.cs b/MFAAvalonia/Views/Pages/TaskQueueView.axaml.cs
+index 407e0c5..72f8777 100644
+--- a/MFAAvalonia/Views/Pages/TaskQueueView.axaml.cs
++++ b/MFAAvalonia/Views/Pages/TaskQueueView.axaml.cs
+@@ -55,6 +55,9 @@ public partial class TaskQueueView : UserControl
+     private bool _isTopToolbarCompact;
+     private bool _chipFilterPlanWindowOpen;
+ 
++    private static bool UseChipTaskCheckBox(string? name) =>
++        name == "根据自定义设置锁定/解锁仓库内芯片";
++
+ 
+     public TaskQueueView()
+     {
+@@ -1913,6 +1916,8 @@ public partial class TaskQueueView : UserControl
+     {
+         // 外层容器，包含主选项和子配置项
+         var outerContainer = new StackPanel();
++        var useChipTaskCheckBox = UseChipTaskCheckBox(option.Name);
++        var useCompactChipTaskCheckBox = useChipTaskCheckBox;
+ 
+         // 子配置项容器
+         var subOptionsContainer = new StackPanel
+@@ -1920,20 +1925,38 @@ public partial class TaskQueueView : UserControl
+             Margin = new Thickness(0) // 由 Border 的 Padding 控制间距
+         };
+ 
+-        var button = new ToggleSwitch
++        ToggleButton button;
++        if (useChipTaskCheckBox)
++        {
++            button = new CheckBox
++            {
++                IsChecked = option.Index == yesValue,
++                Width = useCompactChipTaskCheckBox ? 18 : 24,
++                Height = useCompactChipTaskCheckBox ? 18 : 24,
++                MinWidth = useCompactChipTaskCheckBox ? 18 : 24,
++                MinHeight = useCompactChipTaskCheckBox ? 18 : 24,
++                Margin = useCompactChipTaskCheckBox
++                    ? new Thickness(4, 4, 0, 4)
++                    : new Thickness(0, 4, 0, 4),
++                HorizontalAlignment = HorizontalAlignment.Right,
++                Tag = option.Name,
++                VerticalAlignment = VerticalAlignment.Center
++            };
++        }
++        else
+         {
+-            IsChecked = option.Index == yesValue,
+-            Classes =
++            button = new ToggleSwitch
+             {
+-                "Switch"
+-            },
+-            MaxHeight = 60,
+-            MaxWidth = 100,
+-            Margin = new Thickness(0, 4, 0, 4),
+-            HorizontalAlignment = HorizontalAlignment.Right,
+-            Tag = option.Name,
+-            VerticalAlignment = VerticalAlignment.Center
+-        };
++                IsChecked = option.Index == yesValue,
++                Classes = { "Switch" },
++                MaxHeight = 60,
++                MaxWidth = 100,
++                Margin = new Thickness(0, 4, 0, 4),
++                HorizontalAlignment = HorizontalAlignment.Right,
++                Tag = option.Name,
++                VerticalAlignment = VerticalAlignment.Center
++            };
++        }
+ 
+         button.Bind(IsEnabledProperty, new Binding("Idle")
+         {
+@@ -1992,7 +2015,8 @@ public partial class TaskQueueView : UserControl
+         {
+             FontSize = 14,
+             Margin = new Thickness(10, 0, 5, 0),
+-            TextTrimming = TextTrimming.CharacterEllipsis,
++            TextTrimming = useChipTaskCheckBox ? TextTrimming.None : TextTrimming.CharacterEllipsis,
++            TextWrapping = useChipTaskCheckBox ? TextWrapping.Wrap : TextWrapping.NoWrap,
+             VerticalAlignment = VerticalAlignment.Center
+         };
+         textBlock.Bind(TextBlock.TextProperty, new ResourceBindingWithFallback(option.DisplayName, option.Name));
+@@ -2008,20 +2032,24 @@ public partial class TaskQueueView : UserControl
+                 },
+                 new ColumnDefinition
+                 {
+-                    Width = new GridLength(1, GridUnitType.Star)
++                    Width = useChipTaskCheckBox ? GridLength.Auto : new GridLength(1, GridUnitType.Star)
+                 },
+                 new ColumnDefinition
+                 {
+-                    Width = GridLength.Auto
++                    Width = useChipTaskCheckBox ? new GridLength(1, GridUnitType.Star) : GridLength.Auto
+                 }
+             },
+             Margin = new Thickness(0, 6, 10, 6)
+         };
+         var stackPanel = new StackPanel
+         {
+-            Orientation = Orientation.Horizontal,
++            Orientation = useChipTaskCheckBox ? Orientation.Vertical : Orientation.Horizontal,
+             VerticalAlignment = VerticalAlignment.Center,
+-            HorizontalAlignment = HorizontalAlignment.Left,
++            HorizontalAlignment = useChipTaskCheckBox ? HorizontalAlignment.Stretch : HorizontalAlignment.Left,
++            ClipToBounds = useCompactChipTaskCheckBox,
++            Margin = useCompactChipTaskCheckBox
++                ? new Thickness(0, 0, 4, 0)
++                : useChipTaskCheckBox ? new Thickness(0, 0, 10, 0) : new Thickness(0),
+         };
+ 
+         // 添加图标（使用数据绑定支持动态更新）
+@@ -2053,7 +2081,7 @@ public partial class TaskQueueView : UserControl
+         }
+ 
+         Grid.SetColumn(stackPanel, 0);
+-        Grid.SetColumn(button, 2);
++        Grid.SetColumn(button, useChipTaskCheckBox ? 1 : 2);
+         grid.Children.Add(stackPanel);
+         grid.Children.Add(button);
+ 

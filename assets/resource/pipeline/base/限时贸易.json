@@ -1,0 +1,164 @@
+{
+    "限时贸易所购买": {
+        "action": "Custom",
+        "custom_action": "limited_trade_setup",
+        "next": [
+            "[JumpBack]子任务_关闭公告",
+            "Buyit",
+            "LimitedStoreReady",
+            "time_limited",
+            "Shop1",
+            "[JumpBack]子任务_进入首页"
+        ]
+    },
+    "LimitedStoreReady": {
+        "recognition": "OCR",
+        "expected": [
+            "^限时贸易所$"
+        ],
+        "roi": [
+            250,
+            60,
+            240,
+            100
+        ],
+        "action": "DoNothing",
+        "next": [
+            "限时贸易_扫描两页商品",
+            "限时贸易所购买_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 320,
+                "y": 160
+            }
+        }
+    },
+    "Shop1": {
+        "recognition": "OCR",
+        "expected": [
+            "补给站"
+        ],
+        "roi": [
+            0,
+            0,
+            0,
+            0
+        ],
+        "action": "Click",
+        "post_delay": 2500,
+        "next": [
+            "time_limited",
+            "Shop1"
+        ]
+    },
+    "time_limited": {
+        "recognition": "OCR",
+        "expected": [
+            "限时贸易所"
+        ],
+        "roi": [0, 0, 0, 0],
+        "action": "Click",
+        "post_delay": 2000,
+        "next": [
+            "限时贸易_扫描两页商品",
+            "限时贸易所购买_完成"
+        ]
+    },
+    "LimitedTradeProductOCR": {
+        "recognition": "OCR",
+        "roi": [0, 0, 0, 0],
+        "expected": [],
+        "action": "DoNothing"
+    },
+    "限时贸易_扫描两页商品": {
+        "action": "Custom",
+        "custom_action": "limited_trade_setup",
+        "custom_action_param": {"operation": "scan_pages"},
+        "next": "限时贸易_购买分派"
+    },
+    "限时贸易_购买弹窗恢复后扫描": {
+        "recognition": "Custom",
+        "custom_recognition": "limited_trade_state",
+        "custom_recognition_param": {"expected": "need_scan"},
+        "action": "Custom",
+        "custom_action": "limited_trade_setup",
+        "custom_action_param": {"operation": "scan_pages"},
+        "next": "限时贸易_购买分派"
+    },
+    "限时贸易_购买分派": {
+        "next": [
+            "Buy_something",
+            "限时贸易_返回第一页",
+            "限时贸易所购买_无可购完成",
+            "限时贸易所购买_完成"
+        ]
+    },
+    "Buy_something": {
+        "recognition": "Custom",
+        "custom_recognition": "limited_trade_state",
+        "custom_recognition_param": {"expected": "item"},
+        "action": "Click",
+        "post_delay": 1000,
+        "next": "Buyit"
+    },
+    "限时贸易_返回第一页": {
+        "recognition": "Custom",
+        "custom_recognition": "limited_trade_state",
+        "custom_recognition_param": {"expected": "return_first"},
+        "action": "Custom",
+        "custom_action": "limited_trade_setup",
+        "custom_action_param": {"operation": "return_first"},
+        "next": "限时贸易_购买分派"
+    },
+    "Buyit":  {
+        "recognition": "OCR",
+        "expected": [
+            "^购买$"
+        ],
+        "roi": [
+            0,
+            0,
+            0,
+            0
+        ],
+        "action": "Click",
+        "post_delay": 1000,
+        "next": [
+            "限时贸易_芯片箱奖励处理",
+            "[JumpBack]子任务_获得物品",
+            "Buyit",
+            "限时贸易_购买弹窗恢复后扫描",
+            "限时贸易_购买分派"
+        ]
+    },
+    "限时贸易_芯片箱奖励处理": {
+        "recognition": "Custom",
+        "custom_recognition": "limited_trade_state",
+        "custom_recognition_param": {"expected": "chip_reward"},
+        "action": "Custom",
+        "custom_action": "limited_trade_setup",
+        "custom_action_param": {"operation": "process_chip_reward"},
+        "next": "限时贸易_购买分派"
+    },
+    "限时贸易所购买_完成": {
+        "recognition": "Custom",
+        "custom_recognition": "limited_trade_state",
+        "custom_recognition_param": {"expected": "done"},
+        "action": "DoNothing",
+        "focus": "限时贸易所购买任务完成，停留在补给站",
+        "$__mpe_code": {
+            "position": {
+                "x": 980,
+                "y": 160
+            }
+        }
+    },
+    "限时贸易所购买_无可购完成": {
+        "recognition": "Custom",
+        "custom_recognition": "limited_trade_state",
+        "custom_recognition_param": {"expected": "no_items"},
+        "action": "DoNothing",
+        "focus": "当前无符合要求物品，未执行购买操作"
+    }
+}

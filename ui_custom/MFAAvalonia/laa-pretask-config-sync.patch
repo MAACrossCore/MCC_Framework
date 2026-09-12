@@ -1,0 +1,27 @@
+diff --git a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+--- a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
++++ b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+@@ -1498,6 +1498,15 @@ public class MaaProcessor
+         try
+         {
+             var preTaskExecuted = await RunPreTasksAsync(token);
++            if (preTaskExecuted)
++            {
++                // LAA 的 MuMu pretask 会把自动检测到的 ADB、启动程序路径和
++                // 实例参数写回当前实例配置。立即刷新内存配置，避免后续连接
++                // 用旧值覆盖磁盘，同时让已打开的启动设置页面同步显示新路径。
++                InstanceConfiguration.ReloadFromDisk();
++                if (MaaProcessorManager.Instance.Current.InstanceId == InstanceId)
++                    await Instances.ReloadConfigurationForSwitchAsync(refreshTask: false);
++            }
+             if (preTaskExecuted && ViewModel?.CurrentController != MaaControllerTypes.PlayCover && ViewModel?.CurrentDevice == null)
+             {
+                 await Task.Run(() => ViewModel.AutoDetectDevice(token, showToast: false), token);
+@@ -2480,6 +2489,7 @@ public class MaaProcessor
+                 UseShellExecute = false,
+                 CreateNoWindow = true
+             };
++            info.Environment["MFA_INSTANCE_CONFIG_PATH"] = InstanceConfiguration.GetConfigFilePath();
+             foreach (var rawArg in preTask.Args ?? [])
+             {
+                 var arg = MaaInterface.ReplacePlaceholder(rawArg, AppPaths.DataRoot, true) ?? rawArg;

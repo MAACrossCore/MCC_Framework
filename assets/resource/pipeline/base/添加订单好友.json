@@ -1,0 +1,188 @@
+{
+    "$__mpe_config_添加订单好友": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788097118295,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\workwork\\MAA\\MAA_Practice\\assets\\resource\\pipeline\\base\\添加订单好友.json",
+            "savedViewport": {
+                "x": -69,
+                "y": -407,
+                "zoom": 0.49
+            },
+            "filename": "添加订单好友",
+            "version": "v1.9.1"
+        }
+    },
+    "$__mpe_external_子任务_进入个人配置_添加订单好友": {
+        "$__mpe_code": {
+            "position": {
+                "x": 77,
+                "y": 1683
+            }
+        }
+    },
+    "$__mpe_external_子任务_进入首页_添加订单好友": {
+        "$__mpe_code": {
+            "position": {
+                "x": -64,
+                "y": 1221
+            }
+        }
+    },
+    "加好友完毕": {
+        "doc": "friends 类型已加完；活动后另跑任务「拉黑订单好友」",
+        "next": [
+            "子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -507,
+                "y": 1168
+            }
+        }
+    },
+    "取下一单": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "取下一单",
+                "custom_action_param": {}
+            }
+        },
+        "next": [
+            "点击好友栏"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 709,
+                "y": 1437
+            }
+        }
+    },
+    "搜索好友": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "搜索"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "取下一单"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 307,
+                "y": 1418
+            }
+        }
+    },
+    "添加好友": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1042,
+                    105,
+                    67,
+                    25
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "添加好友_副本1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1829,
+                "y": 1418
+            }
+        }
+    },
+    "添加好友_副本1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    998,
+                    206,
+                    86,
+                    35
+                ]
+            }
+        },
+        "next": [
+            "搜索好友"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2234,
+                "y": 1443
+            }
+        }
+    },
+    "点击好友栏": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    768,
+                    109,
+                    19,
+                    19
+                ]
+            }
+        },
+        "post_delay": 1500,
+        "next": [
+            "输入UID"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1077,
+                "y": 1430
+            }
+        }
+    },
+    "订单好友添加流程": {
+        "next": [
+            "[JumpBack]子任务_进入个人配置",
+            "搜索好友",
+            "[JumpBack]子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -501,
+                "y": 1454
+            }
+        }
+    },
+    "输入UID": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "输入当前UID"
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "添加好友"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1457,
+                "y": 1420
+            }
+        }
+    }
+}

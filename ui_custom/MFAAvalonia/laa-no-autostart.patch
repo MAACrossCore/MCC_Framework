@@ -1,0 +1,135 @@
+diff --git a/MFAAvalonia/Views/Windows/RootView.axaml.cs b/MFAAvalonia/Views/Windows/RootView.axaml.cs
+index a24ee0c..1af4c12 100644
+--- a/MFAAvalonia/Views/Windows/RootView.axaml.cs
++++ b/MFAAvalonia/Views/Windows/RootView.axaml.cs
+@@ -419,72 +419,74 @@ public partial class RootView : SukiWindow
+                         await Task.Delay(300);
+                         if ((MaaProcessor.Interface?.Controller?.Count ?? 0) == 1 || !ConfigurationManager.CurrentInstance.ContainsKey(ConfigurationKeys.CurrentController))
+                             vm.CurrentController = (MaaProcessor.Interface?.Controller?.FirstOrDefault()?.Type).ToMaaControllerTypes(vm.CurrentController);
+-                        var beforeTask = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.BeforeTask, "None");
+-                        var startupScriptOnly = beforeTask.Equals("StartupScriptOnly", StringComparison.OrdinalIgnoreCase);
+-                        var delayFingerprintMatching = beforeTask.Contains("StartupSoftware", StringComparison.OrdinalIgnoreCase);
+-                        if (!Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.NoAutoStart, bool.FalseString))
+-                            && (beforeTask.Contains("Startup", StringComparison.OrdinalIgnoreCase) || startupScriptOnly))
++                        var noAutoStart = Convert.ToBoolean(
++                            GlobalConfiguration.GetValue(ConfigurationKeys.NoAutoStart, bool.FalseString));
++                        if (!noAutoStart)
+                         {
+-                            // 只有当不是 StartupScriptOnly 时才启动游戏
+-                            if (!startupScriptOnly)
++                            var beforeTask = ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.BeforeTask, "None");
++                            var startupScriptOnly = beforeTask.Equals("StartupScriptOnly", StringComparison.OrdinalIgnoreCase);
++                            var delayFingerprintMatching = beforeTask.Contains("StartupSoftware", StringComparison.OrdinalIgnoreCase);
++                            if (beforeTask.Contains("Startup", StringComparison.OrdinalIgnoreCase) || startupScriptOnly)
+                             {
+-                                vm.Processor.TaskQueue.Enqueue(new MFATask
++                                // 只有当不是 StartupScriptOnly 时才启动游戏
++                                if (!startupScriptOnly)
+                                 {
+-                                    Name = "启动前",
+-                                    Type = MFATask.MFATaskType.MFA,
+-                                    Action = async () => await vm.Processor.WaitSoftware(),
+-                                    OwnerViewModel = vm,
+-                                });
+-                            }
+-                            // StartupScriptOnly 或 StartupSoftwareAndScript 时启动脚本 (onlyStart = false)
+-                            // StartupSoftware 时只启动游戏不启动脚本 (onlyStart = true)
+-                            var controllerType = vm.CurrentController;
+-                            if (controllerType == MaaControllerTypes.PlayCover)
+-                            {
+-                                vm.TryReadPlayCoverConfig();
+-                            }
+-                            else if (ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.RememberAdb, true) && !delayFingerprintMatching)
+-                            {
+-                                vm.TryReadAdbDeviceFromConfig(false, false);
++                                    vm.Processor.TaskQueue.Enqueue(new MFATask
++                                    {
++                                        Name = "启动前",
++                                        Type = MFATask.MFATaskType.MFA,
++                                        Action = async () => await vm.Processor.WaitSoftware(),
++                                        OwnerViewModel = vm,
++                                    });
++                                }
++                                // StartupScriptOnly 或 StartupSoftwareAndScript 时启动脚本 (onlyStart = false)
++                                // StartupSoftware 时只启动游戏不启动脚本 (onlyStart = true)
++                                var controllerType = vm.CurrentController;
++                                if (controllerType == MaaControllerTypes.PlayCover)
++                                {
++                                    vm.TryReadPlayCoverConfig();
++                                }
++                                else if (ConfigurationManager.CurrentInstance.GetValue(ConfigurationKeys.RememberAdb, true) && !delayFingerprintMatching)
++                                {
++                                    vm.TryReadAdbDeviceFromConfig(false, false);
++                                }
++                                var onlyStart = beforeTask.Equals("StartupSoftware", StringComparison.OrdinalIgnoreCase);
++                                vm.Processor.Start(onlyStart, checkUpdate: false);
+                             }
+-                            var onlyStart = beforeTask.Equals("StartupSoftware", StringComparison.OrdinalIgnoreCase);
+-                            vm.Processor.Start(onlyStart, checkUpdate: false);
+-                        }
+-                        else
+-                        {
+-                            var controllerType = vm.CurrentController;
+-                            var controllerKey = controllerType switch
++                            else
+                             {
+-                                MaaControllerTypes.Adb => "Emulator",
+-                                MaaControllerTypes.Win32 => "Window",
+-                                MaaControllerTypes.MacOS => "Window",
+-                                MaaControllerTypes.PlayCover => "TabPlayCover",
+-                                _ => "Window"
+-                            };
++                                var controllerType = vm.CurrentController;
++                                var controllerKey = controllerType switch
++                                {
++                                    MaaControllerTypes.Adb => "Emulator",
++                                    MaaControllerTypes.Win32 => "Window",
++                                    MaaControllerTypes.MacOS => "Window",
++                                    MaaControllerTypes.PlayCover => "TabPlayCover",
++                                    _ => "Window"
++                                };
+ 
+-                            vm.AddLogByKey("ConnectingTo", (IBrush?)null, true, true, controllerKey);
++                                vm.AddLogByKey("ConnectingTo", (IBrush?)null, true, true, controllerKey);
+ 
+-                            if (controllerType == MaaControllerTypes.PlayCover)
+-                            {
+-                                vm.TryReadPlayCoverConfig();
+-                            }
+-                            else
+-                            {
+-                                vm.TryReadAdbDeviceFromConfig();
+-                            }
++                                if (controllerType == MaaControllerTypes.PlayCover)
++                                {
++                                    vm.TryReadPlayCoverConfig();
++                                }
++                                else
++                                {
++                                    vm.TryReadAdbDeviceFromConfig();
++                                }
+ 
+-                            vm.Processor.TaskQueue.Enqueue(new MFATask
+-                            {
+-                                Name = "连接检测",
+-                                Type = MFATask.MFATaskType.MFA,
+-                                Action = async () => await vm.Processor.TestConnecting(),
+-                                OwnerViewModel = vm,
+-                            });
+-                            vm.Processor.Start(true, checkUpdate: false);
++                                vm.Processor.TaskQueue.Enqueue(new MFATask
++                                {
++                                    Name = "连接检测",
++                                    Type = MFATask.MFATaskType.MFA,
++                                    Action = async () => await vm.Processor.TestConnecting(),
++                                    OwnerViewModel = vm,
++                                });
++                                vm.Processor.Start(true, checkUpdate: false);
++                            }
+                         }
+ 
+-                        GlobalConfiguration.SetValue(ConfigurationKeys.NoAutoStart, bool.FalseString);
+-
+                         // 重新初始化控制器选项，确保 ControllerOptions 包含正确的控制器列表
+                         // 因为 TaskQueueViewModel.Initialize() 可能在 MaaProcessor.Interface初始化之前被调用
+                         vm.InitializeControllerOptions();

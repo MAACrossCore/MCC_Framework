@@ -1,0 +1,137 @@
+{
+  "$__mpe_config_界面导航": {
+    "$__mpe_code": {
+      "prefix": "",
+      "coordinateMode": "absolute-v1",
+      "filename": "界面导航",
+      "version": "v1.9.2",
+      "savedViewport": { "x": 40, "y": 40, "zoom": 0.62 }
+    }
+  },
+  "导航到_主界面": {
+    "next": ["导航识别_主界面", "[JumpBack]子任务_点击首页按钮", "[JumpBack]子任务_点击返回", "[JumpBack]子任务_获得物品"],
+    "$__mpe_code": { "position": { "x": 60, "y": 80 } }
+  },
+  "导航到_基地总览": {
+    "next": ["导航识别_基地总览", "导航边_主界面到基地", "[JumpBack]子任务_点击首页按钮", "[JumpBack]子任务_点击返回"],
+    "$__mpe_code": { "position": { "x": 60, "y": 260 } }
+  },
+  "导航到_自己的订单库": {
+    "next": ["导航识别_自己的订单库", "导航边_基地到自己的订单库", "[JumpBack]导航到_基地总览"],
+    "$__mpe_code": { "position": { "x": 60, "y": 440 } }
+  },
+  "导航到_出击二级菜单": {
+    "next": ["导航识别_出击二级菜单", "导航边_主界面到出击", "[JumpBack]子任务_点击首页按钮", "[JumpBack]子任务_点击返回"],
+    "$__mpe_code": { "position": { "x": 60, "y": 700 } }
+  },
+  "导航到_竞技场对手页面": {
+    "next": ["导航识别_竞技场对手页面", "导航边_镜像竞技模式到对手页", "导航边_出击到镜像竞技", "[JumpBack]导航到_出击二级菜单"],
+    "$__mpe_code": { "position": { "x": 60, "y": 880 } }
+  },
+  "导航到_每日探索分类页": {
+    "next": ["导航识别_每日探索分类页", "导航边_出击到每日探索", "[JumpBack]导航到_出击二级菜单"],
+    "$__mpe_code": { "position": { "x": 60, "y": 1060 } }
+  },
+  "导航到_资源采集": {
+    "next": ["导航识别_资源采集", "导航边_每日探索到资源采集", "[JumpBack]导航到_每日探索分类页"],
+    "$__mpe_code": { "position": { "x": 60, "y": 1240 } }
+  },
+  "导航到_活动探索选择页": {
+    "next": ["导航识别_活动探索选择页", "导航边_出击到活动探索", "[JumpBack]导航到_出击二级菜单"],
+    "$__mpe_code": { "position": { "x": 60, "y": 1420 } }
+  },
+  "导航到_周本选择页": {
+    "next": ["导航识别_周本选择页", "导航边_活动探索到周本选择", "[JumpBack]导航到_活动探索选择页"],
+    "$__mpe_code": { "position": { "x": 60, "y": 1600 } }
+  },
+
+  "导航边_主界面到基地": {
+    "recognition": "OCR", "expected": ["基地"], "roi": [527, 600, 153, 110], "threshold": 0.2,
+    "action": "Click", "target": [606, 620, 42, 42], "post_delay": 2000, "next": ["导航识别_基地总览", "导航边_主界面到基地"],
+    "$__mpe_code": { "position": { "x": 410, "y": 260 } }
+  },
+  "导航边_基地到自己的订单库": {
+    "recognition": "OCR", "expected": ["基地建造", "驻员状况"], "roi": [40, 450, 290, 210], "threshold": 0.2,
+    "action": "Click", "target": [1106, 304, 44, 44], "post_delay": 2500, "next": ["导航识别_自己的订单库", "导航边_基地到自己的订单库"],
+    "$__mpe_code": { "position": { "x": 410, "y": 440 } }
+  },
+  "导航边_主界面到出击": {
+    "recognition": "OCR", "expected": ["出击"], "roi": [1047, 533, 200, 173], "threshold": 0.2,
+    "action": "Click", "target": [1178, 604, 46, 46], "post_delay": 2500, "next": ["导航识别_出击二级菜单", "导航边_主界面到出击"],
+    "$__mpe_code": { "position": { "x": 410, "y": 700 } }
+  },
+  "导航边_出击到镜像竞技": {
+    "recognition": "OCR", "expected": ["模拟军演"], "roi": [430, 120, 320, 210], "threshold": 0.2,
+    "action": "Click", "target": [520, 191, 175, 85], "post_delay": 2200, "next": ["导航识别_镜像竞技模式选择", "导航边_出击到镜像竞技"],
+    "$__mpe_code": { "position": { "x": 410, "y": 840 } }
+  },
+  "导航边_镜像竞技模式到对手页": {
+    "recognition": "OCR", "expected": ["镜像竞技"], "roi": [430, 120, 350, 390], "threshold": 0.2,
+    "action": "Click", "target": [537, 221, 218, 286], "post_delay": 2500, "next": ["导航识别_竞技场对手页面", "导航边_镜像竞技模式到对手页"],
+    "$__mpe_code": { "position": { "x": 760, "y": 880 } }
+  },
+  "导航边_出击到每日探索": {
+    "recognition": "OCR", "expected": ["每日探索"], "roi": [820, 230, 310, 230], "threshold": 0.2,
+    "action": "Click", "target": [916, 317, 172, 90], "post_delay": 2200, "next": ["导航识别_每日探索分类页", "导航边_出击到每日探索"],
+    "$__mpe_code": { "position": { "x": 410, "y": 1060 } }
+  },
+  "导航边_每日探索到资源采集": {
+    "recognition": "OCR", "expected": ["资源采集"], "roi": [130, 70, 390, 230], "threshold": 0.2,
+    "action": "Click", "target": [224, 124, 250, 140], "post_delay": 1800, "next": ["导航识别_资源采集", "导航边_每日探索到资源采集"],
+    "$__mpe_code": { "position": { "x": 410, "y": 1240 } }
+  },
+  "导航边_出击到活动探索": {
+    "recognition": "OCR", "expected": ["活动探索"], "roi": [430, 45, 340, 190], "threshold": 0.2,
+    "action": "Click", "target": [548, 75, 188, 80], "post_delay": 2200, "next": ["导航识别_活动探索选择页", "导航边_出击到活动探索"],
+    "$__mpe_code": { "position": { "x": 410, "y": 1420 } }
+  },
+  "导航边_活动探索到周本选择": {
+    "recognition": "OCR", "expected": ["碎星虚影"], "roi": [350, 350, 440, 230], "threshold": 0.2,
+    "action": "Click", "target": [453, 430, 306, 120], "post_delay": 2800, "next": ["导航识别_周本选择页", "导航边_活动探索到周本选择"],
+    "$__mpe_code": { "position": { "x": 410, "y": 1600 } }
+  },
+
+  "导航识别_主界面": { "recognition": "OCR", "expected": ["基地", "任务", "编队"], "roi": [493, 580, 773, 137], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 80 } } },
+  "导航识别_基地总览": { "recognition": "OCR", "expected": ["基地建造", "驻员状况"], "roi": [30, 430, 350, 250], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 190 } } },
+  "导航识别_基地建筑列表": { "recognition": "OCR", "expected": ["行星指挥部", "原料交易所"], "roi": [100, 100, 1080, 560], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 300 } } },
+  "导航识别_驻员状况": { "recognition": "OCR", "expected": ["驻员预设"], "roi": [900, 80, 340, 580], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 410 } } },
+  "导航识别_自己的订单库": { "recognition": "OCR", "expected": ["好友交付记录", "制作素材"], "roi": [700, 500, 540, 190], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 520 } } },
+  "导航识别_好友订单库": { "recognition": "OCR", "expected": ["好友交付次数共享", "点赞"], "roi": [40, 40, 1200, 650], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 630 } } },
+  "导航识别_任务日常": { "recognition": "OCR", "expected": ["日常"], "roi": [20, 80, 240, 240], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 740 } } },
+  "导航识别_任务周常": { "recognition": "OCR", "expected": ["周常"], "roi": [20, 180, 240, 240], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 850 } } },
+  "导航识别_任务主线": { "recognition": "OCR", "expected": ["主线"], "roi": [20, 260, 240, 200], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 960 } } },
+  "导航识别_任务支线": { "recognition": "OCR", "expected": ["支线"], "roi": [20, 300, 240, 200], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 1070 } } },
+  "导航识别_编队编辑": { "recognition": "OCR", "expected": ["编队预设", "清空队伍"], "roi": [780, 500, 460, 190], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 1180 } } },
+  "导航识别_编队队伍列表": { "recognition": "OCR", "expected": ["第2战队", "第3战队"], "roi": [790, 50, 420, 610], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 1290 } } },
+  "导航识别_编队队员选择": { "recognition": "OCR", "expected": ["确认"], "roi": [930, 570, 300, 120], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 1400 } } },
+  "导航识别_队员列表": { "recognition": "OCR", "expected": ["筛选"], "roi": [900, 20, 330, 150], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 1510 } } },
+  "导航识别_构建": { "recognition": "OCR", "expected": ["构建10次", "构建信息"], "roi": [720, 500, 520, 190], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1120, "y": 1620 } } },
+  "导航识别_补给站全部礼包": { "recognition": "OCR", "expected": ["全部礼包"], "roi": [180, 40, 420, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 80 } } },
+  "导航识别_补给站精选礼包": { "recognition": "OCR", "expected": ["精选礼包"], "roi": [180, 40, 420, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 190 } } },
+  "导航识别_万物贸易所异星灰域": { "recognition": "OCR", "expected": ["异星灰域"], "roi": [150, 40, 560, 190], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 300 } } },
+  "导航识别_万物贸易所罕见星尘区": { "recognition": "OCR", "expected": ["罕见星尘区"], "roi": [150, 40, 620, 190], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 410 } } },
+  "导航识别_限时贸易所": { "recognition": "OCR", "expected": ["限时贸易所"], "roi": [20, 160, 260, 360], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 520 } } },
+  "导航识别_商品购买弹窗": { "recognition": "OCR", "expected": ["购买内容", "售价"], "roi": [300, 150, 680, 470], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 630 } } },
+  "导航识别_获得物品弹窗": { "recognition": "OCR", "expected": ["获得物品"], "roi": [300, 100, 680, 520], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 740 } } },
+  "导航识别_勘探指南": { "recognition": "OCR", "expected": ["勘探指南"], "roi": [20, 20, 360, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 850 } } },
+  "导航识别_勘探任务每日": { "recognition": "OCR", "expected": ["每日任务"], "roi": [250, 60, 780, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 960 } } },
+  "导航识别_勘探任务每周": { "recognition": "OCR", "expected": ["每周任务"], "roi": [250, 60, 780, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 1070 } } },
+  "导航识别_勘探任务本期": { "recognition": "OCR", "expected": ["本期任务"], "roi": [250, 60, 780, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 1180 } } },
+  "导航识别_出击二级菜单": { "recognition": "OCR", "expected": ["主线剧情", "每日探索", "模拟军演", "活动探索"], "roi": [350, 40, 850, 620], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 1290 } } },
+  "导航识别_镜像竞技模式选择": { "recognition": "OCR", "expected": ["镜像竞技"], "roi": [380, 90, 420, 440], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 1400 } } },
+  "导航识别_角斗场模式选择": { "recognition": "OCR", "expected": ["角斗场"], "roi": [380, 90, 700, 440], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 1510 } } },
+  "导航识别_军演竞技模式选择": { "recognition": "OCR", "expected": ["军演竞技"], "roi": [380, 90, 700, 440], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1510, "y": 1620 } } },
+  "导航识别_竞技场对手页面": { "recognition": "OCR", "expected": ["刷新对手", "进攻部署"], "roi": [720, 420, 520, 260], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 80 } } },
+  "导航识别_每日探索分类页": { "recognition": "OCR", "expected": ["资源采集", "芯片嵌合", "跃升行动"], "roi": [80, 60, 520, 600], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 190 } } },
+  "导航识别_资源采集": { "recognition": "OCR", "expected": ["技能磨砺", "星币开采", "技术解析", "荒墟拾遗"], "roi": [760, 50, 480, 600], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 300 } } },
+  "导航识别_技能磨砺": { "recognition": "OCR", "expected": ["技能磨砺"], "roi": [760, 50, 320, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 410 } } },
+  "导航识别_星币开采": { "recognition": "OCR", "expected": ["星币开采"], "roi": [760, 150, 320, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 520 } } },
+  "导航识别_技术解析": { "recognition": "OCR", "expected": ["技术解析"], "roi": [760, 250, 320, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 630 } } },
+  "导航识别_荒墟拾遗": { "recognition": "OCR", "expected": ["荒墟拾遗"], "roi": [760, 360, 320, 180], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 740 } } },
+  "导航识别_芯片嵌合": { "recognition": "OCR", "expected": ["鼓军嵌合", "光桦嵌合", "注刃嵌合"], "roi": [80, 60, 520, 600], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 850 } } },
+  "导航识别_芯片嵌合关卡": { "recognition": "OCR", "expected": ["1层", "2层", "3层", "4层", "5层"], "roi": [1040, 100, 220, 550], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 960 } } },
+  "导航识别_跃升行动": { "recognition": "OCR", "expected": ["自然跃升", "人造跃升", "生命跃升"], "roi": [80, 60, 520, 600], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 1070 } } },
+  "导航识别_跃升行动关卡": { "recognition": "OCR", "expected": ["1层", "2层"], "roi": [1040, 100, 220, 550], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 1180 } } },
+  "导航识别_活动探索选择页": { "recognition": "OCR", "expected": ["碎星虚影", "永境战域", "异态侵蚀"], "roi": [260, 250, 940, 400], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 1290 } } },
+  "导航识别_周本选择页": { "recognition": "OCR", "expected": ["戈里刻虚影", "诺斯虚影", "尼克罗虚影"], "roi": [30, 170, 760, 500], "threshold": 0.2, "action": "DoNothing", "$__mpe_code": { "position": { "x": 1900, "y": 1400 } } }
+}

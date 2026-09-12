@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 1920 1080">
+  <rect width="1920" height="1080" fill="#20242b"/>
+  <rect x="4" y="4" width="1912" height="1072" fill="none" stroke="#32a8ff" stroke-width="8"/>
+  <text x="60" y="90" fill="#ffffff" font-size="42" font-family="Microsoft YaHei, sans-serif">限时贸易所 Buy_something</text>
+  <text x="60" y="150" fill="#77c7ff" font-size="34" font-family="Microsoft YaHei, sans-serif">OCR ROI = [0, 0, 0, 0]（全屏，保持不变）</text>
+  <rect x="80" y="250" width="320" height="500" rx="18" fill="#39414c" stroke="#b7c3d0" stroke-width="4"/>
+  <rect x="430" y="250" width="320" height="500" rx="18" fill="#39414c" stroke="#b7c3d0" stroke-width="4"/>
+  <rect x="780" y="250" width="320" height="500" rx="18" fill="#39414c" stroke="#b7c3d0" stroke-width="4"/>
+  <text x="855" y="460" fill="#ffffff" font-size="30" font-family="Microsoft YaHei, sans-serif">商品名称</text>
+  <rect x="830" y="500" width="220" height="70" rx="12" fill="#6d3030" stroke="#ff7b72" stroke-width="4"/>
+  <text x="890" y="547" fill="#ffffff" font-size="30" font-family="Microsoft YaHei, sans-serif">售罄</text>
+  <path d="M940 475 L940 495" stroke="#ff7b72" stroke-width="8" marker-end="url(#redarrow)"/>
+  <rect x="1130" y="250" width="320" height="500" rx="18" fill="#39414c" stroke="#b7c3d0" stroke-width="4"/>
+  <rect x="1480" y="250" width="390" height="500" rx="18" fill="#39414c" stroke="#ffb84d" stroke-width="6" stroke-dasharray="18 12"/>
+  <path d="M1620 850 L1230 850" stroke="#ffdf61" stroke-width="18" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="10" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ffdf61"/></marker>
+    <marker id="redarrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ff7b72"/></marker>
+  </defs>
+  <text x="1180" y="920" fill="#ffdf61" font-size="32" font-family="Microsoft YaHei, sans-serif">轻微向左拖动，补全右侧商品后按名称去重</text>
+  <text x="60" y="980" fill="#ff9a91" font-size="30" font-family="Microsoft YaHei, sans-serif">同列且位于商品名下方的“售罄”标记绑定该卡片，并在购买计划前排除</text>
+  <text x="60" y="1030" fill="#ffffff" font-size="30" font-family="Microsoft YaHei, sans-serif">商品 OCR 方式与区域不变；状态层管理两页扫描、售罄排除、去重及回拖购买</text>
+</svg>

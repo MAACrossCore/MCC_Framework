@@ -1,0 +1,1273 @@
+[
+    {
+        "name": "拉",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                2,
+                0
+            ],
+            [
+                1,
+                2,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 80,
+        "buff": 0,
+        "np": 40,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "灼碧",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                2,
+                0
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 60,
+        "heal": 80,
+        "buff": 80,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "龙弦",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 40,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "熔铄",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 20,
+        "heal": 0,
+        "buff": 20,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "芭贝拉·红",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                2,
+                1,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "提泽纳",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                1,
+                0
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 40,
+        "heal": 0,
+        "buff": 30,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "昆仑·不朽",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                2,
+                1
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 95,
+        "heal": 10,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 80
+        }
+    },
+    {
+        "name": "阿图姆",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                2,
+                1
+            ],
+            [
+                1,
+                1,
+                1
+            ]
+        ],
+        "dps": 40,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "莫拉鲁塔",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                2,
+                1
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "伊根·灭刃",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                1,
+                0
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 85,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 60,
+            "dot": 100,
+            "ret": 0
+        }
+    },
+    {
+        "name": "赫格尼",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 60,
+        "buff": 0,
+        "np": 40,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "洛贝拉",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 100,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 100,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "赤夕",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                0,
+                0,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 100,
+        "buff": 80,
+        "np": 60,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "利兹",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                1,
+                0
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 60,
+        "buff": 0,
+        "np": 20,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "冕羽",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                2,
+                0
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 60,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "岁稔",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                2,
+                1,
+                0
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 60,
+        "buff": 60,
+        "np": 80,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "卡提那·联域",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                2,
+                0
+            ],
+            [
+                1,
+                2,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 100,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 100,
+            "extra": 100,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "乌琳",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                2
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 60,
+        "np": 70,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "琶音",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                2,
+                1,
+                0
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 60,
+        "buff": 40,
+        "np": 60,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "随想曲",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                0,
+                1
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                1,
+                2
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 80,
+        "np": 100,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "圣歌",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 80,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "进行曲",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                1,
+                0
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                1,
+                0,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 100,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "旋律",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                2,
+                1,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 60,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "袅韵",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                2,
+                1,
+                0
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 80,
+        "buff": 0,
+        "np": 80,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "刃齿",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                2,
+                1
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 60,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 60,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "巴德兰兹",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                0,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 80,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "绯猁",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                0,
+                0,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "赤溟",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                0,
+                1
+            ]
+        ],
+        "dps": 50,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 40,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "刺蝽",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                2,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "幽兰",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                2,
+                1
+            ],
+            [
+                1,
+                1,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 40,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "哈托莉",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                2,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "杜兰德尔",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                1,
+                1,
+                1
+            ]
+        ],
+        "dps": 60,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 60,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "卡提那",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                0,
+                0
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                1,
+                1,
+                1
+            ]
+        ],
+        "dps": 0,
+        "heal": 40,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "缇尔锋",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                0,
+                1
+            ]
+        ],
+        "dps": 70,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 80
+        }
+    },
+    {
+        "name": "艾穆尔",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                1,
+                2
+            ]
+        ],
+        "dps": 40,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 60
+        }
+    },
+    {
+        "name": "波塞冬",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                1,
+                2,
+                0
+            ],
+            [
+                1,
+                2,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 60,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "努特",
+        "isEnable": false,
+        "buffPattern": [
+            [
+                2,
+                1,
+                0
+            ],
+            [
+                2,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 40,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "鸣刃",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                0,
+                1,
+                1
+            ]
+        ],
+        "dps": 60,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "朝晖",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                0,
+                1
+            ]
+        ],
+        "dps": 75,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 40,
+            "extra": 60,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "夜暝",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                1,
+                2
+            ]
+        ],
+        "dps": 0,
+        "heal": 0,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    },
+    {
+        "name": "阿尔卑斯",
+        "isEnable": true,
+        "buffPattern": [
+            [
+                1,
+                1,
+                0
+            ],
+            [
+                1,
+                1,
+                2
+            ],
+            [
+                1,
+                1,
+                0
+            ]
+        ],
+        "dps": 0,
+        "heal": 50,
+        "buff": 0,
+        "np": 0,
+        "tag": {
+            "aoe": 0,
+            "extra": 0,
+            "dot": 0,
+            "ret": 0
+        }
+    }
+]

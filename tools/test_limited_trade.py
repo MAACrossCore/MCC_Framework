@@ -1,0 +1,622 @@
+# -*- coding: utf-8 -*-
+"""Offline checks for the limited-store configurable OCR whitelist."""
+
+from pathlib import Path
+import json
+import sys
+import tempfile
+from types import SimpleNamespace
+
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "agent"))
+
+import limited_trade as trade_module  # noqa: E402
+from limited_trade import (  # noqa: E402
+    CHIP_TYPES,
+    CHIP_REWARD_LOCK_POINT,
+    CHIP_REWARD_POINT,
+    DEFAULT_SETTINGS,
+    MATERIAL_ITEMS,
+    MODULE_ITEMS,
+    PURCHASE_STRATEGIES,
+    LimitedTradeRecognition,
+    LimitedTradeChipRewardFlow,
+    LimitedTradeEngine,
+    SKILL_BOOK_TYPES,
+    STORE_SWIPE_LEFT,
+    STORE_SWIPE_RIGHT,
+    STRATEGY_ALL,
+    STRATEGY_FALLBACK,
+    STRATEGY_ONE,
+    TRAINING_ITEMS,
+    build_whitelist,
+    load_settings,
+    chip_box_rarity,
+    is_chip_box,
+    merge_page_items,
+    product_is_sold_out,
+    select_purchase_plan,
+    _param,
+    _SESSION,
+)
+
+
+def test_default_whitelist_preserves_existing_categories_without_new_chip_boxes():
+    whitelist = build_whitelist(DEFAULT_SETTINGS)
+    assert whitelist == list(MATERIAL_ITEMS + TRAINING_ITEMS + MODULE_ITEMS)
+    assert "定制模块" in whitelist
+    assert {"初级硅化剂", "进化之息", "涅槃凝胶"}.issubset(whitelist)
+    assert {"武装技能训练", "技能2", "技能3"}.issubset(whitelist)
+    assert len(whitelist) == len(set(whitelist))
+    assert not any(item.startswith(("R4", "R5")) for item in whitelist)
+
+
+def test_selected_categories_and_chip_rarities_are_exact():
+    settings = {
+        "materials": False,
+        "training": True,
+        "skill_books": {"技能书Ⅰ"},
+        "modules": False,
+        "chip_boxes": True,
+        "chip_types": {"连击", "特防"},
+        "chip_rarities": {"连击": {"R5"}, "特防": set()},
+    }
+    assert build_whitelist(settings) == ["武装技能训练", "R5连击芯片箱"]
+
+
+def test_saved_nested_options_are_loaded():
+    task = {
+        "TaskItems": [{
+            "name": "限时贸易所购买",
+            "entry": "限时贸易所购买",
+            "option": [
+                {"name": "限时贸易_购买素材", "index": 1},
+                {
+                    "name": "限时贸易_购买武装技能训练",
+                    "index": 0,
+                    "sub_options": [{
+                        "name": "限时贸易_技能书购买策略",
+                        "index": 1,
+                    }, {
+                        "name": "限时贸易_技能书类型",
+                        "selected_cases": ["技能书Ⅱ"],
+                    }],
+                },
+                {"name": "限时贸易_购买模块", "index": 1},
+                {
+                    "name": "限时贸易_购买芯片箱",
+                    "index": 0,
+                    "sub_options": [{
+                        "name": "限时贸易_芯片箱购买策略",
+                        "index": 0,
+                    }, {
+                        "name": "限时贸易_芯片箱类型",
+                        "selected_cases": ["连击", "特防"],
+                        "sub_options": [
+                            {"name": "限时贸易_连击芯片箱品质", "selected_cases": ["R5"]},
+                            {"name": "限时贸易_特防芯片箱品质", "selected_cases": []},
+                        ],
+                    }],
+                },
+            ],
+        }]
+    }
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / "default.json"
+        path.write_text(json.dumps(task, ensure_ascii=False), encoding="utf-8")
+        settings = load_settings(path)
+    assert build_whitelist(settings) == ["技能2", "R5连击芯片箱"]
+    assert settings["strategies"]["training"] == STRATEGY_ONE
+    assert settings["strategies"]["chip_boxes"] == STRATEGY_ALL
+
+
+def test_interface_exposes_nested_chip_box_controls():
+    interface = json.loads((ROOT / "assets" / "interface.json").read_text(encoding="utf-8-sig"))
+    task = next(item for item in interface["task"] if item["entry"] == "限时贸易所购买")
+    assert task["option"] == [
+        "限时贸易_购买素材",
+        "限时贸易_购买武装技能训练",
+        "限时贸易_购买模块",
+        "限时贸易_购买芯片箱",
+    ]
+    options = interface["option"]
+    expected_defaults = {
+        "限时贸易_素材购买策略": STRATEGY_FALLBACK,
+        "限时贸易_技能书购买策略": STRATEGY_ONE,
+        "限时贸易_模块购买策略": STRATEGY_FALLBACK,
+        "限时贸易_芯片箱购买策略": STRATEGY_ALL,
+    }
+    for option_name, default in expected_defaults.items():
+        strategy = options[option_name]
+        assert strategy["type"] == "select"
+        assert strategy["default_case"] == default
+        assert [case["name"] for case in strategy["cases"]] == list(PURCHASE_STRATEGIES)
+    training = options["限时贸易_购买武装技能训练"]
+    training_yes = next(case for case in training["cases"] if case["name"] == "Yes")
+    assert training_yes["option"] == ["限时贸易_技能书购买策略", "限时贸易_技能书类型"]
+    assert [case["name"] for case in options["限时贸易_技能书类型"]["cases"]] == list(SKILL_BOOK_TYPES)
+    material_yes = next(case for case in options["限时贸易_购买素材"]["cases"] if case["name"] == "Yes")
+    assert material_yes["option"] == ["限时贸易_素材购买策略"]
+    module_yes = next(case for case in options["限时贸易_购买模块"]["cases"] if case["name"] == "Yes")
+    assert module_yes["option"] == ["限时贸易_模块购买策略"]
+    master = options["限时贸易_购买芯片箱"]
+    yes = next(case for case in master["cases"] if case["name"] == "Yes")
+    assert yes["option"] == ["限时贸易_芯片箱购买策略", "限时贸易_芯片箱类型"]
+    chip_types = options["限时贸易_芯片箱类型"]
+    assert [case["name"] for case in chip_types["cases"]] == list(CHIP_TYPES)
+    for case in chip_types["cases"]:
+        quality = options[case["option"][0]]
+        assert quality["type"] == "checkbox"
+        assert [item["name"] for item in quality["cases"]] == ["R4", "R5"]
+    compact_patch = (
+        ROOT / "ui_custom" / "MFAAvalonia" / "laa-limited-trade-chip-options.patch"
+    ).read_text(encoding="utf-8-sig")
+    assert "IsLimitedTradeChipTypeOption" in compact_patch
+    assert "compactColumn == 2" in compact_patch
+    assert "FontSize = isCompactChipChoice ? 12 : 14" in compact_patch
+
+
+def test_chip_quality_controls_default_to_both_rarities():
+    """上级类型默认勾选时，下方品质必须默认 R4+R5 全勾。
+
+    否则会出现「选了特防但一个品质都没勾」的空档（用户报的 UI 逻辑问题）。
+    """
+    interface = json.loads((ROOT / "assets" / "interface.json").read_text(encoding="utf-8-sig"))
+    options = interface["option"]
+    chip_types = options["限时贸易_芯片箱类型"]
+    assert set(chip_types["default_case"]) == set(CHIP_TYPES)
+    for case in chip_types["cases"]:
+        quality = options[case["option"][0]]
+        assert quality["default_case"] == ["R4", "R5"], case["name"]
+
+
+def test_ui_patch_keeps_parent_child_chip_sync():
+    """UI 补丁必须保留三处关键实现。
+
+    联动与存档规范化都是 C# 侧实现的（见 TaskOptionGenerator），
+    这里钉住补丁里确实有这些逻辑，避免重新生成补丁时被漏掉：
+
+      1. LimitedTradeChipTypeNameOf —— 由品质选项名反推上级类型名；
+      2. LimitedTradeChipTypeToggles —— 类级注册表，避开「闭包里的旧按钮引用失效」；
+      3. NormalizeLimitedTradeChipQualityOptions —— 面板级把空品质补成 R4+R5；
+      4. SyncChipQualityParent —— 品质全不勾时取消上级。
+    """
+    patch = (
+        ROOT / "ui_custom" / "MFAAvalonia" / "laa-limited-trade-chip-options.patch"
+    ).read_text(encoding="utf-8-sig")
+    assert "LimitedTradeChipTypeNameOf" in patch
+    assert "LimitedTradeChipTypeToggles" in patch
+    assert "NormalizeLimitedTradeChipQualityOptions" in patch
+    assert "SyncChipQualityParent" in patch
+    assert "LAA: 品质全不勾时，上级类型一起取消选" in patch
+
+
+def test_unchecked_chip_qualities_never_reach_the_whitelist():
+    """核对购买侧：品质全不勾 -> 该芯片箱不进白名单，因而不会被购买。
+
+    「UI 联动」与「实际购买」一致的关键就在白名单：
+    没勾品质的箱子不白名单，扫描阶段 (`scan_items` 只回白名单内的名字)
+    就扫不到它，购买计划里自然不会有它。
+    """
+    settings = {
+        "materials": False,
+        "training": False,
+        "skill_books": set(),
+        "modules": False,
+        "chip_boxes": True,
+        "chip_types": {"特防"},
+        "chip_rarities": {"特防": set()},
+    }
+    assert build_whitelist(settings) == []
+
+    # 对比：同样选特防，但品质勾了 R5 -> 只有 R5 那个箱子进白名单
+    settings["chip_rarities"] = {"特防": {"R5"}}
+    assert build_whitelist(settings) == ["R5特防芯片箱"]
+
+
+def test_purchase_plan_trusts_the_scanned_items():
+    """边界说明：白名单过滤发生在 `scan_items`，不在 `select_purchase_plan`。
+
+    所以用白名单外的商品直接喂进来，计划会照样选中它 —— 这是**预期行为**，
+    因为生产路径下 `ordered` 只可能来自 `scan_items(..., whitelist, ...)`。
+    这条测试把这个边界写下来，避免以后误以为计划层会兜白名单。
+    """
+    settings = {
+        "materials": False, "training": False, "skill_books": set(), "modules": False,
+        "chip_boxes": True, "chip_types": {"特防"}, "chip_rarities": {"特防": {"R5"}},
+        "strategies": dict(DEFAULT_SETTINGS["strategies"]),
+    }
+    assert settings["strategies"]["chip_boxes"] == STRATEGY_ALL
+
+    # 直接喂入未过滤的商店商品：计划会全部选中（不做白名单裁剪）
+    store = [
+        {"name": "R4特防芯片箱", "page": "first", "x": 100, "y": 200, "world_x": 100},
+        {"name": "R5特防芯片箱", "page": "first", "x": 300, "y": 200, "world_x": 300},
+    ]
+    second, first = select_purchase_plan(store, [], settings)
+    assert (second, first) == ([], ["R4特防芯片箱", "R5特防芯片箱"])
+
+    # 生产路径：扫描结果已按白名单过滤，此时只剩 R5
+    filtered = [item for item in store if item["name"] in build_whitelist(settings)]
+    second, first = select_purchase_plan(filtered, [], settings)
+    assert (second, first) == ([], ["R5特防芯片箱"])
+
+
+def test_scan_items_only_returns_whitelisted_chip_boxes():
+    """端到端：商店摆了全部 14 个箱子，只有勾选类型的那几个会被扫到并购买。
+
+    这条把「UI 勾选 -> 白名单 -> 扫描 -> 购买计划」整条链固定下来：
+    未勾选类型（精力/重击/痛击/特防）的箱子即便在售也不会进入购买计划。
+    """
+    settings = {
+        "materials": False,
+        "training": False,
+        "skill_books": set(),
+        "modules": False,
+        "chip_boxes": True,
+        "chip_types": {"连击", "装填", "扩大"},
+        "chip_rarities": {"连击": {"R4", "R5"}, "装填": {"R4", "R5"}, "扩大": {"R4", "R5"}},
+        "strategies": dict(DEFAULT_SETTINGS["strategies"]),
+    }
+    whitelist = build_whitelist(settings)
+    assert sorted(whitelist) == sorted([
+        "R4连击芯片箱", "R5连击芯片箱",
+        "R4装填芯片箱", "R5装填芯片箱",
+        "R4扩大芯片箱", "R5扩大芯片箱",
+    ])
+
+    on_sale = ["%s%s芯片箱" % (rarity, chip_type)
+               for chip_type in CHIP_TYPES for rarity in ("R4", "R5")]
+    assert len(on_sale) == 14
+
+    engine = LimitedTradeEngine()
+    pages = {"first": on_sale[:7], "second": on_sale[7:]}
+    served = {"first": False, "second": False}
+
+    def fake_recognize(_context, _image, choices):
+        # choices 就是白名单 —— 生产路径的过滤点
+        page = "first" if not served["first"] else "second"
+        served[page] = True
+        names = pages[page]
+        results = [
+            SimpleNamespace(text=name, box=(100 + 200 * index, 300, 160, 40))
+            for index, name in enumerate(names)
+        ]
+        return SimpleNamespace(hit=bool(results), all_results=results,
+                               best_result=results[0] if results else None)
+
+    class _Image:
+        shape = (720, 1280, 3)
+
+    engine.recognize = fake_recognize
+    original_guard = trade_module.ensure_running
+    trade_module.ensure_running = lambda _context: None
+    try:
+        first_all = engine.scan_items(None, _Image(), whitelist, "first")
+        second_all = engine.scan_items(None, _Image(), whitelist, "second")
+    finally:
+        trade_module.ensure_running = original_guard
+
+    scanned = {item["name"] for item in first_all + second_all}
+    assert scanned == set(whitelist), (sorted(scanned), sorted(whitelist))
+
+    second_plan, first_plan = select_purchase_plan(first_all, second_all, settings)
+    plan = set(second_plan) | set(first_plan)
+    assert plan <= set(whitelist)
+    assert plan == set(whitelist)
+
+
+def test_purchase_path_only_ever_sees_whitelist_items():
+    """购买侧的不变量：进入购买计划的商品一定来自白名单。
+
+    三道闸（都在 agent/limited_trade.py）：
+      1. 初始化时 `load_settings()` 只读一次配置，白名单随之固定；
+      2. 白名单为空时直接进 done 阶段，根本不做扫描；
+      3. `scan_items` 用 `_canonical_item(text, choices)` 过滤，只回白名单内的名字。
+
+    所以「品质全不勾 -> 该芯片箱不在白名单 -> 不会被买」是成立的，
+    UI 联动与购买行为一致。这里把这三道闸钉住，避免以后被改掉。
+    """
+    source = (ROOT / "agent" / "limited_trade.py").read_text(encoding="utf-8")
+
+    # 2) 空白名单直接结束，不做扫描
+    assert "if not whitelist:" in source
+    assert '_SESSION["stage"] = "done"' in source
+
+    # 3) 扫描按白名单过滤（只回白名单内的名字）
+    assert 'name = _canonical_item(getattr(result, "text", ""), choices)' in source
+
+    # 1) 白名单只在初始化阶段构建一次（1 处 def + 1 处调用），扫描时复用 _SESSION 里那份
+    assert source.count("build_whitelist") == 2
+    assert 'whitelist = list(_SESSION.get("whitelist") or [])' in source
+
+    # 兜底策略也只在扫描结果（= 白名单内商品）里挑
+    assert "item for item in ordered" in source
+    assert "select_purchase_plan(" in source
+
+
+def test_empty_chip_quality_is_not_a_purchase_candidate():
+    """白名单为空时，select_purchase_plan 不会凭空选中商店里的同类商品。
+
+    注意：生产路径下 `ordered` 只可能含白名单内商品（见上一条测试），
+    这里直接喂入白名单外商品，是用来钉住「兜底分支不得放宽白名单」这个意图。
+    """
+    settings = {
+        "materials": True,
+        "training": False,
+        "skill_books": set(),
+        "modules": False,
+        "chip_boxes": True,
+        "chip_types": {"特防"},
+        "chip_rarities": {"特防": set()},
+        "strategies": dict(DEFAULT_SETTINGS["strategies"]),
+    }
+    settings["strategies"]["chip_boxes"] = STRATEGY_FALLBACK
+    whitelist = build_whitelist(settings)
+    assert not any(is_chip_box(name) for name in whitelist)
+
+    # 生产路径：扫描结果为空 -> 没有候选 -> 无购买计划
+    second, first = select_purchase_plan([], [], settings)
+    assert (second, first) == ([], [])
+
+
+def test_pipeline_delegates_item_location_to_original_fullscreen_ocr():
+    pipeline = json.loads(
+        (ROOT / "assets" / "resource" / "pipeline" / "base" / "限时贸易.json").read_text(
+            encoding="utf-8-sig"
+        )
+    )
+    entry = pipeline["限时贸易所购买"]
+    assert entry["action"] == "Custom"
+    assert entry["custom_action"] == "limited_trade_setup"
+    ocr = pipeline["LimitedTradeProductOCR"]
+    assert ocr["recognition"] == "OCR"
+    assert ocr["roi"] == [0, 0, 0, 0]
+    purchase = pipeline["Buy_something"]
+    assert purchase["recognition"] == "Custom"
+    assert purchase["custom_recognition"] == "limited_trade_state"
+    assert purchase["action"] == "Click"
+    buy_next = pipeline["Buyit"]["next"]
+    assert buy_next[0] == "限时贸易_芯片箱奖励处理"
+    reward = pipeline["限时贸易_芯片箱奖励处理"]
+    assert reward["custom_recognition_param"] == {"expected": "chip_reward"}
+    assert reward["custom_action_param"] == {"operation": "process_chip_reward"}
+    assert "限时贸易_购买弹窗恢复后扫描" in buy_next
+    assert "限时贸易_扫描两页商品" not in buy_next
+    dispatch = pipeline["限时贸易_购买分派"]["next"]
+    assert dispatch.index("限时贸易所购买_无可购完成") < dispatch.index("限时贸易所购买_完成")
+    no_items = pipeline["限时贸易所购买_无可购完成"]
+    assert no_items["custom_recognition_param"] == {"expected": "no_items"}
+    assert no_items["focus"] == "当前无符合要求物品，未执行购买操作"
+
+
+def test_two_page_plan_supplements_and_deduplicates_before_purchase():
+    second, first_only = merge_page_items(
+        ["亚金电池", "技能2", "亚金电池"],
+        ["技能2", "定制模块", "定制模块"],
+    )
+    assert second == ["技能2", "定制模块"]
+    assert first_only == ["亚金电池"]
+
+
+def _record(name, page, x, y, offset=0):
+    return {"name": name, "page": page, "x": x, "y": y, "world_x": x + offset}
+
+
+def test_primary_strategies_buy_all_or_first_and_suppress_fallback_categories():
+    settings = {
+        "strategies": {
+            "materials": STRATEGY_FALLBACK,
+            "training": STRATEGY_ONE,
+            "modules": STRATEGY_FALLBACK,
+            "chip_boxes": STRATEGY_ALL,
+        }
+    }
+    first = [
+        _record("亚金电池", "first", 100, 100),
+        _record("技能3", "first", 500, 100),
+        _record("技能2", "first", 300, 100),
+        _record("稀有模块", "first", 700, 100),
+    ]
+    second = [
+        _record("R4连击芯片箱", "second", 700, 100, 260),
+        _record("R5连击芯片箱", "second", 900, 100, 260),
+    ]
+    second_names, first_names = select_purchase_plan(first, second, settings)
+    assert second_names == ["R4连击芯片箱", "R5连击芯片箱"]
+    assert first_names == ["技能2"]
+
+
+def test_fallback_strategy_buys_only_first_spatial_item_when_nothing_else_matches():
+    settings = {
+        "strategies": {
+            "materials": STRATEGY_FALLBACK,
+            "training": STRATEGY_ONE,
+            "modules": STRATEGY_FALLBACK,
+            "chip_boxes": STRATEGY_ALL,
+        }
+    }
+    first = [
+        _record("稀有模块", "first", 500, 100),
+        _record("亚金电池", "first", 200, 100),
+    ]
+    second_names, first_names = select_purchase_plan(first, [], settings)
+    assert second_names == []
+    assert first_names == ["亚金电池"]
+
+
+def test_store_swipes_are_small_and_exact_inverses():
+    assert STORE_SWIPE_LEFT[:4] == (
+        STORE_SWIPE_RIGHT[2], STORE_SWIPE_RIGHT[3],
+        STORE_SWIPE_RIGHT[0], STORE_SWIPE_RIGHT[1],
+    )
+    assert 150 <= STORE_SWIPE_LEFT[0] - STORE_SWIPE_LEFT[2] <= 350
+
+
+def test_sold_out_label_is_bound_only_to_the_product_directly_above_it():
+    top_product = (865, 297, 121, 23)
+    bottom_product = (865, 536, 121, 22)
+    sold_out = [(900, 334, 53, 32)]
+    assert product_is_sold_out(top_product, sold_out) is True
+    assert product_is_sold_out(bottom_product, sold_out) is False
+
+
+def test_purchase_popup_resume_scans_only_before_normal_purchase_loop():
+    recognition = LimitedTradeRecognition()
+    argv = SimpleNamespace(custom_recognition_param='{"expected":"need_scan"}')
+    _SESSION.clear()
+    _SESSION.update({"stage": "navigate", "pending": []})
+    assert recognition.analyze(None, argv) is not None
+    _SESSION["stage"] = "second"
+    assert recognition.analyze(None, argv) is None
+
+
+def test_empty_purchase_plan_has_a_dedicated_success_state():
+    recognition = LimitedTradeRecognition()
+    argv = SimpleNamespace(custom_recognition_param='{"expected":"no_items"}')
+    _SESSION.clear()
+    _SESSION.update({
+        "initialized": True,
+        "stage": "first",
+        "pending": [],
+        "selected_total": 0,
+        "attempted": [],
+        "saw_sold_out": True,
+        "sold_out": ["R4精力芯片箱"],
+    })
+    assert recognition.analyze(None, argv) is not None
+    _SESSION["attempted"] = ["R4精力芯片箱"]
+    assert recognition.analyze(None, argv) is None
+
+
+def test_null_custom_action_param_is_treated_as_empty_object():
+    assert _param(None) == {}
+    assert _param("null") == {}
+    assert _param({}) == {}
+
+
+def test_chip_box_kind_and_reward_coordinates_are_explicit():
+    assert is_chip_box("R4装填芯片箱") is True
+    assert is_chip_box("R5连击芯片箱") is True
+    assert is_chip_box("定制模块") is False
+    assert chip_box_rarity("R4装填芯片箱") == "R4"
+    assert chip_box_rarity("R5连击芯片箱") == "R5"
+    assert CHIP_REWARD_POINT == (960, 575)
+    assert CHIP_REWARD_LOCK_POINT == (1207, 225)
+    flow = LimitedTradeChipRewardFlow()
+    assert flow.detail_lock_y_offset == 154
+    assert (flow.detail_lock_y_min, flow.detail_lock_y_max) == (220, 255)
+
+
+class _FakeR4RewardFlow(LimitedTradeChipRewardFlow):
+    def __init__(self):
+        self.clicks = []
+        self._viewport = (1920, 1080)
+
+    def _shot(self, _context):
+        return "image"
+
+    def _is_reward_popup(self, _context, image):
+        return image == "image"
+
+    def _is_detail_open(self, _context, _image):
+        return True
+
+    def _wait_until(self, _context, predicate, timeout=4.0):
+        return True
+
+    def _click(self, _context, point, label):
+        self.clicks.append((point, label))
+
+    def _sleep(self, _context, _seconds):
+        return None
+
+    def _dismiss_reward(self, _context):
+        return True
+
+
+def test_r4_reward_is_clicked_and_locked_exactly_once(monkeypatch=None):
+    flow = _FakeR4RewardFlow()
+    result = flow.process(None, "R4装填芯片箱")
+    assert result is not None
+    assert [point for point, _ in flow.clicks] == [
+        CHIP_REWARD_POINT,
+        CHIP_REWARD_LOCK_POINT,
+    ]
+    assert result["record"]["rarity"] == "R4"
+    assert result["record"]["changed"] is True
+    assert "verified" not in result["record"]
+
+
+class _FakeR5RewardFlow(_FakeR4RewardFlow):
+    def __init__(self, main_level):
+        super().__init__()
+        self.main_level = main_level
+
+    def _read_detail(self, _context):
+        return {
+            "main_skill": {"name": "连击", "level": self.main_level},
+            "sub_skills": [
+                {"name": "攻击", "level": 1},
+                {"name": "暴伤", "level": 1},
+                {"name": "命中", "level": 1},
+            ],
+            "_lock_toggle_point": (1207, 210),
+        }
+
+
+class _FakeUnreadableR5RewardFlow(_FakeR4RewardFlow):
+    def _read_detail(self, _context):
+        return None
+
+
+def test_unreadable_r5_detail_exits_safely_without_failing_the_task():
+    flow = _FakeUnreadableR5RewardFlow()
+    result = flow.process(None, "R5装填芯片箱")
+    assert result is not None
+    assert [point for point, _ in flow.clicks] == [CHIP_REWARD_POINT]
+    assert result["record"]["skipped_reason"] == "detail_ocr_unstable"
+    assert result["summary"]["failed"] == 1
+
+
+def test_r5_matching_chip_locks_once_but_level_three_never_clicks():
+    original = trade_module.load_filter_plan
+    trade_module.load_filter_plan = lambda: {
+        "levels": {
+            "1": {"mode": "lock", "conditions": {}},
+            "2": {"mode": "lock", "conditions": {}},
+            "3": {"mode": "lock", "conditions": {}},
+        }
+    }
+    try:
+        level_one = _FakeR5RewardFlow(1)
+        one_result = level_one.process(None, "R5连击芯片箱")
+        assert [point for point, _ in level_one.clicks] == [
+            CHIP_REWARD_POINT,
+            (1207, 210),
+        ]
+        assert one_result["record"]["changed"] is True
+
+        level_three = _FakeR5RewardFlow(3)
+        three_result = level_three.process(None, "R5连击芯片箱")
+        assert [point for point, _ in level_three.clicks] == [CHIP_REWARD_POINT]
+        assert three_result["record"]["auto_locked_by_game"] is True
+        assert three_result["record"]["changed"] is False
+    finally:
+        trade_module.load_filter_plan = original
+
+
+def test_done_state_never_succeeds_without_completed_initialization():
+    recognition = LimitedTradeRecognition()
+    argv = SimpleNamespace(custom_recognition_param='{"expected":"done"}')
+    _SESSION.clear()
+    _SESSION.update({"stage": "done", "pending": []})
+    assert recognition.analyze(None, argv) is None
+
+
+if __name__ == "__main__":
+    tests = [value for name, value in globals().items() if name.startswith("test_")]
+    for test in tests:
+        test()
+    print("LIMITED_TRADE_OK (%d tests)" % len(tests))

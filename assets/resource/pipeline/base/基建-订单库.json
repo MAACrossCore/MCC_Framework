@@ -1,0 +1,245 @@
+{
+  "BaseOrderTask": {
+    "recognition": "DirectHit", "action": "Custom", "custom_action": "base_order_atomic",
+    "custom_action_param": { "operation": "init" }, "next": "订单库_页面接续",
+    "$__mpe_code": { "position": { "x": 60, "y": 100 } }
+  },
+
+  "订单库_页面接续": {
+    "next": ["订单库_接续自己的订单库", "订单库_接续好友订单库", "订单库_好友列表首位", "订单库_合成恢复奖励", "订单库_合成恢复详情", "订单库_合成恢复目录", "[JumpBack]导航到_自己的订单库"],
+    "$__mpe_code": { "position": { "x": 380, "y": 100 } }
+  },
+  "订单库_接续自己的订单库": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:own_order" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "scan_own" }, "next": "订单库_自己的决定",
+    "$__mpe_code": { "position": { "x": 720, "y": -220 } }
+  },
+  "订单库_接续好友订单库": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:friend_order" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "observe_friend" }, "next": "订单库_好友进入分派",
+    "$__mpe_code": { "position": { "x": 720, "y": -60 } }
+  },
+
+  "订单库_自己的决定": {
+    "next": ["订单库_自己可交付", "订单库_自己需合成", "订单库_自己已扫描完成"],
+    "$__mpe_code": { "position": { "x": 1050, "y": -220 } }
+  },
+  "订单库_自己可交付": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:submit" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "click_order" }, "post_delay": 900, "next": "订单库_等待提交确认",
+    "$__mpe_code": { "position": { "x": 1370, "y": -360 } }
+  },
+  "订单库_自己需合成": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:synthesize" },
+    "action": "DoNothing", "next": "订单库_选择素材类别",
+    "$__mpe_code": { "position": { "x": 1370, "y": -220 } }
+  },
+  "订单库_自己已扫描完成": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:library_done" },
+    "action": "Click", "target": [116, 611, 34, 44], "post_delay": 1600, "next": "订单库_等待好友列表",
+    "$__mpe_code": { "position": { "x": 1370, "y": -80 } }
+  },
+
+  "订单库_等待好友列表": {
+    "next": ["订单库_好友列表首位", "订单库_接续自己的订单库"],
+    "$__mpe_code": { "position": { "x": 1680, "y": -80 } }
+  },
+  "订单库_好友列表首位": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:friend_list" },
+    "action": "Click", "target": [294, 500, 34, 44], "post_delay": 2000, "next": "订单库_观察好友",
+    "$__mpe_code": { "position": { "x": 1990, "y": -80 } }
+  },
+  "订单库_观察好友": {
+    "recognition": "DirectHit", "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "observe_friend" },
+    "next": "订单库_好友进入分派", "$__mpe_code": { "position": { "x": 2300, "y": -80 } }
+  },
+  "订单库_好友进入分派": {
+    "next": ["订单库_好友可扫描", "订单库_好友遍历完成", "订单库_好友切换失败"],
+    "$__mpe_code": { "position": { "x": 2610, "y": -80 } }
+  },
+  "订单库_好友可扫描": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:friend_ready" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "scan_friend" }, "next": "订单库_好友决定",
+    "$__mpe_code": { "position": { "x": 2920, "y": -220 } }
+  },
+  "订单库_好友遍历完成": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:friends_done" },
+    "action": "DoNothing", "next": "订单库_完成返回主界面",
+    "$__mpe_code": { "position": { "x": 2920, "y": -80 } }
+  },
+  "订单库_好友切换失败": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:friend_failed" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "fail" },
+    "$__mpe_code": { "position": { "x": 2920, "y": 60 } }
+  },
+
+  "订单库_好友决定": {
+    "next": ["订单库_好友可交付", "订单库_好友需合成", "订单库_当前好友扫描完成"],
+    "$__mpe_code": { "position": { "x": 3230, "y": -220 } }
+  },
+  "订单库_好友可交付": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:submit" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "click_order" }, "post_delay": 900, "next": "订单库_等待提交确认",
+    "$__mpe_code": { "position": { "x": 3540, "y": -360 } }
+  },
+  "订单库_好友需合成": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:synthesize" },
+    "action": "DoNothing", "next": "订单库_选择素材类别",
+    "$__mpe_code": { "position": { "x": 3540, "y": -220 } }
+  },
+  "订单库_当前好友扫描完成": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:library_done" },
+    "action": "Click", "target": [195, 611, 34, 44], "post_delay": 1800, "next": "订单库_观察好友",
+    "$__mpe_code": { "position": { "x": 3540, "y": -80 } }
+  },
+
+  "订单库_等待提交确认": {
+    "next": ["订单库_确认提交", "订单库_提交未打开_自己", "订单库_提交未打开_好友"],
+    "$__mpe_code": { "position": { "x": 3850, "y": -420 } }
+  },
+  "订单库_确认提交": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:confirm" },
+    "action": "Click", "target": [742, 428, 34, 44], "post_delay": 1500, "next": "订单库_确认提交结果",
+    "$__mpe_code": { "position": { "x": 4160, "y": -500 } }
+  },
+  "订单库_提交未打开_自己": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:own_order" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "block_current" }, "next": "订单库_接续自己的订单库",
+    "$__mpe_code": { "position": { "x": 4160, "y": -360 } }
+  },
+  "订单库_提交未打开_好友": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:friend_order" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "block_current" }, "next": "订单库_重新扫描好友",
+    "$__mpe_code": { "position": { "x": 4160, "y": -220 } }
+  },
+  "订单库_确认提交结果": {
+    "next": ["订单库_自己提交完成", "订单库_好友提交完成", "订单库_提交奖励"],
+    "$__mpe_code": { "position": { "x": 4470, "y": -500 } }
+  },
+  "订单库_自己提交完成": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:own_order" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "mark_submitted" }, "next": "订单库_接续自己的订单库",
+    "$__mpe_code": { "position": { "x": 4780, "y": -640 } }
+  },
+  "订单库_好友提交完成": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:friend_order" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "mark_submitted" }, "next": "订单库_重新扫描好友",
+    "$__mpe_code": { "position": { "x": 4780, "y": -500 } }
+  },
+  "订单库_提交奖励": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:reward" },
+    "action": "Click", "target": [790, 578, 34, 44], "post_delay": 900, "next": "订单库_确认提交结果",
+    "$__mpe_code": { "position": { "x": 4780, "y": -360 } }
+  },
+  "订单库_重新扫描好友": {
+    "recognition": "DirectHit", "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "scan_friend" }, "next": "订单库_好友决定",
+    "$__mpe_code": { "position": { "x": 5090, "y": -500 } }
+  },
+
+  "订单库_选择素材类别": {
+    "next": ["订单库_选择星币素材", "订单库_选择技术素材", "订单库_选择构建素材"],
+    "$__mpe_code": { "position": { "x": 1680, "y": 300 } }
+  },
+  "订单库_选择星币素材": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "kind:coin" },
+    "action": "Click", "target": [83, 176, 34, 34], "post_delay": 1500, "next": "订单库_等待素材目录",
+    "$__mpe_code": { "position": { "x": 1990, "y": 160 } }
+  },
+  "订单库_选择技术素材": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "kind:tech" },
+    "action": "Click", "target": [83, 276, 34, 34], "post_delay": 1500, "next": "订单库_等待素材目录",
+    "$__mpe_code": { "position": { "x": 1990, "y": 300 } }
+  },
+  "订单库_选择构建素材": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "kind:build" },
+    "action": "Click", "target": [83, 376, 34, 34], "post_delay": 1500, "next": "订单库_等待素材目录",
+    "$__mpe_code": { "position": { "x": 1990, "y": 440 } }
+  },
+  "订单库_等待素材目录": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:synthesis_catalog" },
+    "action": "DoNothing", "next": ["订单库_点击星币素材", "订单库_点击技术素材", "订单库_点击构建素材"],
+    "$__mpe_code": { "position": { "x": 2300, "y": 300 } }
+  },
+  "订单库_点击星币素材": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "kind:coin" },
+    "action": "Click", "target": [483, 390, 34, 34], "post_delay": 1400, "next": "订单库_设置合成数量",
+    "$__mpe_code": { "position": { "x": 2610, "y": 160 } }
+  },
+  "订单库_点击技术素材": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "kind:tech" },
+    "action": "Click", "target": [976, 390, 34, 34], "post_delay": 1400, "next": "订单库_设置合成数量",
+    "$__mpe_code": { "position": { "x": 2610, "y": 300 } }
+  },
+  "订单库_点击构建素材": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "kind:build" },
+    "action": "Click", "target": [323, 576, 34, 34], "post_delay": 1400, "next": "订单库_设置合成数量",
+    "$__mpe_code": { "position": { "x": 2610, "y": 440 } }
+  },
+  "订单库_设置合成数量": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:synthesis_detail" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "set_synthesis_amount" }, "next": "订单库_合成数量分派",
+    "$__mpe_code": { "position": { "x": 2920, "y": 300 } }
+  },
+  "订单库_合成数量分派": {
+    "next": ["订单库_确认合成", "订单库_合成数量失败"],
+    "$__mpe_code": { "position": { "x": 3230, "y": 300 } }
+  },
+  "订单库_确认合成": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:amount_ready" },
+    "action": "Click", "target": [1046, 610, 34, 34], "post_delay": 1500, "next": "订单库_合成返回订单库",
+    "$__mpe_code": { "position": { "x": 3540, "y": 220 } }
+  },
+  "订单库_合成数量失败": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "status:action_failed" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "block_current" }, "next": "订单库_合成返回订单库",
+    "$__mpe_code": { "position": { "x": 3540, "y": 380 } }
+  },
+  "订单库_合成返回订单库": {
+    "next": ["订单库_合成恢复奖励", "订单库_合成恢复详情", "订单库_合成恢复目录", "订单库_合成回到自己", "订单库_合成回到好友"],
+    "$__mpe_code": { "position": { "x": 3850, "y": 300 } }
+  },
+  "订单库_合成恢复奖励": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:reward" },
+    "action": "Click", "target": [790, 578, 34, 44], "post_delay": 900, "next": "订单库_合成返回订单库",
+    "$__mpe_code": { "position": { "x": 4160, "y": 80 } }
+  },
+  "订单库_合成恢复详情": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:synthesis_detail" },
+    "action": "Click", "target": [92, 28, 34, 34], "post_delay": 900, "next": "订单库_合成返回订单库",
+    "$__mpe_code": { "position": { "x": 4160, "y": 220 } }
+  },
+  "订单库_合成恢复目录": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:synthesis_catalog" },
+    "action": "Click", "target": [92, 28, 34, 34], "post_delay": 1200, "next": "订单库_合成返回订单库",
+    "$__mpe_code": { "position": { "x": 4160, "y": 360 } }
+  },
+  "订单库_合成回到自己": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:own_order" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "synthesis_done" }, "next": "订单库_接续自己的订单库",
+    "$__mpe_code": { "position": { "x": 4160, "y": 500 } }
+  },
+  "订单库_合成回到好友": {
+    "recognition": "Custom", "custom_recognition": "base_order_state", "custom_recognition_param": { "expected": "page:friend_order" },
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "synthesis_done" }, "next": "订单库_重新扫描好友",
+    "$__mpe_code": { "position": { "x": 4160, "y": 640 } }
+  },
+
+  "订单库_完成返回主界面": {
+    "recognition": "TemplateMatch", "template": ["StartUp/HomeButton.png", "StartUp/HomeButton1.png"], "roi": [180, 10, 100, 70],
+    "action": "Click", "post_delay": 2200, "next": "订单库_确认主界面",
+    "$__mpe_code": { "position": { "x": 3230, "y": 20 } }
+  },
+  "订单库_确认主界面": {
+    "recognition": "OCR", "expected": ["基地", "任务", "编队"], "roi": [493, 580, 773, 137], "threshold": 0.2,
+    "action": "Custom", "custom_action": "base_order_atomic", "custom_action_param": { "operation": "finish" },
+    "next": ["通用-返回主页"],
+    "$__mpe_code": { "position": { "x": 3540, "y": 20 } }
+  },
+
+  "BaseOrderText": { "recognition": "OCR", "expected": [], "threshold": 0.2, "$__mpe_code": { "position": { "x": 60, "y": 900 } } },
+  "BaseOrderTitle": { "recognition": "OCR", "expected": [], "threshold": 0.2, "$__mpe_code": { "position": { "x": 320, "y": 900 } } },
+  "BaseOrderCard": { "recognition": "OCR", "expected": [], "threshold": 0.2, "$__mpe_code": { "position": { "x": 580, "y": 900 } } },
+  "BaseOrderCost": { "recognition": "OCR", "expected": [], "threshold": 0.2, "$__mpe_code": { "position": { "x": 840, "y": 900 } } },
+  "BaseOrderInventory": { "recognition": "OCR", "expected": [], "threshold": 0.2, "$__mpe_code": { "position": { "x": 1100, "y": 900 } } },
+  "BaseSynthesisCount": { "recognition": "OCR", "expected": [], "threshold": 0.2, "$__mpe_code": { "position": { "x": 1360, "y": 900 } } }
+}

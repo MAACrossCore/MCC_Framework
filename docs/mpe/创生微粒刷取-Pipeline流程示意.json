@@ -1,0 +1,125 @@
+{
+    "$__mpe_config_创生微粒刷取Pipeline流程示意": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "filename": "创生微粒刷取-Pipeline流程示意",
+            "version": "v1.10.0",
+            "savedViewport": { "x": 40, "y": 40, "zoom": 0.72 }
+        }
+    },
+    "MPE创生微粒_任意页面任务入口": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": ["MPE创生微粒_中间页面接续判断", "MPE创生微粒_主界面点击出击", "MPE创生微粒_距离过远返回主界面"],
+        "$__mpe_code": { "position": { "x": 80, "y": 160 } }
+    },
+    "MPE创生微粒_中间页面接续判断": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": ["MPE创生微粒_每日探索分类页", "MPE创生微粒_核心开发页", "MPE创生微粒_超维跃升页", "MPE创生微粒_关卡01页", "MPE创生微粒_扫荡次数弹窗", "MPE创生微粒_扫荡结算页"],
+        "$__mpe_code": { "position": { "x": 360, "y": -80 } }
+    },
+    "MPE创生微粒_距离过远返回主界面": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_任意页面任务入口",
+        "$__mpe_code": { "position": { "x": 360, "y": 400 } }
+    },
+    "MPE创生微粒_主界面点击出击": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_出击选择每日探索",
+        "$__mpe_code": { "position": { "x": 360, "y": 160 } }
+    },
+    "MPE创生微粒_出击选择每日探索": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_每日探索分类页",
+        "$__mpe_code": { "position": { "x": 640, "y": 160 } }
+    },
+    "MPE创生微粒_每日探索分类页": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_向上滑动露出核心开发",
+        "$__mpe_code": { "position": { "x": 920, "y": 160 } }
+    },
+    "MPE创生微粒_向上滑动露出核心开发": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_核心开发页",
+        "$__mpe_code": { "position": { "x": 1200, "y": 160 } }
+    },
+    "MPE创生微粒_核心开发页": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_选择超维跃升",
+        "$__mpe_code": { "position": { "x": 1480, "y": 160 } }
+    },
+    "MPE创生微粒_选择超维跃升": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_超维跃升页",
+        "$__mpe_code": { "position": { "x": 1760, "y": 160 } }
+    },
+    "MPE创生微粒_超维跃升页": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_选择关卡01",
+        "$__mpe_code": { "position": { "x": 2040, "y": 160 } }
+    },
+    "MPE创生微粒_选择关卡01": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_关卡01页",
+        "$__mpe_code": { "position": { "x": 2320, "y": 160 } }
+    },
+    "MPE创生微粒_关卡01页": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": ["MPE创生微粒_票数为0直接完成", "MPE创生微粒_点击扫荡"],
+        "$__mpe_code": { "position": { "x": 2600, "y": 160 } }
+    },
+    "MPE创生微粒_票数为0直接完成": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_完成后点击主界面键",
+        "$__mpe_code": { "position": { "x": 2880, "y": -40 } }
+    },
+    "MPE创生微粒_点击扫荡": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_扫荡次数弹窗",
+        "$__mpe_code": { "position": { "x": 2880, "y": 160 } }
+    },
+    "MPE创生微粒_扫荡次数弹窗": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_校准次数为3",
+        "$__mpe_code": { "position": { "x": 3160, "y": 160 } }
+    },
+    "MPE创生微粒_校准次数为3": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": ["MPE创生微粒_OCR确认次数3", "MPE创生微粒_识别黄色加号并点击"],
+        "$__mpe_code": { "position": { "x": 3440, "y": 160 } }
+    },
+    "MPE创生微粒_识别黄色加号并点击": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_校准次数为3",
+        "$__mpe_code": { "position": { "x": 3720, "y": 280 } }
+    },
+    "MPE创生微粒_OCR确认次数3": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_开始战斗",
+        "$__mpe_code": { "position": { "x": 3720, "y": 40 } }
+    },
+    "MPE创生微粒_开始战斗": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_扫荡结算页",
+        "$__mpe_code": { "position": { "x": 4000, "y": 160 } }
+    },
+    "MPE创生微粒_扫荡结算页": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_返回关卡01",
+        "$__mpe_code": { "position": { "x": 4280, "y": 160 } }
+    },
+    "MPE创生微粒_返回关卡01": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_完成后点击主界面键",
+        "$__mpe_code": { "position": { "x": 4560, "y": 160 } }
+    },
+    "MPE创生微粒_完成后点击主界面键": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "next": "MPE创生微粒_确认基地UI后完成",
+        "$__mpe_code": { "position": { "x": 4840, "y": 160 } }
+    },
+    "MPE创生微粒_确认基地UI后完成": {
+        "recognition": "DirectHit", "action": "DoNothing",
+        "$__mpe_code": { "position": { "x": 5120, "y": 160 } }
+    }
+}

@@ -40,3 +40,13 @@ Win10 或者 Win11 系统自带了一份 "Python"，但它其实只是一个安�
 > [!WARNING]
 > 在提问前，请完整阅读 [MaaFramework 开发文档](https://maafw.com/docs/1.1-QuickStarted) 以及 [如何开发](./how_to_develop.md)，通常情况下它们能解决大多数问题。
 > 在提问时，请 **具体指出文档中困惑的章节** / **分享你的项目文件中的具体内容** / **提供完整的报错信息**，不然你能得到的大概率只有类似 _“请先读文档”_ 这样的回答。
+
+## 7. Release 包提示找不到 Python、pretask 路径错误、或 Agent Custom 不工作
+
+1. 确认下载的是 [Releases](https://github.com/MAACrossCore/MCC_Framework/releases) 完整 zip，而不是 GitHub 源码。
+2. 解压后根目录应同时存在 `MFAAvalonia.exe`（或同类启动文件）、`python/`、`deps/`、`agent/`。
+3. 打开包内 `interface.json`，Windows 上 `agent.child_exec` 与 `pretask.exec` 应为 `./python/python.exe`；若仍是 `"python"`，说明包过旧，请下最新版。
+4. Agent 首次运行会从 `deps/` 安装依赖，稍等片刻；仍失败时 Windows 可双击 `Install-Agent-Deps.bat`。
+5. Linux Release 不含内置 Python，需本机安装 Python 3.10+ 并执行 `pip install -r agent/requirements.txt`。
+
+更多细节见 [本地开发手册](./local_dev.md)。

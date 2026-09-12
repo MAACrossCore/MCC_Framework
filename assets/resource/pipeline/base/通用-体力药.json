@@ -1,0 +1,161 @@
+{
+  "$__mpe_config_通用-体力药": {
+    "$__mpe_code": {
+      "prefix": "",
+      "coordinateMode": "absolute-v1",
+      "filename": "通用-体力药",
+      "version": "v1.9.2",
+      "savedViewport": { "x": 0, "y": 0, "zoom": 0.55 }
+    }
+  },
+  "通用_体力药入口": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "potion:pending" },
+    "action": "Click",
+    "target": [991, 42, 4, 4],
+    "post_delay": 900,
+    "next": "通用_体力药列表",
+    "$__mpe_code": { "position": { "x": 100, "y": 160 } }
+  },
+  "通用_体力药列表": {
+    "recognition": "OCR",
+    "expected": ["燃料补给", "使用后恢复10燃料", "使用后恢复120燃料"],
+    "roi": [180, 90, 870, 500],
+    "threshold": 0.2,
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "limit_potion_to_stock" },
+    "next": "通用_体力药列表分派",
+    "$__mpe_code": { "position": { "x": 400, "y": 160 } }
+  },
+  "通用_体力药列表分派": {
+    "next": ["通用_选择小体力药", "通用_选择大体力药", "通用_体力药完成列表页"],
+    "$__mpe_code": { "position": { "x": 550, "y": 160 } }
+  },
+  "通用_选择小体力药": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "potion:small" },
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "prepare_potion_batch" },
+    "next": "通用_点击小体力药使用",
+    "$__mpe_code": { "position": { "x": 700, "y": 60 } }
+  },
+  "通用_选择大体力药": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "potion:large" },
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "prepare_potion_batch" },
+    "next": "通用_点击大体力药使用",
+    "$__mpe_code": { "position": { "x": 700, "y": 260 } }
+  },
+  "通用_点击小体力药使用": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [738, 532, 4, 4],
+    "post_delay": 900,
+    "next": ["通用_体力药使用结果", "通用_体力药数量页"],
+    "$__mpe_code": { "position": { "x": 1000, "y": 60 } }
+  },
+  "通用_点击大体力药使用": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [951, 532, 4, 4],
+    "post_delay": 900,
+    "next": ["通用_体力药使用结果", "通用_体力药数量页"],
+    "$__mpe_code": { "position": { "x": 1000, "y": 260 } }
+  },
+  "通用_体力药数量页": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "potion:quantity_page" },
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "adjust_potion_count" },
+    "next": "通用_确认使用体力药",
+    "$__mpe_code": { "position": { "x": 1600, "y": 260 } }
+  },
+  "通用_确认使用体力药": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [800, 480, 4, 4],
+    "post_delay": 1000,
+    "next": "通用_体力药使用结果",
+    "$__mpe_code": { "position": { "x": 1900, "y": 260 } }
+  },
+  "通用_体力药使用结果": {
+    "recognition": "OCR",
+    "expected": "点击空白处继续",
+    "roi": [420, 400, 450, 200],
+    "threshold": 0.2,
+    "action": "Click",
+    "target": [760, 460, 4, 4],
+    "post_delay": 1000,
+    "next": "通用_标记体力药本轮完成",
+    "$__mpe_code": { "position": { "x": 1900, "y": 60 } }
+  },
+  "通用_标记体力药本轮完成": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "mark_potion_batch_done" },
+    "next": "通用_体力药批次分派",
+    "$__mpe_code": { "position": { "x": 2200, "y": 160 } }
+  },
+  "通用_体力药批次分派": {
+    "next": ["通用_继续使用体力药", "通用_体力药完成数量页", "通用_体力药完成列表页"],
+    "$__mpe_code": { "position": { "x": 2500, "y": 160 } }
+  },
+  "通用_继续使用体力药": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "potion:more_quantity" },
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "prepare_potion_batch" },
+    "next": "通用_继续数量页",
+    "$__mpe_code": { "position": { "x": 2800, "y": 0 } }
+  },
+  "通用_继续数量页": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "potion:quantity_page" },
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "adjust_potion_count" },
+    "next": "通用_确认使用体力药",
+    "$__mpe_code": { "position": { "x": 3100, "y": 0 } }
+  },
+  "通用_体力药完成数量页": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "potion:done_quantity" },
+    "action": "Click",
+    "target": [1120, 360, 4, 4],
+    "post_delay": 700,
+    "next": "通用_关闭体力药列表",
+    "$__mpe_code": { "position": { "x": 2800, "y": 160 } }
+  },
+  "通用_体力药完成列表页": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "potion:done_fuel_page" },
+    "action": "DoNothing",
+    "next": "通用_关闭体力药列表",
+    "$__mpe_code": { "position": { "x": 2800, "y": 300 } }
+  },
+  "通用_关闭体力药列表": {
+    "recognition": "OCR",
+    "expected": "燃料补给",
+    "roi": [180, 90, 300, 120],
+    "action": "Click",
+    "target": [1120, 360, 4, 4],
+    "post_delay": 900,
+    "next": "活动_活动页已到",
+    "$__mpe_code": { "position": { "x": 3400, "y": 200 } }
+  }
+}

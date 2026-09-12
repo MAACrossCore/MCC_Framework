@@ -1,0 +1,979 @@
+{
+    "$__mpe_config_每日探索": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788191021576,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MaaXXX-win-x86_64-v0.3.0\\resource\\pipeline\\base\\每日探索.json",
+            "savedViewport": {
+                "x": 64,
+                "y": -311,
+                "zoom": 0.35
+            },
+            "filename": "每日探索",
+            "version": "v1.9.2"
+        }
+    },
+    "$__mpe_external_子任务_进入首页_每日探索": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 176
+            }
+        }
+    },
+    "$__mpe_external_进入首页_每日探索": {
+        "$__mpe_code": {
+            "position": {
+                "x": 3122,
+                "y": 2189
+            }
+        }
+    },
+    "$__mpe_external_首页_出击_每日探索": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 36
+            }
+        }
+    },
+    "每日探索_人造": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    830,
+                    241,
+                    190,
+                    60
+                ],
+                "expected": [
+                    "人造"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 354
+            }
+        }
+    },
+    "每日探索_光": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    830,
+                    241,
+                    190,
+                    60
+                ],
+                "expected": [
+                    "光"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 702
+            }
+        }
+    },
+    "每日探索_入口": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    874,
+                    294,
+                    218,
+                    132
+                ],
+                "expected": [
+                    "每日探索"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "next_doc": "Set in code.",
+        "$__mpe_code": {
+            "position": {
+                "x": -66,
+                "y": 14
+            }
+        }
+    },
+    "每日探索_升级": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    540,
+                    242,
+                    207,
+                    91
+                ],
+                "template": "Combat/DailyExplore_LevelUp.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3122,
+                "y": 1434
+            }
+        }
+    },
+    "每日探索_层数选择": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1147,
+                    258,
+                    93,
+                    365
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "text_doc": "Set in code.",
+        "next": [
+            "每日探索_扫荡"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1864,
+                "y": 1391
+            }
+        }
+    },
+    "每日探索_开始战斗": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    943,
+                    521,
+                    159,
+                    85
+                ],
+                "expected": [
+                    "开始战斗"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "next": [
+            "[JumpBack]每日探索_扫荡双倍",
+            "每日探索_扫荡奖励",
+            "每日探索_燃料补给",
+            "每日探索_开始战斗"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2459,
+                "y": 1650
+            }
+        }
+    },
+    "每日探索_扫荡": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    835,
+                    566,
+                    106,
+                    105
+                ],
+                "expected": [
+                    "扫荡"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    866,
+                    598,
+                    63,
+                    48
+                ]
+            }
+        },
+        "post_delay": 2600,
+        "next": [
+            "每日探索_开始战斗",
+            "每日探索_扫荡"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2165,
+                "y": 1376
+            }
+        }
+    },
+    "每日探索_扫荡双倍": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    702,
+                    398,
+                    252,
+                    100
+                ],
+                "expected": [
+                    "使用"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "$__mpe_code": {
+            "position": {
+                "x": 2802,
+                "y": 1760
+            }
+        }
+    },
+    "每日探索_扫荡奖励": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    569,
+                    5,
+                    181,
+                    66
+                ],
+                "expected": [
+                    "扫荡奖励"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "next": [
+            "[JumpBack]每日探索_升级",
+            "每日探索_扫荡",
+            "每日探索_扫荡奖励"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2802,
+                "y": 1395
+            }
+        }
+    },
+    "每日探索_技术解析": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    838,
+                    347,
+                    176,
+                    60
+                ],
+                "expected": [
+                    "技术解析"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 1047
+            }
+        }
+    },
+    "每日探索_技能磨砺": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    830,
+                    127,
+                    190,
+                    60
+                ],
+                "expected": [
+                    "技能磨砺"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2600,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 1392
+            }
+        }
+    },
+    "每日探索_旧入口": {
+        "next": [
+            "首页_出击",
+            "[JumpBack]子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 12
+            }
+        }
+    },
+    "每日探索_星币开采": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    838,
+                    237,
+                    176,
+                    60
+                ],
+                "expected": [
+                    "星币开采"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 1737
+            }
+        }
+    },
+    "每日探索_注": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    830,
+                    341,
+                    190,
+                    60
+                ],
+                "expected": [
+                    "注"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 2082
+            }
+        }
+    },
+    "每日探索_燃料补给": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    212,
+                    139,
+                    180,
+                    60
+                ],
+                "expected": [
+                    "燃料补给"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    584,
+                    57,
+                    10,
+                    10
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "next": [
+            "进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2802,
+                "y": 2070
+            }
+        }
+    },
+    "每日探索_生命": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    830,
+                    341,
+                    190,
+                    60
+                ],
+                "expected": [
+                    "生命"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 2427
+            }
+        }
+    },
+    "每日探索_自然": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    830,
+                    127,
+                    190,
+                    60
+                ],
+                "expected": [
+                    "自然"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 2772
+            }
+        }
+    },
+    "每日探索_芯片嵌合": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    287,
+                    372,
+                    205,
+                    64
+                ],
+                "expected": [
+                    "芯片嵌合"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next_doc": "Set in code.",
+        "$__mpe_code": {
+            "position": {
+                "x": 189,
+                "y": 10
+            }
+        }
+    },
+    "每日探索_荒墟拾遗": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    838,
+                    455,
+                    176,
+                    60
+                ],
+                "expected": [
+                    "荒墟拾遗"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 3117
+            }
+        }
+    },
+    "每日探索_资源采集": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    259,
+                    205,
+                    243,
+                    70
+                ],
+                "expected": [
+                    "资源采集"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next_doc": "Set in code.",
+        "$__mpe_code": {
+            "position": {
+                "x": 465,
+                "y": 14
+            }
+        }
+    },
+    "每日探索_跃升行动": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    287,
+                    534,
+                    205,
+                    64
+                ],
+                "expected": [
+                    "跃升行动"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next_doc": "Set in code.",
+        "$__mpe_code": {
+            "position": {
+                "x": 719,
+                "y": 18
+            }
+        }
+    },
+    "每日探索_鼓军嵌合": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    830,
+                    127,
+                    190,
+                    60
+                ],
+                "expected": [
+                    "鼓军嵌合"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "每日探索_层数选择"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1522,
+                "y": 12
+            }
+        }
+    },
+    "每日探索_芯片双倍记录": {
+        "recognition": "OCR",
+        "roi": [
+            280,
+            285,
+            720,
+            180
+        ],
+        "expected": [
+            "掉落加成",
+            "剩余"
+        ],
+        "threshold": 0.2,
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "record_double"
+        },
+        "post_delay": 1200,
+        "next": [
+            "每日探索_芯片仓库上限确认",
+            "每日探索_芯片结算确认"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3060,
+                "y": 1180
+            }
+        }
+    },
+    "每日探索_芯片结算确认": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "settlement"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    225,
+                    120,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 1800,
+        "next": "每日探索_芯片奖励初始化",
+        "$__mpe_code": {
+            "position": {
+                "x": 3270,
+                "y": 1320
+            }
+        }
+    },
+    "每日探索_芯片奖励初始化": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "init_rewards"
+        },
+        "pre_delay": 1500,
+        "next": "每日探索_芯片奖励分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3370,
+                "y": 1180
+            }
+        }
+    },
+    "每日探索_芯片仓库上限确认": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "capacity_overflow"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "handle_capacity_overflow"
+        },
+        "post_delay": 1200,
+        "next": "每日探索_芯片仓满处理分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3220,
+                "y": 980
+            }
+        }
+    },
+    "每日探索_芯片仓满处理分派": {
+        "next": [
+            "每日探索_芯片仓满允许清理",
+            "每日探索_芯片仓满取消结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3320,
+                "y": 980
+            }
+        }
+    },
+    "每日探索_芯片仓满允许清理": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:capacity_cleanup"
+        },
+        "action": "DoNothing",
+        "next": "每日探索_芯片仓满清理初始化",
+        "$__mpe_code": {
+            "position": {
+                "x": 3480,
+                "y": 880
+            }
+        }
+    },
+    "每日探索_芯片仓满取消结束": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:capacity_abort"
+        },
+        "action": "DoNothing",
+        "$__mpe_code": {
+            "position": {
+                "x": 3480,
+                "y": 1080
+            }
+        }
+    },
+    "每日探索_芯片仓满清理初始化": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "chip_atomic",
+        "custom_action_param": {
+            "operation": "init_capacity_cleanup"
+        },
+        "next": "芯片_阶段分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3420,
+                "y": 900
+            }
+        }
+    },
+    "每日探索_芯片仓满清理返回": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "return_after_capacity_cleanup"
+        },
+        "next": "开始战斗",
+        "$__mpe_code": {
+            "position": {
+                "x": 4720,
+                "y": 900
+            }
+        }
+    },
+    "每日探索_芯片仓满重试成功": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "capacity_retry_succeeded"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "clear_capacity_retry"
+        },
+        "next": [
+            "每日探索_芯片双倍记录",
+            "开启加成",
+            "每日探索_芯片结算确认"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4960,
+                "y": 900
+            }
+        }
+    },
+    "每日探索_芯片奖励分派": {
+        "next": [
+            "每日探索_芯片奖励处理一枚",
+            "每日探索_芯片奖励滚动",
+            "每日探索_芯片奖励完成",
+            "每日探索_芯片奖励失败"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3670,
+                "y": 1180
+            }
+        }
+    },
+    "每日探索_芯片奖励处理一枚": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:process"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "process_one"
+        },
+        "next": "每日探索_芯片奖励分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3980,
+                "y": 960
+            }
+        }
+    },
+    "每日探索_芯片奖励滚动": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:scroll"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "scroll_rows"
+        },
+        "next": "每日探索_芯片奖励分派",
+        "$__mpe_code": {
+            "position": {
+                "x": 3980,
+                "y": 1120
+            }
+        }
+    },
+    "每日探索_芯片奖励完成": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:done"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "finish"
+        },
+        "next": "扫荡成功-检查",
+        "$__mpe_code": {
+            "position": {
+                "x": 3980,
+                "y": 1280
+            }
+        }
+    },
+    "每日探索_芯片奖励失败": {
+        "recognition": "Custom",
+        "custom_recognition": "daily_chip_reward_state",
+        "custom_recognition_param": {
+            "expected": "status:failed"
+        },
+        "action": "Custom",
+        "custom_action": "daily_chip_reward",
+        "custom_action_param": {
+            "operation": "finish"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3980,
+                "y": 1440
+            }
+        }
+    },
+    "DailyChipLockActionBadge": {
+        "recognition": "TemplateMatch",
+        "roi": [
+            760,
+            90,
+            90,
+            90
+        ],
+        "template": "chip_locked_badge.png",
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "$__mpe_code": {
+            "position": {
+                "x": 4300,
+                "y": 1180
+            }
+        }
+    },
+    "DailyChipUnlockActionBadge": {
+        "recognition": "TemplateMatch",
+        "roi": [
+            760,
+            90,
+            90,
+            90
+        ],
+        "template": "chip_unlock_action_badge.png",
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "$__mpe_code": {
+            "position": {
+                "x": 4300,
+                "y": 1340
+            }
+        }
+    }
+}

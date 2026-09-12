@@ -1,0 +1,200 @@
+{
+    "$__mpe_config_每日免费礼包": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788262091860,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MaaXXX-win-x86_64-v0.4.2\\resource\\pipeline\\base\\每日免费礼包.json",
+            "savedViewport": {
+                "x": -161,
+                "y": 8,
+                "zoom": 0.57
+            },
+            "filename": "每日免费礼包",
+            "version": "v1.9.2"
+        }
+    },
+    "$__mpe_external_子任务_关闭公告_每日免费礼包": {
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 12
+            }
+        }
+    },
+    "$__mpe_external_子任务_获得物品_每日免费礼包": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1948,
+                "y": 192
+            }
+        }
+    },
+    "$__mpe_external_子任务_进入首页_每日免费礼包": {
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 152
+            }
+        }
+    },
+    "$__mpe_external_进入首页_每日免费礼包": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 405
+            }
+        }
+    },
+    "DailyGift": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    20,
+                    325,
+                    203,
+                    81
+                ],
+                "expected": [
+                    "礼包"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "DailyGiftYes",
+            "每日免费礼包_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 275
+            }
+        }
+    },
+    "DailyGiftYes": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    255,
+                    580,
+                    990,
+                    68
+                ],
+                "expected": "免费"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "Purchase",
+            "每日免费礼包_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 932,
+                "y": 185
+            }
+        }
+    },
+    "Purchase": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    758,
+                    513,
+                    191,
+                    75
+                ],
+                "expected": [
+                    "购买"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    847,
+                    527,
+                    51,
+                    16
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]子任务_获得物品",
+            "每日免费礼包_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1604,
+                "y": 53
+            }
+        }
+    },
+    "Shop": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1008,
+                    593,
+                    111,
+                    118
+                ],
+                "expected": [
+                    "补给站"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "DailyGift",
+            "Shop"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 302
+            }
+        }
+    },
+    "每日免费礼包": {
+        "next": [
+            "[JumpBack]子任务_关闭公告",
+            "DailyGift",
+            "Shop",
+            "[JumpBack]子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -46,
+                "y": 69
+            }
+        }
+    },
+    "每日免费礼包_完成": {
+        "action": "DoNothing",
+        "focus": "每日免费礼包任务完成，停留在补给站",
+        "$__mpe_code": {
+            "position": {
+                "x": 1948,
+                "y": 340
+            }
+        }
+    }
+}

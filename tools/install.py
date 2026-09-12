@@ -108,6 +108,81 @@ def install_deps():
 
 
 
+def configure_interface_agent(interface: dict):
+    if os_name == "win":
+        python_exec = r"./python/python.exe"
+    elif os_name == "macos":
+        python_exec = r"./python/bin/python3"
+    elif os_name == "linux":
+        python_exec = "python3"
+    else:
+        return
+
+    agent = interface.setdefault("agent", {})
+    agent["child_exec"] = python_exec
+    agent["child_args"] = ["-u", "./agent/main.py"]
+
+    pretask = interface.get("pretask")
+    if not pretask:
+        return
+
+    pretasks = pretask if isinstance(pretask, list) else [pretask]
+    for item in pretasks:
+        item["exec"] = python_exec
+        args = item.get("args") or []
+        mapped = [
+            "./agent/ensure_mumu.py"
+            if isinstance(arg, str) and "ensure_mumu" in arg
+            else arg
+            for arg in args
+        ]
+        if not any(isinstance(arg, str) and "ensure_mumu.py" in arg for arg in mapped):
+            mapped = ["./agent/ensure_mumu.py"]
+        item["args"] = mapped
+
+
+def install_python_runtime():
+    if os_name not in ("win", "macos"):
+        return
+
+    embedded_src = (working_dir / "install" / "python").resolve()
+    embedded_dst = (install_path / "python").resolve()
+    if not embedded_src.is_dir():
+        print("Warning: embedded Python not found; release will still require system Python.")
+        return
+
+    if embedded_src == embedded_dst:
+        print(f"Embedded Python already in place: {embedded_dst}")
+        return
+
+    shutil.copytree(
+        embedded_src,
+        embedded_dst,
+        dirs_exist_ok=True,
+    )
+
+
+def install_agent_dependency_wheels():
+    if os_name == "android":
+        return
+
+    deps_src = (working_dir / "install" / "deps").resolve()
+    deps_dst = (install_path / "deps").resolve()
+    if not deps_src.is_dir() or not any(deps_src.glob("*.whl")):
+        print("Warning: install/deps wheel cache not found; first Agent run may download online.")
+        return
+
+    if deps_src == deps_dst:
+        print(f"Agent dependency wheels already in place: {deps_dst}")
+        return
+
+    shutil.copytree(
+        deps_src,
+        deps_dst,
+        dirs_exist_ok=True,
+    )
+
+
 def install_resource():
 
     configure_ocr_model()
@@ -115,6 +190,11 @@ def install_resource():
     shutil.copytree(
         working_dir / "assets" / "resource",
         install_path / "resource",
+        dirs_exist_ok=True,
+    )
+    shutil.copytree(
+        working_dir / "assets" / "default",
+        install_path / "default",
         dirs_exist_ok=True,
     )
     shutil.copy2(
@@ -126,6 +206,7 @@ def install_resource():
         interface = jsonc.load(f)
 
     interface["version"] = version
+    configure_interface_agent(interface)
 
     with open(install_path / "interface.json", "w", encoding="utf-8") as f:
         jsonc.dump(interface, f, ensure_ascii=False, indent=4)
@@ -141,19 +222,41 @@ def install_chores():
         install_path,
     )
 
+    appsettings_path = install_path / "appsettings.json"
+    if appsettings_path.exists():
+        with open(appsettings_path, "r", encoding="utf-8-sig") as f:
+            appsettings = jsonc.load(f)
+        appsettings["NoAutoStart"] = "True"
+        with open(appsettings_path, "w", encoding="utf-8") as f:
+            jsonc.dump(appsettings, f, ensure_ascii=False, indent=2)
+
 
 def install_agent():
     shutil.copytree(
         working_dir / "agent",
         install_path / "agent",
         dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"),
     )
+
+    # Windows: one-click pip install for end users (Agent / MuMu pretask)
+    bat = working_dir / "Install-Agent-Deps.bat"
+    if bat.is_file() and os_name == "win":
+        shutil.copy2(bat, install_path / "Install-Agent-Deps.bat")
+
+    config_dir = install_path / "config"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    example = working_dir / "agent" / "orders_source.example.json"
+    if example.is_file():
+        shutil.copy2(example, config_dir / "orders_source.example.json")
 
 
 if __name__ == "__main__":
     install_deps()
     install_resource()
     install_chores()
+    install_python_runtime()
+    install_agent_dependency_wheels()
     install_agent()
 
     print(f"Install to {install_path} successfully.")

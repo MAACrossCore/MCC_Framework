@@ -5,8 +5,11 @@ env:
   # - 设置 VERSION 为空字符串时，下载 latest 版本
   # - 设置 VERSION 为具体版本号时（如 v1.2.3），下载指定版本
   MAAFW_VERSION: ""
-  # 下载的是该仓库 Releases 附件（MFW-PyQt6-*.zip），不是 git clone 源码
+  # 默认 UI：自有 MFW-PyQt6 发行包（Releases 附件，不是 git clone 源码）
   # 仓库：https://github.com/qing4368-svg/MFW-PyQt6-ui
+  # 备选：main 上的 MFAAvalonia + ui_custom/MFAAvalonia patch 链仍保留在仓库，
+  # 以后若要切回，把本文件里 Download MFW 换成 MFAAvalonia，并恢复
+  # 「Build and install customized MFAAvalonia core」步骤即可。
   MFW_VERSION: ""
 
 on:
@@ -16,6 +19,10 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
 
 jobs:
   meta:
@@ -102,6 +109,22 @@ jobs:
           rm -f "${ARCHIVE_FILE_PATH}"
           echo "Archive cleanup command executed for MFW."
 
+      # Agent / pretask 用：与 MFA 方案共用，不依赖 MFAAvalonia Core.dll
+      - name: Prepare embedded Python
+        if: matrix.os == 'win' || matrix.os == 'macos'
+        shell: bash
+        run: |
+          python tools/ci/setup_embed_python.py --target-os ${{ matrix.os }} --target-arch ${{ matrix.arch }}
+
+      - name: Download agent dependency wheels
+        if: matrix.os != 'android'
+        shell: bash
+        run: |
+          python tools/ci/download_deps.py \
+            --deps-dir install/deps \
+            --target-os ${{ matrix.os }} \
+            --target-arch ${{ matrix.arch }}
+
       - name: Install
         shell: bash
         run: |
@@ -122,6 +145,9 @@ jobs:
           python -m pip install -r ./requirements.txt
           python ./install.py ${{ needs.meta.outputs.tag }} ${{ matrix.os }} ${{ matrix.arch }}
           cd ..
+
+      # 当前默认 UI 为 MFW：不再 clone MFAAvalonia / 打 ui_custom patch / 编 Core.dll。
+      # 还原 MFA 定制 UI 时，参考 git 历史 main 分支的对应步骤，或 ui_custom/MFAAvalonia/README.md。
 
       - uses: actions/upload-artifact@v4
         with:
@@ -158,6 +184,9 @@ jobs:
     if: ${{ needs.meta.outputs.is_release == 'true' }}
     needs: [meta, install, changelog]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -168,7 +197,7 @@ jobs:
           for f in *; do
             (cd $f && zip -r ../$f-${{ needs.meta.outputs.tag }}.zip .)
           done
-          
+
       - uses: softprops/action-gh-release@v2
         with:
           files: assets/*

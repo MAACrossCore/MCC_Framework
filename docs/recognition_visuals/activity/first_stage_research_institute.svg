@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#111820"/>
+  <text x="40" y="48" fill="#ffffff" font-size="28" font-family="Microsoft YaHei">活动困难第一关定位（1280×720 基准）</text>
+  <rect x="45" y="550" width="1190" height="135" rx="8" fill="#17242c" stroke="#5b6b73" stroke-width="2"/>
+  <rect x="70" y="585" width="250" height="90" fill="#00bcd4" fill-opacity="0.18" stroke="#00e5ff" stroke-width="4"/>
+  <text x="88" y="625" fill="#ffffff" font-size="22" font-family="Microsoft YaHei">1　研究所</text>
+  <text x="70" y="704" fill="#00e5ff" font-size="18" font-family="Microsoft YaHei">OCR ROI [70,585,250,90]；expected="研究所"；点击 OCR 返回文字框</text>
+  <circle cx="215" cy="635" r="8" fill="#ffca28"/>
+  <circle cx="1095" cy="635" r="8" fill="#ffca28"/>
+  <line x1="215" y1="635" x2="1095" y2="635" stroke="#ffca28" stroke-width="6" marker-end="url(#arrow)"/>
+  <text x="485" y="605" fill="#ffca28" font-size="22" font-family="Microsoft YaHei">每轮连续向右拖拽两次</text>
+  <text x="420" y="665" fill="#ffca28" font-size="18" font-family="Microsoft YaHei">begin (215,635) → end (1095,635)，650ms；等待 1400/1800ms</text>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ffca28"/>
+    </marker>
+  </defs>
+</svg>

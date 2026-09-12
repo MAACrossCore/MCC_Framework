@@ -1,0 +1,108 @@
+diff --git a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+index 54e6302..eac968d 100644
+--- a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
++++ b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+@@ -2449,19 +2449,52 @@ public class MaaProcessor
+             if (preTask.Resource is { Count: > 0 }
+                 && !preTask.Resource.Any(name => string.Equals(name, resourceName, StringComparison.OrdinalIgnoreCase))) continue;
+ 
+-            var exec = MaaInterface.ReplacePlaceholder(preTask.Exec, ResourceBase) ?? preTask.Exec;
++            var exec = MaaInterface.ReplacePlaceholder(preTask.Exec, AppPaths.DataRoot, true) ?? preTask.Exec;
++            var executablePath = PathFinder.FindPath(exec);
++            if (!File.Exists(executablePath)
++                && string.Equals(Path.GetFileNameWithoutExtension(preTask.Exec), "python", StringComparison.OrdinalIgnoreCase))
++            {
++                var localPythonCandidates = new[]
++                {
++                    Path.Combine(AppPaths.DataRoot, "python", "python.exe"),
++                    Path.Combine(AppPaths.DataRoot, "python", "bin", "python3"),
++                    Path.Combine(AppPaths.DataRoot, ".venv", "Scripts", "python.exe"),
++                    Path.GetFullPath(Path.Combine(AppPaths.DataRoot, "..", ".venv", "Scripts", "python.exe")),
++                    Path.Combine(AppPaths.DataRoot, ".venv", "bin", "python3"),
++                    Path.GetFullPath(Path.Combine(AppPaths.DataRoot, "..", ".venv", "bin", "python3"))
++                };
++                executablePath = localPythonCandidates.FirstOrDefault(File.Exists) ?? executablePath;
++            }
++            else if (!File.Exists(executablePath))
++            {
++                var bundledPythonCandidates = new[]
++                {
++                    Path.GetFullPath(Path.Combine(AppPaths.DataRoot, exec.TrimStart('.', '/', '\\'))),
++                    Path.Combine(AppPaths.DataRoot, "python", "python.exe"),
++                    Path.Combine(AppPaths.DataRoot, "python", "bin", "python3")
++                };
++                executablePath = bundledPythonCandidates.FirstOrDefault(File.Exists) ?? executablePath;
++            }
++
++            if (!File.Exists(executablePath))
++                throw new FileNotFoundException($"pretask executable not found: {preTask.Exec}", executablePath);
++
+             var info = new ProcessStartInfo
+             {
+-                FileName = exec,
+-                WorkingDirectory = ResourceBase,
++                FileName = executablePath,
++                WorkingDirectory = AppPaths.DataRoot,
+                 UseShellExecute = false,
+                 CreateNoWindow = true
+             };
+-            foreach (var arg in preTask.Args ?? []) info.ArgumentList.Add(arg);
++            foreach (var rawArg in preTask.Args ?? [])
++            {
++                var arg = MaaInterface.ReplacePlaceholder(rawArg, AppPaths.DataRoot, true) ?? rawArg;
++                info.ArgumentList.Add(arg);
++            }
+             if (preTask.Option is { Count: > 0 })
+                 info.ArgumentList.Add(BuildPreTaskOptionJson(preTask.Option, controllerName, resourceName));
+ 
+-            LoggerHelper.Info($"执行 pretask：{preTask.Name ?? preTask.Exec}");
++            LoggerHelper.Info($"执行 pretask：{preTask.Name ?? preTask.Exec}，程序={executablePath}");
+             executed = true;
+             using var process = Process.Start(info) ?? throw new InvalidOperationException($"无法启动 pretask: {preTask.Exec}");
+             await process.WaitForExitAsync(token);
+diff --git a/MFAAvalonia/Extensions/MaaFW/PathFinder.cs b/MFAAvalonia/Extensions/MaaFW/PathFinder.cs
+index 085803b..5a94f30 100644
+--- a/MFAAvalonia/Extensions/MaaFW/PathFinder.cs
++++ b/MFAAvalonia/Extensions/MaaFW/PathFinder.cs
+@@ -2,6 +2,7 @@ using System;
+ using System.Diagnostics;
+ using System.IO;
+ using System.Runtime.InteropServices;
++using MFAAvalonia.Helper;
+ 
+ namespace MFAAvalonia.Extensions.MaaFW;
+ 
+@@ -42,6 +43,33 @@ public static class PathFinder
+ 
+     private static string FindOnWindows(string fileName)
+     {
++        if (Path.IsPathRooted(fileName) && File.Exists(fileName))
++        {
++            return fileName;
++        }
++
++        var requestedName = Path.GetFileNameWithoutExtension(fileName);
++        if (!fileName.Contains(Path.DirectorySeparatorChar)
++            && !fileName.Contains(Path.AltDirectorySeparatorChar)
++            && (requestedName.Equals("python", StringComparison.OrdinalIgnoreCase)
++                || requestedName.Equals("python3", StringComparison.OrdinalIgnoreCase)))
++        {
++            var localPythonCandidates = new[]
++            {
++                Path.Combine(AppPaths.DataRoot, "python", "python.exe"),
++                Path.Combine(AppPaths.DataRoot, "python", "bin", "python3"),
++                Path.Combine(AppPaths.DataRoot, ".venv", "Scripts", "python.exe"),
++                Path.GetFullPath(Path.Combine(AppPaths.DataRoot, "..", ".venv", "Scripts", "python.exe"))
++            };
++            foreach (var candidate in localPythonCandidates)
++            {
++                if (File.Exists(candidate))
++                {
++                    return candidate;
++                }
++            }
++        }
++
+         // Windows 可执行文件扩展名
+         var extensions = new[] { ".exe", ".cmd", ".bat", ".com", "" };
+         

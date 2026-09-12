@@ -1,98 +1,2638 @@
 {
-    // 本文件主要定义了通用 UI 的行为和显示内容
-    // 可参考文档和示例添加更多您需要的功能
-    // 文档：https://maafw.xyz/docs/3.3-ProjectInterfaceV2
-    // 示例：https://github.com/MaaXYZ/MaaFramework/blob/main/sample/interface.json
     "interface_version": 2,
     "name": "MaaXXX",
-    "description": "这是一个使用 MaaFramework 创建的新项目。",
-    "contact": "QQ群: 123456789",
-    "license": "MIT",
-    "welcome": "首次使用！欢迎使用 MAA!",
-    // 填写项目地址和版本号可实现自动更新功能
-    "github": "https://github.com/MaaXYZ/MaaPracticeBoilerplate",
-    "version": "1.0.0",
-    // Mirror酱为第三方分发服务，新项目默认关闭
-    // 若有需要请联系 Mirror酱 开通，直接自行开启是无法使用的
-    // "mirrorchyan_rid": "MaaXXX",
-    // "mirrorchyan_multiplatform": true,
+    "label": "​",
+    "description": "交错战线助手（基于 MCCA 任务结构）",
+    "version": "v0.5.11",
+    "group": [
+        {
+            "name": "周常",
+            "label": "周常",
+            "description": "每周更新、不需要每天执行的任务。分组只是显示上收拢，组内任务与其它任务完全同级。",
+            "default_expand": true
+        }
+    ],
+    "pretask": {
+        "name": "自动启动 MuMu 12",
+        "label": "仅在选择启动游戏时运行",
+        "description": "自动查找 MuMu 12、启动实例并配置 ADB（不打开游戏；开游戏由「启动游戏」任务负责）。",
+        "exec": "./python/python.exe",
+        "args": [
+            "./agent/ensure_mumu.py"
+        ]
+    },
+    "agent": {
+        "child_exec": "./python/python.exe",
+        "child_args": [
+            "-u",
+            "./agent/main.py"
+        ]
+    },
     "controller": [
         {
-            "name": "安卓端",
+            "name": "ADB 默认方式",
             "type": "Adb",
-            "display_short_side": 720 // 默认缩放分辨率的短边长度
-        },
-        {
-            "name": "桌面端",
-            "type": "Win32",
-            "win32": {
-                "class_regex": ".*",
-                "window_regex": "Visual Studio",
-                // 截图及控制方式，请根据项目实际情况修改
-                // 文档: https://maafw.xyz/docs/2.4-ControlMethods
-                "screencap": "PrintWindow", // 截图方式
-                "mouse": "PostMessageWithCursorPos", // 鼠标控制方式
-                "keyboard": "PostMessageWithCursorPos" // 键盘控制方式
-            }
+            "display_short_side": 720
         }
     ],
     "resource": [
         {
             "name": "官服",
             "path": [
-                "./resource"
+                "{PROJECT_DIR}/resource"
             ]
         },
         {
             "name": "B 服",
             "path": [
-                "./resource"
-                // "./resource_bilibili"
+                "{PROJECT_DIR}/resource",
+                "{PROJECT_DIR}/resource/bilibili"
             ]
         }
     ],
-    // 自定义识别/动作需要 Agent（普通 Python 子进程，不是大模型）
-    "agent": {
-        "child_exec": "python",
-        "child_args": [
-            "./agent/main.py"
-        ]
-    },
     "task": [
         {
-            "name": "一键日常",
-            "entry": "一键日常",
-            "description": "启动游戏 → 基地任务 → JJC（一条龙）"
-        },
-        {
             "name": "启动游戏",
-            "entry": "点击游戏名称",
-            "description": "从桌面进入游戏并处理常见弹窗（结束后会进基地，因与一条龙共用衔接）"
+            "entry": "进入首页",
+            "doc": "优先复用可用的 ADB 连接，连接失败时自动查找并启动 MuMu。",
+            "option": [
+                "MuMu实例",
+                "模拟器自动启动",
+                "每次重新检测连接"
+            ]
         },
         {
-            "name": "领取邮件",
-            "entry": "领取邮件",
-            "description": "主界面领邮件后回到主菜单"
+            "name": "每日免费礼包",
+            "entry": "每日免费礼包",
+            "doc": "无"
         },
         {
-            "name": "基地任务",
-            "entry": "家园任务",
-            "description": "采矿 / 商店黑匣 / 刷支援卷（结束后会进 JJC，因与一条龙共用衔接）"
+            "name": "限时贸易所购买",
+            "entry": "限时贸易所购买",
+            "doc": "按任务设置中启用的分类和芯片箱类型购买商品。",
+            "option": [
+                "限时贸易_购买素材",
+                "限时贸易_购买武装技能训练",
+                "限时贸易_购买模块",
+                "限时贸易_购买芯片箱"
+            ]
         },
         {
-            "name": "JJC",
-            "entry": "JJC出击",
-            "description": "镜像竞技刷挑战，次数用完后回主菜单"
+            "name": "活动",
+            "entry": "活动_任务",
+            "doc": "活动底层流程：进活动页、领取每日票、体力换票、进入困难关、按票数分批扫荡。后续新活动优先只替换节点识别与点击坐标。",
+            "option": [
+                "活动票兑换方式",
+                "通用队伍选择",
+                "活动掉落加成"
+            ]
         },
         {
-            "name": "日常刷体力",
-            "entry": "日常任务出击",
-            "description": "荒墟拾遗扫荡（开发中）"
+            "name": "每日探索",
+            "entry": "出击任务列表",
+            "doc": "选择芯片关时，可在下方打开按方案锁定，并通过任务说明区的“点击自定义芯片筛选方案”入口编辑筛选条件。",
+            "option": [
+                "关卡选择",
+                "体力消耗方式",
+                "每日探索掉落加成"
+            ]
+        },
+        {
+            "name": "竞技场",
+            "entry": "ArenaTask",
+            "doc": "按最高战力与最低积分筛选第 1 位；剩余刷新次数不足时进入兜底，按 1→2→3 位找能打的对手。",
+            "option": [
+                "可挑战的最高战力",
+                "最低挑战积分",
+                "刷新次数放宽阈值",
+                "放宽后的最低积分",
+                "重复挑战方式"
+            ]
+        },
+        {
+            "name": "角斗场",
+            "entry": "角斗场",
+            "pipeline_override": {
+                "首页_出击": {
+                    "next": "模拟军演"
+                }
+            }
+        },
+        {
+            "name": "基建",
+            "entry": "基建",
+            "doc": "收资源、换班、订单交付（And：图标+可交付；构建票另识别数额）。可勾选「添加订单群好友」自动串联：加好友 → 基建 → 拉黑。",
+            "option": [
+                "添加订单群好友",
+                "是否访问每个好友换抽",
+                "基建_构建票订单数额6-10",
+                "基建_构建票订单数额16-18",
+                "兑换经验订单",
+                "兑换星币订单"
+            ]
+        },
+        {
+            "name": "领取奖励(邮箱+每日+通行证)",
+            "entry": "领取奖励",
+            "doc": "依次处理邮箱、每日任务和通行证奖励；可单独跳过邮箱内容。",
+            "option": [
+                "是否领取邮箱内容"
+            ]
+        },
+        {
+            "name": "芯片筛选-仓库",
+            "entry": "ChipDetailReadTask",
+            "doc": "按勾选顺序清理四星及以下芯片，并根据已保存方案纠正仓库芯片的上锁状态。",
+            "option": [
+                "清理四星及以下芯片",
+                "根据自定义设置锁定/解锁仓库内芯片"
+            ]
+        },
+        {
+            "name": "创生微粒刷取",
+            "entry": "创生微粒刷取",
+            "doc": "每周使用3张超维跃升门票完成一次扫荡；票数为0时返回主界面后结束。",
+            "group": [
+                "周常"
+            ],
+            "pipeline_override": {
+                "出击-选择": {
+                    "expected": "每日探索",
+                    "next": [
+                        "创生微粒_每日探索分类页"
+                    ]
+                },
+                "扫荡结束": {
+                    "next": [
+                        "创生微粒_完成后返回主界面"
+                    ]
+                }
+            }
         },
         {
             "name": "周本",
-            "entry": "活动探索",
-            "description": "碎星虚影 · 宙斯"
+            "entry": "周本",
+            "group": [
+                "周常"
+            ],
+            "pipeline_override": {
+                "首页_出击": {
+                    "next": "活动探索"
+                }
+            },
+            "option": [
+                "周本关卡选择"
+            ]
+        },
+        {
+            "name": "异星灰域购买",
+            "entry": "异星灰域购买",
+            "doc": "补给站 -> 万物贸易所 -> 异星灰域商店页，按勾选逐个购买（买完即下架，全部售罄则正常结束）。无限池的数据协议未在购买物品选择中。",
+            "group": [
+                "周常"
+            ],
+            "option": [
+                "异星灰域_购买物品选择"
+            ]
+        },
+        {
+            "name": "关闭游戏",
+            "entry": "关闭游戏",
+            "option": [
+                "并关闭模拟器"
+            ]
+        },
+        {
+            "name": "历战试炼",
+            "entry": "历战试炼",
+            "doc": "测试中,暂时仅支持打限时boss，任务目标达到10为高进度，将不会继续任务；[color:red]开启该任务需自行配置有足够强度的队伍[/color]",
+            "pipeline_override": {
+                "活动选择": {
+                    "expected": "历战试炼",
+                    "next": "历战试炼-关卡选择"
+                }
+            },
+            "option": [
+                "是否打挑战难度",
+                "挑战难度选择"
+            ]
+        },
+        {
+            "name": "添加订单好友",
+            "entry": "订单好友添加流程",
+            "doc": "【兜底】单独添加订单群好友；URL 见 config/orders_source.json。日常建议改用「基建」内「添加订单群好友」选项。"
+        },
+        {
+            "name": "拉黑订单好友",
+            "entry": "拉黑好友流程",
+            "doc": "【兜底】单独拉黑 orders_state.json 中全部 held 好友。日常建议改用「基建」内「添加订单群好友」选项。"
         }
-    ]
+    ],
+    "option": {
+        "限时贸易_购买素材": {
+            "type": "switch",
+            "label": "是否购买素材",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "option": [
+                        "限时贸易_素材购买策略"
+                    ]
+                },
+                {
+                    "name": "No"
+                }
+            ]
+        },
+        "限时贸易_购买武装技能训练": {
+            "type": "switch",
+            "label": "是否购买武装技能训练",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "option": [
+                        "限时贸易_技能书购买策略",
+                        "限时贸易_技能书类型"
+                    ]
+                },
+                {
+                    "name": "No"
+                }
+            ]
+        },
+        "限时贸易_技能书类型": {
+            "type": "checkbox",
+            "label": "技能书类型",
+            "default_case": [
+                "技能书Ⅰ",
+                "技能书Ⅱ",
+                "技能书Ⅲ"
+            ],
+            "cases": [
+                {
+                    "name": "技能书Ⅰ"
+                },
+                {
+                    "name": "技能书Ⅱ"
+                },
+                {
+                    "name": "技能书Ⅲ"
+                }
+            ]
+        },
+        "限时贸易_素材购买策略": {
+            "type": "select",
+            "label": "购买策略",
+            "default_case": "当没有其他满足要求商品时购买本商品",
+            "cases": [
+                {
+                    "name": "购买所有本商品"
+                },
+                {
+                    "name": "仅购买一个本商品"
+                },
+                {
+                    "name": "当没有其他满足要求商品时购买本商品"
+                }
+            ]
+        },
+        "限时贸易_技能书购买策略": {
+            "type": "select",
+            "label": "购买策略",
+            "default_case": "仅购买一个本商品",
+            "cases": [
+                {
+                    "name": "购买所有本商品"
+                },
+                {
+                    "name": "仅购买一个本商品"
+                },
+                {
+                    "name": "当没有其他满足要求商品时购买本商品"
+                }
+            ]
+        },
+        "限时贸易_购买模块": {
+            "type": "switch",
+            "label": "是否购买模块",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "option": [
+                        "限时贸易_模块购买策略"
+                    ]
+                },
+                {
+                    "name": "No"
+                }
+            ]
+        },
+        "限时贸易_模块购买策略": {
+            "type": "select",
+            "label": "购买策略",
+            "default_case": "当没有其他满足要求商品时购买本商品",
+            "cases": [
+                {
+                    "name": "购买所有本商品"
+                },
+                {
+                    "name": "仅购买一个本商品"
+                },
+                {
+                    "name": "当没有其他满足要求商品时购买本商品"
+                }
+            ]
+        },
+        "限时贸易_购买芯片箱": {
+            "type": "switch",
+            "label": "是否购买芯片箱",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "option": [
+                        "限时贸易_芯片箱购买策略",
+                        "限时贸易_芯片箱类型"
+                    ]
+                },
+                {
+                    "name": "No"
+                }
+            ]
+        },
+        "限时贸易_芯片箱购买策略": {
+            "type": "select",
+            "label": "购买策略",
+            "default_case": "购买所有本商品",
+            "cases": [
+                {
+                    "name": "购买所有本商品"
+                },
+                {
+                    "name": "仅购买一个本商品"
+                },
+                {
+                    "name": "当没有其他满足要求商品时购买本商品"
+                }
+            ]
+        },
+        "限时贸易_芯片箱类型": {
+            "type": "checkbox",
+            "label": "芯片箱类型",
+            "default_case": [
+                "连击",
+                "精力",
+                "装填",
+                "重击",
+                "痛击",
+                "扩大",
+                "特防"
+            ],
+            "cases": [
+                {
+                    "name": "连击",
+                    "option": [
+                        "限时贸易_连击芯片箱品质"
+                    ]
+                },
+                {
+                    "name": "精力",
+                    "option": [
+                        "限时贸易_精力芯片箱品质"
+                    ]
+                },
+                {
+                    "name": "装填",
+                    "option": [
+                        "限时贸易_装填芯片箱品质"
+                    ]
+                },
+                {
+                    "name": "重击",
+                    "option": [
+                        "限时贸易_重击芯片箱品质"
+                    ]
+                },
+                {
+                    "name": "痛击",
+                    "option": [
+                        "限时贸易_痛击芯片箱品质"
+                    ]
+                },
+                {
+                    "name": "扩大",
+                    "option": [
+                        "限时贸易_扩大芯片箱品质"
+                    ]
+                },
+                {
+                    "name": "特防",
+                    "option": [
+                        "限时贸易_特防芯片箱品质"
+                    ]
+                }
+            ]
+        },
+        "限时贸易_连击芯片箱品质": {
+            "type": "checkbox",
+            "label": "连击",
+            "default_case": [
+                "R4",
+                "R5"
+            ],
+            "cases": [
+                {
+                    "name": "R4"
+                },
+                {
+                    "name": "R5"
+                }
+            ]
+        },
+        "限时贸易_精力芯片箱品质": {
+            "type": "checkbox",
+            "label": "精力",
+            "default_case": [
+                "R4",
+                "R5"
+            ],
+            "cases": [
+                {
+                    "name": "R4"
+                },
+                {
+                    "name": "R5"
+                }
+            ]
+        },
+        "限时贸易_装填芯片箱品质": {
+            "type": "checkbox",
+            "label": "装填",
+            "default_case": [
+                "R4",
+                "R5"
+            ],
+            "cases": [
+                {
+                    "name": "R4"
+                },
+                {
+                    "name": "R5"
+                }
+            ]
+        },
+        "限时贸易_重击芯片箱品质": {
+            "type": "checkbox",
+            "label": "重击",
+            "default_case": [
+                "R4",
+                "R5"
+            ],
+            "cases": [
+                {
+                    "name": "R4"
+                },
+                {
+                    "name": "R5"
+                }
+            ]
+        },
+        "限时贸易_痛击芯片箱品质": {
+            "type": "checkbox",
+            "label": "痛击",
+            "default_case": [
+                "R4",
+                "R5"
+            ],
+            "cases": [
+                {
+                    "name": "R4"
+                },
+                {
+                    "name": "R5"
+                }
+            ]
+        },
+        "限时贸易_扩大芯片箱品质": {
+            "type": "checkbox",
+            "label": "扩大",
+            "default_case": [
+                "R4",
+                "R5"
+            ],
+            "cases": [
+                {
+                    "name": "R4"
+                },
+                {
+                    "name": "R5"
+                }
+            ]
+        },
+        "限时贸易_特防芯片箱品质": {
+            "type": "checkbox",
+            "label": "特防",
+            "default_case": [
+                "R4",
+                "R5"
+            ],
+            "cases": [
+                {
+                    "name": "R4"
+                },
+                {
+                    "name": "R5"
+                }
+            ]
+        },
+        "活动票兑换方式": {
+            "type": "select",
+            "label": "刷关票兑换方式",
+            "default_case": "消耗完当前体力",
+            "cases": [
+                {
+                    "name": "消耗完当前体力",
+                    "option": [
+                        "活动使用体力药-消耗完"
+                    ]
+                },
+                {
+                    "name": "自定次数",
+                    "option": [
+                        "活动自定兑换次数",
+                        "活动使用体力药-自定"
+                    ]
+                }
+            ]
+        },
+        "活动自定兑换次数": {
+            "type": "input",
+            "label": "自定扫荡次数",
+            "inputs": [
+                {
+                    "name": "兑换次数",
+                    "label": "扫荡次数",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入大于或等于 1 的整数"
+                }
+            ]
+        },
+        "活动使用体力药-消耗完": {
+            "type": "select",
+            "label": "体力药",
+            "default_case": "不使用",
+            "cases": [
+                {
+                    "name": "不使用"
+                },
+                {
+                    "name": "使用",
+                    "option": [
+                        "活动体力药类型",
+                        "活动体力药数量"
+                    ]
+                }
+            ]
+        },
+        "活动使用体力药-自定": {
+            "type": "select",
+            "label": "体力药",
+            "default_case": "不使用",
+            "cases": [
+                {
+                    "name": "不使用"
+                },
+                {
+                    "name": "使用",
+                    "option": [
+                        "活动体力药类型"
+                    ]
+                }
+            ]
+        },
+        "活动体力药类型": {
+            "type": "select",
+            "label": "体力药类型",
+            "default_case": "小药",
+            "cases": [
+                {
+                    "name": "小药"
+                },
+                {
+                    "name": "大药"
+                }
+            ]
+        },
+        "活动体力药数量": {
+            "type": "input",
+            "label": "使用体力药数目",
+            "inputs": [
+                {
+                    "name": "使用数量",
+                    "label": "使用数量",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入大于或等于 1 的整数"
+                }
+            ]
+        },
+        "通用队伍选择": {
+            "type": "select",
+            "label": "队伍",
+            "default_case": "1",
+            "cases": [
+                {
+                    "name": "1"
+                },
+                {
+                    "name": "2"
+                },
+                {
+                    "name": "3"
+                },
+                {
+                    "name": "4"
+                }
+            ]
+        },
+        "活动掉落加成": {
+            "type": "switch",
+            "label": "使用每日双倍掉落",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes"
+                },
+                {
+                    "name": "No"
+                }
+            ]
+        },
+        "每日探索掉落加成": {
+            "type": "switch",
+            "label": "是否使用双倍",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "开启加成": {
+                            "roi": [
+                                761,
+                                416,
+                                83,
+                                66
+                            ],
+                            "expected": "使用"
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "开启加成": {
+                            "roi": [
+                                430,
+                                416,
+                                100,
+                                66
+                            ],
+                            "expected": "不使用"
+                        }
+                    }
+                }
+            ]
+        },
+        "每日探索_按方案锁定芯片": {
+            "type": "switch",
+            "label": "是否根据现有方案锁定满足要求芯片",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No"
+                },
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "开始战斗": {
+                            "next": [
+                                "每日探索_芯片仓满重试成功",
+                                "每日探索_芯片仓库上限确认",
+                                "使用燃料界面",
+                                "开启加成",
+                                "每日探索_芯片双倍记录",
+                                "每日探索_芯片结算确认"
+                            ]
+                        },
+                        "每日探索_芯片结算确认": {
+                            "next": "每日探索_芯片奖励初始化"
+                        }
+                    }
+                }
+            ]
+        },
+        "每日探索_仓满自动清理": {
+            "type": "switch",
+            "label": "执行任务但芯片仓已满时清理四星及以下芯片\n（若不勾选则不执行刷取操作）",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No"
+                },
+                {
+                    "name": "Yes"
+                }
+            ]
+        },
+        "MuMu实例": {
+            "type": "select",
+            "label": "MuMu实例",
+            "default_case": "自动",
+            "cases": [
+                {
+                    "name": "自动"
+                },
+                {
+                    "name": "0"
+                },
+                {
+                    "name": "1"
+                },
+                {
+                    "name": "2"
+                },
+                {
+                    "name": "3"
+                },
+                {
+                    "name": "4"
+                },
+                {
+                    "name": "5"
+                },
+                {
+                    "name": "6"
+                },
+                {
+                    "name": "7"
+                },
+                {
+                    "name": "8"
+                },
+                {
+                    "name": "9"
+                }
+            ]
+        },
+        "模拟器自动启动": {
+            "type": "select",
+            "label": "ADB 失败时启动模拟器",
+            "default_case": "开启",
+            "cases": [
+                {
+                    "name": "开启"
+                },
+                {
+                    "name": "关闭"
+                }
+            ]
+        },
+        "每次重新检测连接": {
+            "type": "select",
+            "label": "每次重新检测连接",
+            "default_case": "关闭",
+            "cases": [
+                {
+                    "name": "关闭"
+                },
+                {
+                    "name": "开启"
+                }
+            ]
+        },
+        "添加订单群好友": {
+            "type": "switch",
+            "label": "添加订单群好友",
+            "description": "默认关闭。开启后：基建前加订单群好友 → 跑基建 → 结束后拉黑全部 held。须配置 config/orders_source.json（含 url）。配置错误或拉单失败时，日志会提示原因，且不会继续基建。",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "基建_前置_添加订单群好友": {
+                            "enabled": false
+                        },
+                        "基建_后置_拉黑订单群好友": {
+                            "enabled": false
+                        }
+                    }
+                },
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "基建_前置_添加订单群好友": {
+                            "enabled": true
+                        },
+                        "基建_后置_拉黑订单群好友": {
+                            "enabled": true
+                        },
+                        "加好友完毕": {
+                            "next": [
+                                "基建_主体"
+                            ]
+                        },
+                        "清理完毕退出": {
+                            "next": [
+                                "基建_完成"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "是否访问每个好友换抽": {
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "基建_拜访好友": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "基建_拜访好友": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "type": "switch"
+        },
+        "是否领取邮箱内容": {
+            "type": "switch",
+            "label": "是否领取邮箱内容",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "领取奖励_跳过邮箱": {
+                            "enabled": false
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "领取奖励_跳过邮箱": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        },
+        "并关闭模拟器": {
+            "type": "switch",
+            "label": "并关闭模拟器",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "关闭游戏_并关闭模拟器": {
+                            "enabled": true
+                        },
+                        "关闭游戏_仅关闭游戏": {
+                            "enabled": false
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "关闭游戏_并关闭模拟器": {
+                            "enabled": false
+                        },
+                        "关闭游戏_仅关闭游戏": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        },
+        "基建_构建票订单数额6-10": {
+            "type": "checkbox",
+            "label": "构建票订单（6-10）",
+            "default_case": [
+                "6",
+                "8"
+            ],
+            "cases": [
+                {
+                    "name": "6",
+                    "label": "6票",
+                    "pipeline_override": {
+                        "基建_构建票6_可交付": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8票",
+                    "pipeline_override": {
+                        "基建_构建票8_可交付": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10票",
+                    "pipeline_override": {
+                        "基建_构建票10_可交付": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        },
+        "基建_构建票订单数额16-18": {
+            "type": "checkbox",
+            "label": "构建票订单（16-18）",
+            "default_case": [
+                "16"
+            ],
+            "cases": [
+                {
+                    "name": "16",
+                    "label": "16票",
+                    "pipeline_override": {
+                        "基建_构建票16_可交付": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "18",
+                    "label": "18票",
+                    "pipeline_override": {
+                        "基建_构建票18_可交付": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        },
+        "兑换经验订单": {
+            "type": "switch",
+            "label": "兑换稀有经验订单",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "基建_经验_可交付": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "基建_经验_可交付": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "兑换星币订单": {
+            "type": "switch",
+            "label": "兑换稀有星币订单",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "基建_星币_可交付": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "基建_星币_可交付": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "是否打挑战难度": {
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "历战试炼_挑战难度": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "历战试炼_挑战难度": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "type": "switch"
+        },
+        "挑战难度选择": {
+            "cases": [
+                {
+                    "name": "1",
+                    "pipeline_override": {
+                        "历战试炼_挑战难度_选择": {
+                            "expected": "1"
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "pipeline_override": {
+                        "历战试炼_挑战难度_选择": {
+                            "expected": "2"
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "pipeline_override": {
+                        "历战试炼_挑战难度_选择": {
+                            "expected": "3"
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "pipeline_override": {
+                        "历战试炼_挑战难度_选择": {
+                            "expected": "4"
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "pipeline_override": {
+                        "历战试炼_挑战难度_选择": {
+                            "expected": "5"
+                        }
+                    }
+                }
+            ],
+            "type": "select"
+        },
+        "关卡选择": {
+            "cases": [
+                {
+                    "name": "技能磨砺（技能书）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "资源采集",
+                            "next": [
+                                "每日探索-选择2"
+                            ]
+                        },
+                        "每日探索-选择2": {
+                            "expected": "技能磨砺",
+                            "next": [
+                                "每日探索_第几层"
+                            ]
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第4层"
+                        }
+                    },
+                    "option": [
+                        "第几层（1-4）"
+                    ]
+                },
+                {
+                    "name": "星币开采（星币）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "资源采集",
+                            "next": [
+                                "每日探索-选择2"
+                            ]
+                        },
+                        "每日探索-选择2": {
+                            "expected": "星币开采",
+                            "next": [
+                                "每日探索_第几层"
+                            ]
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第6层"
+                        }
+                    },
+                    "option": [
+                        "第几层"
+                    ]
+                },
+                {
+                    "name": "技术解析（技术点）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "资源采集",
+                            "next": [
+                                "每日探索-选择2"
+                            ]
+                        },
+                        "每日探索-选择2": {
+                            "expected": "技术解析",
+                            "next": [
+                                "每日探索_第几层"
+                            ]
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第6层"
+                        }
+                    },
+                    "option": [
+                        "第几层"
+                    ]
+                },
+                {
+                    "name": "荒墟拾遗（遗余之谱）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "资源采集",
+                            "next": [
+                                "每日探索-选择2"
+                            ]
+                        },
+                        "每日探索-选择2": {
+                            "expected": "荒墟拾遗",
+                            "next": [
+                                "每日探索_第几层"
+                            ]
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）"
+                    ]
+                },
+                {
+                    "name": "鼓军嵌合（物攻、振奋）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "芯片嵌合",
+                            "next": [
+                                "每日探索_芯片列表归顶"
+                            ]
+                        },
+                        "每日探索_芯片关卡查找": {
+                            "expected": "鼓军嵌合"
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        },
+                        "扫荡结束": {
+                            "next": [
+                                "进入首页"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）",
+                        "每日探索_按方案锁定芯片",
+                        "每日探索_仓满自动清理"
+                    ]
+                },
+                {
+                    "name": "光杵嵌合（能量、金刚）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "芯片嵌合",
+                            "next": [
+                                "每日探索_芯片列表归顶"
+                            ]
+                        },
+                        "每日探索_芯片关卡查找": {
+                            "expected": "光杵嵌合"
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        },
+                        "扫荡结束": {
+                            "next": [
+                                "进入首页"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）",
+                        "每日探索_按方案锁定芯片",
+                        "每日探索_仓满自动清理"
+                    ]
+                },
+                {
+                    "name": "注刈嵌合（切割、集中）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "芯片嵌合",
+                            "next": [
+                                "每日探索_芯片列表归顶"
+                            ]
+                        },
+                        "每日探索_芯片关卡查找": {
+                            "expected": "注刈嵌合"
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        },
+                        "扫荡结束": {
+                            "next": [
+                                "进入首页"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）",
+                        "每日探索_按方案锁定芯片",
+                        "每日探索_仓满自动清理"
+                    ]
+                },
+                {
+                    "name": "链接嵌合（神力、神速）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "芯片嵌合",
+                            "next": [
+                                "每日探索_芯片列表归顶"
+                            ]
+                        },
+                        "每日探索_芯片关卡查找": {
+                            "expected": "链接嵌合"
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        },
+                        "扫荡结束": {
+                            "next": [
+                                "进入首页"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）",
+                        "每日探索_按方案锁定芯片",
+                        "每日探索_仓满自动清理"
+                    ]
+                },
+                {
+                    "name": "体魄嵌合（穿甲、支援）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "芯片嵌合",
+                            "next": [
+                                "每日探索_芯片列表归顶"
+                            ]
+                        },
+                        "每日探索_芯片关卡查找": {
+                            "expected": "体魄嵌合"
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        },
+                        "扫荡结束": {
+                            "next": [
+                                "进入首页"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）",
+                        "每日探索_按方案锁定芯片",
+                        "每日探索_仓满自动清理"
+                    ]
+                },
+                {
+                    "name": "侵蚀嵌合（腐蚀、引爆）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "芯片嵌合",
+                            "next": [
+                                "每日探索_芯片列表归顶"
+                            ]
+                        },
+                        "每日探索_芯片关卡查找": {
+                            "expected": "侵蚀嵌合"
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        },
+                        "扫荡结束": {
+                            "next": [
+                                "进入首页"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）",
+                        "每日探索_按方案锁定芯片",
+                        "每日探索_仓满自动清理"
+                    ]
+                },
+                {
+                    "name": "迅刃嵌合（灵巧、暴怒）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "芯片嵌合",
+                            "next": [
+                                "每日探索_芯片列表归顶"
+                            ]
+                        },
+                        "每日探索_芯片关卡查找": {
+                            "expected": "迅刃嵌合"
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        },
+                        "扫荡结束": {
+                            "next": [
+                                "进入首页"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）",
+                        "每日探索_按方案锁定芯片",
+                        "每日探索_仓满自动清理"
+                    ]
+                },
+                {
+                    "name": "矛盾嵌合（致命、屏障）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "芯片嵌合",
+                            "next": [
+                                "每日探索_芯片列表归顶"
+                            ]
+                        },
+                        "每日探索_芯片关卡查找": {
+                            "expected": "矛盾嵌合"
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        },
+                        "扫荡结束": {
+                            "next": [
+                                "进入首页"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "第几层（1-5）",
+                        "每日探索_按方案锁定芯片",
+                        "每日探索_仓满自动清理"
+                    ]
+                },
+                {
+                    "name": "自然跃升（气象、山脉模块）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "跃升行动",
+                            "next": [
+                                "每日探索-选择2"
+                            ]
+                        },
+                        "每日探索-选择2": {
+                            "expected": "自然跃升",
+                            "next": [
+                                "每日探索_第几层"
+                            ]
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第2层"
+                        }
+                    },
+                    "option": [
+                        "第几层（1-2）"
+                    ]
+                },
+                {
+                    "name": "人造跃升（灭刃、乐团模块）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "跃升行动",
+                            "next": [
+                                "每日探索-选择2"
+                            ]
+                        },
+                        "每日探索-选择2": {
+                            "expected": "人造跃升",
+                            "next": [
+                                "每日探索_第几层"
+                            ]
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第2层"
+                        }
+                    },
+                    "option": [
+                        "第几层（1-2）"
+                    ]
+                },
+                {
+                    "name": "生命跃升（不朽、虫洞模块）",
+                    "pipeline_override": {
+                        "出击-选择": {
+                            "expected": "每日探索",
+                            "next": [
+                                "每日探索-选择"
+                            ]
+                        },
+                        "每日探索-选择": {
+                            "expected": "跃升行动",
+                            "next": [
+                                "每日探索-选择2"
+                            ]
+                        },
+                        "每日探索-选择2": {
+                            "expected": "生命跃升",
+                            "next": [
+                                "每日探索_第几层"
+                            ]
+                        },
+                        "每日探索_第几层": {
+                            "expected": "第2层"
+                        }
+                    },
+                    "option": [
+                        "第几层（1-2）"
+                    ]
+                }
+            ],
+            "type": "select"
+        },
+        "第几层": {
+            "cases": [
+                {
+                    "name": "不选择-默认打最高",
+                    "pipeline_override": {}
+                },
+                {
+                    "name": "第1层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第1层"
+                        }
+                    }
+                },
+                {
+                    "name": "第2层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第2层"
+                        }
+                    }
+                },
+                {
+                    "name": "第3层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第3层"
+                        }
+                    }
+                },
+                {
+                    "name": "第4层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第4层"
+                        }
+                    }
+                },
+                {
+                    "name": "第5层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        }
+                    }
+                },
+                {
+                    "name": "第6层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第6层"
+                        }
+                    }
+                }
+            ],
+            "type": "select",
+            "label": "第几层"
+        },
+        "手动次数": {
+            "cases": [
+                {
+                    "name": "1次",
+                    "pipeline_override": {
+                        "自选-次数1": {
+                            "enabled": true,
+                            "next": [
+                                "开启加成",
+                                "扫荡成功"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数3"
+                            ]
+                        },
+                        "自选-次数3": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数3"
+                            ]
+                        },
+                        "自选-次数3": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数4"
+                            ]
+                        },
+                        "自选-次数4": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "5次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数3"
+                            ]
+                        },
+                        "自选-次数3": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数4"
+                            ]
+                        },
+                        "自选-次数4": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数5"
+                            ]
+                        },
+                        "自选-次数5": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "6次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数3"
+                            ]
+                        },
+                        "自选-次数3": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数4"
+                            ]
+                        },
+                        "自选-次数4": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数5"
+                            ]
+                        },
+                        "自选-次数5": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数6"
+                            ]
+                        },
+                        "自选-次数6": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "7次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数3"
+                            ]
+                        },
+                        "自选-次数3": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数4"
+                            ]
+                        },
+                        "自选-次数4": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数5"
+                            ]
+                        },
+                        "自选-次数5": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数6"
+                            ]
+                        },
+                        "自选-次数6": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数7"
+                            ]
+                        },
+                        "自选-次数7": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "8次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数3"
+                            ]
+                        },
+                        "自选-次数3": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数4"
+                            ]
+                        },
+                        "自选-次数4": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数5"
+                            ]
+                        },
+                        "自选-次数5": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数6"
+                            ]
+                        },
+                        "自选-次数6": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数7"
+                            ]
+                        },
+                        "自选-次数7": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数8"
+                            ]
+                        },
+                        "自选-次数8": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "9次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数3"
+                            ]
+                        },
+                        "自选-次数3": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数4"
+                            ]
+                        },
+                        "自选-次数4": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数5"
+                            ]
+                        },
+                        "自选-次数5": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数6"
+                            ]
+                        },
+                        "自选-次数6": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数7"
+                            ]
+                        },
+                        "自选-次数7": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数8"
+                            ]
+                        },
+                        "自选-次数8": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数9"
+                            ]
+                        },
+                        "自选-次数9": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "10次",
+                    "pipeline_override": {
+                        "自选-次数2": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数3"
+                            ]
+                        },
+                        "自选-次数3": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数4"
+                            ]
+                        },
+                        "自选-次数4": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数5"
+                            ]
+                        },
+                        "自选-次数5": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数6"
+                            ]
+                        },
+                        "自选-次数6": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数7"
+                            ]
+                        },
+                        "自选-次数7": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数8"
+                            ]
+                        },
+                        "自选-次数8": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数9"
+                            ]
+                        },
+                        "自选-次数9": {
+                            "enabled": true,
+                            "next": [
+                                "自选-次数10"
+                            ]
+                        },
+                        "自选-次数10": {
+                            "enabled": true,
+                            "next": [
+                                "开始战斗"
+                            ]
+                        }
+                    }
+                }
+            ],
+            "type": "select"
+        },
+        "体力消耗方式": {
+            "type": "select",
+            "label": "体力消耗方式",
+            "default_case": "消耗完体力",
+            "cases": [
+                {
+                    "name": "消耗完体力",
+                    "pipeline_override": {
+                        "扫荡次数选择": {
+                            "enabled": true
+                        },
+                        "每日探索_按体力计算次数": {
+                            "enabled": true
+                        },
+                        "自选扫荡次数": {
+                            "enabled": false
+                        },
+                        "每日探索_按次数扫荡": {
+                            "enabled": false
+                        }
+                    },
+                    "option": [
+                        "每日探索_使用体力药-消耗完"
+                    ]
+                },
+                {
+                    "name": "指定次数",
+                    "pipeline_override": {
+                        "扫荡次数选择": {
+                            "enabled": false
+                        },
+                        "自选扫荡次数": {
+                            "enabled": false
+                        },
+                        "每日探索_扫荡弹窗已打开": {
+                            "enabled": false
+                        },
+                        "每日探索_按次数扫荡": {
+                            "enabled": true
+                        },
+                        "每日探索_下一批": {
+                            "enabled": true
+                        }
+                    },
+                    "option": [
+                        "每日探索_自定次数",
+                        "每日探索_使用体力药-自定"
+                    ]
+                }
+            ]
+        },
+        "每日探索_自定次数": {
+            "type": "input",
+            "label": "指定扫荡次数",
+            "inputs": [
+                {
+                    "name": "扫荡次数",
+                    "label": "扫荡次数",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入大于或等于 1 的整数"
+                }
+            ]
+        },
+        "每日探索_使用体力药-消耗完": {
+            "type": "select",
+            "label": "体力药",
+            "default_case": "不使用",
+            "cases": [
+                {
+                    "name": "不使用",
+                    "pipeline_override": {
+                        "每日探索_体力药准备": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "使用",
+                    "pipeline_override": {
+                        "每日探索_体力药准备": {
+                            "enabled": true
+                        }
+                    },
+                    "option": [
+                        "每日探索_体力药类型",
+                        "每日探索_体力药数量"
+                    ]
+                }
+            ]
+        },
+        "每日探索_使用体力药-自定": {
+            "type": "select",
+            "label": "体力药",
+            "default_case": "不使用",
+            "cases": [
+                {
+                    "name": "不使用",
+                    "pipeline_override": {
+                        "每日探索_体力药准备": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "使用",
+                    "pipeline_override": {
+                        "每日探索_体力药准备": {
+                            "enabled": true
+                        }
+                    },
+                    "option": [
+                        "每日探索_体力药类型"
+                    ]
+                }
+            ]
+        },
+        "每日探索_体力药类型": {
+            "type": "select",
+            "label": "体力药类型",
+            "default_case": "小药",
+            "cases": [
+                {
+                    "name": "小药"
+                },
+                {
+                    "name": "大药"
+                }
+            ]
+        },
+        "每日探索_体力药数量": {
+            "type": "input",
+            "label": "体力药数量",
+            "inputs": [
+                {
+                    "name": "体力药数量",
+                    "label": "数量",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入大于或等于 1 的整数"
+                }
+            ]
+        },
+        "周本关卡选择": {
+            "cases": [
+                {
+                    "name": "第一关45微晶",
+                    "pipeline_override": {
+                        "活动探索_戈里刻虚影": {
+                            "next": [
+                                "活动探索_虚影阿瑞斯",
+                                "活动探索_上滑",
+                                "活动探索_戈里刻虚影"
+                            ]
+                        },
+                        "活动探索_战斗结束3": {
+                            "next": [
+                                "子任务_获得物品",
+                                "活动探索_虚影阿瑞斯",
+                                "活动探索_战斗结束3"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "第五关120微晶",
+                    "pipeline_override": {
+                        "活动探索_戈里刻虚影": {
+                            "next": [
+                                "活动探索_第五关",
+                                "[JumpBack]活动探索_下滑",
+                                "活动探索_戈里刻虚影"
+                            ]
+                        },
+                        "活动探索_战斗结束3": {
+                            "next": [
+                                "[JumpBack]子任务_获得物品",
+                                "活动探索_第五关",
+                                "活动探索_战斗结束3"
+                            ]
+                        }
+                    }
+                }
+            ],
+            "type": "select"
+        },
+        "清理四星及以下芯片": {
+            "type": "switch",
+            "label": "清理四星及以下芯片",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No"
+                },
+                {
+                    "name": "Yes"
+                }
+            ]
+        },
+        "根据自定义设置锁定/解锁仓库内芯片": {
+            "type": "switch",
+            "label": "根据自定义设置锁定/解锁仓库内芯片",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No"
+                },
+                {
+                    "name": "Yes"
+                }
+            ]
+        },
+        "重复挑战方式": {
+            "type": "select",
+            "label": "重复挑战方式",
+            "default_case": "自定次数",
+            "cases": [
+                {
+                    "name": "自定次数",
+                    "option": [
+                        "自定次数"
+                    ]
+                },
+                {
+                    "name": "重复挑战直到次数归零"
+                }
+            ]
+        },
+        "自定次数": {
+            "type": "select",
+            "label": "挑战次数",
+            "default_case": "1",
+            "cases": [
+                {
+                    "name": "1"
+                },
+                {
+                    "name": "2"
+                },
+                {
+                    "name": "3"
+                },
+                {
+                    "name": "4"
+                },
+                {
+                    "name": "5"
+                },
+                {
+                    "name": "6"
+                },
+                {
+                    "name": "7"
+                },
+                {
+                    "name": "8"
+                },
+                {
+                    "name": "9"
+                },
+                {
+                    "name": "10"
+                }
+            ]
+        },
+        "最低挑战积分": {
+            "type": "select",
+            "label": "最低挑战积分",
+            "description": "第 1 位对手的积分达到这个值才挑战，否则刷新对手。26 较宽松，28 只在对手给高分时才出手。",
+            "default_case": "26",
+            "cases": [
+                {
+                    "name": "26"
+                },
+                {
+                    "name": "28"
+                }
+            ]
+        },
+        "可挑战的最高战力": {
+            "type": "input",
+            "label": "可挑战的最高战力",
+            "inputs": [
+                {
+                    "name": "可挑战的最高战力",
+                    "label": "可挑战的最高战力",
+                    "default": "20000",
+                    "pipeline_type": "int",
+                    "verify": "^[0-9]+$",
+                    "pattern_msg": "请输入大于或等于 0 的整数"
+                }
+            ]
+        },
+        "刷新次数放宽阈值": {
+            "type": "select",
+            "label": "剩余刷新次数 ≤ N 时放宽",
+            "description": "剩余刷新次数不超过这个值（或「剩余挑战次数」所选的含义）时进入兜底：按第 1 → 第 2 → 第 3 位的顺序，找第一个「战力不高于上限 且 积分不低于放宽后最低积分」的对手。选「从不」则永不进入兜底，也就不会挑战第 2、3 位。",
+            "default_case": "从不",
+            "cases": [
+                {
+                    "name": "从不"
+                },
+                {
+                    "name": "剩余挑战次数"
+                },
+                {
+                    "name": "1"
+                },
+                {
+                    "name": "2"
+                },
+                {
+                    "name": "3"
+                },
+                {
+                    "name": "4"
+                },
+                {
+                    "name": "5"
+                },
+                {
+                    "name": "6"
+                },
+                {
+                    "name": "7"
+                },
+                {
+                    "name": "8"
+                },
+                {
+                    "name": "9"
+                },
+                {
+                    "name": "10"
+                },
+                {
+                    "name": "11"
+                },
+                {
+                    "name": "12"
+                },
+                {
+                    "name": "13"
+                },
+                {
+                    "name": "14"
+                },
+                {
+                    "name": "15"
+                }
+            ]
+        },
+        "放宽后的最低积分": {
+            "type": "input",
+            "label": "放宽后的最低积分",
+            "inputs": [
+                {
+                    "name": "放宽后的最低积分",
+                    "label": "放宽后的最低积分",
+                    "description": "进入兜底后能接受的最低积分，默认 20。仅在「剩余刷新次数 ≤ N 时放宽」不为「从不」时显示。",
+                    "default": "20",
+                    "pipeline_type": "int",
+                    "verify": "^[0-9]+$",
+                    "pattern_msg": "请输入大于或等于 0 的整数"
+                }
+            ]
+        },
+        "第几层（1-5）": {
+            "label": "第几层",
+            "type": "select",
+            "cases": [
+                {
+                    "name": "不选择-默认打最高",
+                    "pipeline_override": {}
+                },
+                {
+                    "name": "第1层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第1层"
+                        }
+                    }
+                },
+                {
+                    "name": "第2层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第2层"
+                        }
+                    }
+                },
+                {
+                    "name": "第3层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第3层"
+                        }
+                    }
+                },
+                {
+                    "name": "第4层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第4层"
+                        }
+                    }
+                },
+                {
+                    "name": "第5层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第5层"
+                        }
+                    }
+                }
+            ]
+        },
+        "第几层（1-4）": {
+            "label": "第几层",
+            "type": "select",
+            "cases": [
+                {
+                    "name": "不选择-默认打最高",
+                    "pipeline_override": {}
+                },
+                {
+                    "name": "第1层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第1层"
+                        }
+                    }
+                },
+                {
+                    "name": "第2层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第2层"
+                        }
+                    }
+                },
+                {
+                    "name": "第3层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第3层"
+                        }
+                    }
+                },
+                {
+                    "name": "第4层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第4层"
+                        }
+                    }
+                }
+            ]
+        },
+        "第几层（1-2）": {
+            "label": "第几层",
+            "type": "select",
+            "cases": [
+                {
+                    "name": "不选择-默认打最高",
+                    "pipeline_override": {}
+                },
+                {
+                    "name": "第1层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第1层"
+                        }
+                    }
+                },
+                {
+                    "name": "第2层",
+                    "pipeline_override": {
+                        "每日探索_第几层": {
+                            "expected": "第2层"
+                        }
+                    }
+                }
+            ]
+        },
+        "异星灰域_购买物品选择": {
+            "type": "checkbox",
+            "label": "购买物品选择",
+            "default_case": [
+                "传说星尘券",
+                "构建蓝图",
+                "数据协议"
+            ],
+            "cases": [
+                {
+                    "name": "传说星尘券",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_传说星尘券": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_传说星尘券": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_传说星尘券": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "构建蓝图",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_构建蓝图": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_构建蓝图": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_构建蓝图": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "赤狼星源",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_赤狼星源": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_赤狼星源": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_赤狼星源": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "破碎程式x50",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_破碎程式x50": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_破碎程式x50": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_破碎程式x50": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "稀有礼物箱",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_稀有礼物箱": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_稀有礼物箱": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_稀有礼物箱": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "家具币x10",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_家具币x10": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_家具币x10": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_家具币x10": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "装饰券x5",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_装饰券x5": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_装饰券x5": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_装饰券x5": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "总队长星源",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_总队长星源": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_总队长星源": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_总队长星源": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "罕见星尘券x20",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_罕见星尘券x20": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_罕见星尘券x20": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_罕见星尘券x20": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "高纯硅化剂",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_高纯硅化剂": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_高纯硅化剂": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_高纯硅化剂": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "进化之息",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_进化之息": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_进化之息": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_进化之息": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "数据协议",
+                    "pipeline_override": {
+                        "异星灰域_售罄跳过_数据协议": {
+                            "enabled": true
+                        },
+                        "异星灰域_购买_数据协议": {
+                            "enabled": true
+                        },
+                        "异星灰域_买不起_数据协议": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "github": "https://github.com/MAACrossCore/MCC_Framework"
 }

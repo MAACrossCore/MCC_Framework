@@ -1,0 +1,650 @@
+{
+    "$__mpe_config_通用": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788608618093,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MAAlocalhost\\resource\\pipeline\\base\\通用.json",
+            "savedViewport": {
+                "x": -274,
+                "y": -1394,
+                "zoom": 0.8
+            },
+            "filename": "通用",
+            "version": "v1.9.3"
+        }
+    },
+    "$__mpe_external_NERI_通用": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 708
+            }
+        }
+    },
+    "$__mpe_external_启动角色界面_通用": {
+        "$__mpe_code": {
+            "position": {
+                "x": 13,
+                "y": -3
+            }
+        }
+    },
+    "$__mpe_external_开始游戏_通用": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 988
+            }
+        }
+    },
+    "$__mpe_external_签到_通用": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 848
+            }
+        }
+    },
+    "$__mpe_external_首页标志1_通用": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 1430
+            }
+        }
+    },
+    "$__mpe_external_首页标志2_通用": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 2689
+            }
+        }
+    },
+    "好友": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "好友"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 470,
+                "y": 1245
+            }
+        }
+    },
+    "子任务_关闭公告": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    900,
+                    55,
+                    362,
+                    200
+                ],
+                "template": "StartUp/CloseAnnouncement.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 2388
+            }
+        }
+    },
+    "子任务_关闭周年公告": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    900,
+                    55,
+                    362,
+                    200
+                ],
+                "template": "StartUp/ZNGG.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 732,
+                "y": 12
+            }
+        }
+    },
+    "子任务_点击取消": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    330,
+                    346,
+                    313,
+                    150
+                ],
+                "expected": [
+                    "取消"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 2134
+            }
+        }
+    },
+    "子任务_点击确认": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    665,
+                    364,
+                    331,
+                    152
+                ],
+                "expected": [
+                    "确认"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 1570
+            }
+        }
+    },
+    "子任务_点击返回": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    14,
+                    10,
+                    126,
+                    72
+                ],
+                "template": "StartUp/BackButton.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 1128
+            }
+        }
+    },
+    "子任务_点击首页按钮": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    180,
+                    10,
+                    100,
+                    70
+                ],
+                "template": [
+                    "StartUp/HomeButton.png",
+                    "StartUp/HomeButton1.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 5000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 346
+            }
+        }
+    },
+    "子任务_获得物品": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    447,
+                    117,
+                    405,
+                    117
+                ],
+                "expected": [
+                    "获得物品",
+                    "合成成功"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 1824
+            }
+        }
+    },
+    "子任务_进入个人配置": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1204,
+                    25,
+                    35,
+                    35
+                ],
+                "template": [
+                    "StartUp/菜单多.png"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "好友"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 169,
+                "y": 1196
+            }
+        }
+    },
+    "子任务_进入首页": {
+        "next": [
+            "首页标志2",
+            "[JumpBack]子任务_点击首页按钮",
+            "[JumpBack]子任务_点击返回",
+            "[JumpBack]子任务_获得物品",
+            "[JumpBack]子任务_点击取消",
+            "[JumpBack]子任务_点击确认",
+            "[JumpBack]子任务_关闭公告",
+            "签到",
+            "首页标志1",
+            "开始游戏",
+            "启动角色界面"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 892,
+                "y": 1345
+            }
+        }
+    },
+    "战斗_启用二倍速": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    973,
+                    30,
+                    95,
+                    57
+                ],
+                "template": "Combat/Combat_Doublespeed.png",
+                "threshold": 0.9
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1012,
+                    52,
+                    10,
+                    10
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1452,
+                "y": 12
+            }
+        }
+    },
+    "战斗_自动战斗": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1069,
+                    27,
+                    105,
+                    59
+                ],
+                "template": "Combat/Combat_Auto.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 492,
+                "y": 12
+            }
+        }
+    },
+    "活动探索-右滑": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1116,
+                    376,
+                    37,
+                    47
+                ],
+                "end": [
+                    [
+                        858,
+                        379,
+                        49,
+                        44
+                    ]
+                ],
+                "duration": 1000
+            }
+        },
+        "post_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 656
+            }
+        }
+    },
+    "活动探索-首页-出击": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1085,
+                    557,
+                    194,
+                    152
+                ],
+                "template": "StartUp/chuji.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": 200,
+        "next": [
+            "进入活动探索界面"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 351
+            }
+        }
+    },
+    "活动选择": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    91,
+                    173,
+                    1139,
+                    422
+                ],
+                "expected": "活动选择"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 346
+            }
+        }
+    },
+    "跳过首领演出动画": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1067,
+                    10,
+                    187,
+                    90
+                ],
+                "template": "weekly_skip_720.png",
+                "threshold": 0.52
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "$__mpe_code": {
+            "position": {
+                "x": 252,
+                "y": 12
+            }
+        }
+    },
+    "跳过首领演出动画_OCR": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1119,
+                    30,
+                    87,
+                    44
+                ],
+                "expected": "跳过"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "$__mpe_code": {
+            "position": {
+                "x": 252,
+                "y": 92
+            }
+        }
+    },
+    "进入活动探索界面": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    527,
+                    110,
+                    227,
+                    90
+                ],
+                "expected": "活动探索"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "next": [
+            "活动选择",
+            "[JumpBack]活动探索-右滑"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 357,
+                "y": 400
+            }
+        }
+    },
+    "通用-啥也不做": {
+        "focus": "结束任务",
+        "$__mpe_code": {
+            "position": {
+                "x": -270,
+                "y": 145
+            }
+        }
+    },
+    "通用-确认获得物品": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    511,
+                    154,
+                    276,
+                    116
+                ],
+                "expected": "获得物品"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 2000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 12
+            }
+        }
+    },
+    "通用-返回": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    11,
+                    8,
+                    426,
+                    102
+                ],
+                "template": "返回.png"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1692,
+                "y": 12
+            }
+        }
+    },
+    "通用-返回主页": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    164,
+                    21,
+                    112,
+                    51
+                ],
+                "template": "返回主页.png"
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click"
+        },
+        "focus": "返回主页",
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 12
+            }
+        }
+    },
+    "首页_出击": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1094,
+                    539,
+                    176,
+                    175
+                ],
+                "template": "StartUp/chuji.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next_doc": "Set in code.",
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 12
+            }
+        }
+    }
+}

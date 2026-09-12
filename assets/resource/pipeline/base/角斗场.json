@@ -1,0 +1,788 @@
+{
+    "$__mpe_config_角斗场": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788451827795,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\workwork\\MAA\\MAA_Practice\\assets\\resource\\pipeline\\base\\角斗场.json",
+            "savedViewport": {
+                "x": -334,
+                "y": -315,
+                "zoom": 0.53
+            },
+            "filename": "角斗场",
+            "version": "v1.9.2"
+        }
+    },
+    "模拟军演": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    152,
+                    263,
+                    247,
+                    183
+                ],
+                "expected": "模拟军演"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_军演竞技"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 728
+            }
+        }
+    },
+    "模拟军演_军演竞技": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    152,
+                    263,
+                    247,
+                    183
+                ],
+                "expected": "军演竞技"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 728
+            }
+        }
+    },
+    "模拟军演_角斗场": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    152,
+                    263,
+                    247,
+                    183
+                ],
+                "expected": "角斗场"
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_测试版"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 728
+            }
+        }
+    },
+    "模拟军演_角斗场_入场确认": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    263,
+                    172,
+                    749,
+                    323
+                ],
+                "expected": "入场确认"
+            }
+        },
+        "next": [
+            "模拟军演_角斗场_可免费入场次数大于0",
+            "模拟军演_角斗场_可免费入场次数为0"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 740
+            }
+        }
+    },
+    "模拟军演_角斗场_全部领取": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    587,
+                    477,
+                    145,
+                    42
+                ],
+                "expected": "全部领取"
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_全部领取_完成点击"
+        ]
+    },
+    "模拟军演_角斗场_全部领取_完成点击": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 5000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    587,
+                    477,
+                    145,
+                    42
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "模拟军演_角斗场_全部领取_完成"
+        ]
+    },
+    "模拟军演_角斗场_全部领取_完成": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "jdc_reset_state"
+            }
+        },
+        "next": [
+            "通用-返回主页"
+        ]
+    },
+    "模拟军演_角斗场_可免费入场次数为0": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    511,
+                    425,
+                    251,
+                    31
+                ],
+                "expected": "0"
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    172,
+                    22,
+                    86,
+                    53
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "next": [
+            "通用-返回主页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 370
+            }
+        }
+    },
+    "模拟军演_角斗场_可免费入场次数大于0": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    511,
+                    425,
+                    251,
+                    31
+                ],
+                "expected": [
+                    "1",
+                    "2",
+                    "3"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_随机模式_使用体力入场"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 761
+            }
+        }
+    },
+    "模拟军演_角斗场_战斗胜利": {
+        "recognition": "OCR",
+        "expected": "战斗胜利",
+        "roi": [
+            31,
+            38,
+            326,
+            89
+        ],
+        "action": "Click",
+        "pre_delay": 5000,
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_战斗胜利_后处理等待"
+        ]
+    },
+    "模拟军演_角斗场_战斗胜利_后处理等待": {
+        "recognition": "DirectHit",
+        "post_delay": 5000,
+        "timeout": 300000,
+        "rate_limit": 1000,
+        "next": [
+            "模拟军演_角斗场_全部领取",
+            "模拟军演_角斗场_随机模式_选角色",
+            "模拟军演_角斗场_推关"
+        ]
+    },
+    "模拟军演_角斗场_战斗胜利_等待": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    31,
+                    38,
+                    326,
+                    89
+                ],
+                "expected": "战斗胜利"
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "模拟军演_角斗场_战斗胜利"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 1247
+            }
+        }
+    },
+    "模拟军演_角斗场_推关": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    156,
+                    101,
+                    1074,
+                    443
+                ],
+                "expected": "回合"
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "jdc_route_push",
+                "custom_action_param": {
+                    "stage_search_roi": [
+                        156,
+                        101,
+                        1074,
+                        443
+                    ],
+                    "star_roi": [
+                        1080,
+                        610,
+                        180,
+                        70
+                    ]
+                }
+            }
+        },
+        "post_delay": 2000,
+        "timeout": 1200000,
+        "rate_limit": 1000,
+        "next": [
+            "模拟军演_角斗场_全部领取",
+            "模拟军演_角斗场_战斗失败",
+            "模拟军演_角斗场_战斗胜利_等待"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 1180
+            }
+        }
+    },
+    "模拟军演_角斗场_战斗失败": {
+        "recognition": "OCR",
+        "expected": "战斗失败",
+        "roi": [
+            406,
+            54,
+            451,
+            116
+        ],
+        "pre_delay": 3000,
+        "action": "Click",
+        "target": [
+            440,
+            634,
+            141,
+            40
+        ],
+        "post_delay": 3000,
+        "timeout": 300000,
+        "rate_limit": 1000,
+        "next": [
+            "模拟军演_角斗场_全部领取"
+        ]
+    },
+    "模拟军演_角斗场_测试版": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    404,
+                    233,
+                    472,
+                    262
+                ],
+                "expected": "角斗场"
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_随机模式"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 721
+            }
+        }
+    },
+    "模拟军演_角斗场_编队_已是平面": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    671,
+                    339,
+                    45,
+                    125
+                ],
+                "expected": "此面向敌"
+            }
+        },
+        "next": [
+            "模拟军演_角斗场_编队_清空队伍"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1073
+            }
+        }
+    },
+    "模拟军演_角斗场_编队_平面": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    492,
+                    652,
+                    105,
+                    29
+                ],
+                "expected": "平面"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_编队_清空队伍"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1374
+            }
+        }
+    },
+    "模拟军演_角斗场_编队_执行": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    670,
+                    325,
+                    70,
+                    150
+                ],
+                "expected": "此面向敌"
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "jdc_build_team",
+                "custom_action_param": {
+                    "character_list_roi": [
+                        775,
+                        88,
+                        483,
+                        591
+                    ],
+                    "clear_team_roi": [
+                        51,
+                        554,
+                        80,
+                        68
+                    ],
+                    "formation_roi": [
+                        191,
+                        169,
+                        465,
+                        462
+                    ],
+                    "post_character_delay": 500,
+                    "swipe_duration": 600
+                }
+            }
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_编队_返回"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 1215
+            }
+        }
+    },
+    "模拟军演_角斗场_编队_检测平面": {
+        "next": [
+            "模拟军演_角斗场_编队_已是平面",
+            "模拟军演_角斗场_编队_平面"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 1073
+            }
+        }
+    },
+    "模拟军演_角斗场_编队_清空队伍": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    47,
+                    544,
+                    87,
+                    80
+                ],
+                "expected": "清空队伍"
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    67,
+                    558,
+                    45,
+                    37
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_编队_执行"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 1230
+            }
+        }
+    },
+    "模拟军演_角斗场_编队_返回": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    51,
+                    554,
+                    80,
+                    68
+                ],
+                "expected": "清空队伍"
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    34,
+                    25,
+                    137,
+                    48
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_推关"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 1230
+            }
+        }
+    },
+    "模拟军演_角斗场_编队入口": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    9,
+                    611,
+                    129,
+                    47
+                ],
+                "expected": "当前编队"
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    165,
+                    588,
+                    96,
+                    91
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_编队_检测平面"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2892,
+                "y": 12
+            }
+        }
+    },
+    "模拟军演_角斗场_随机模式": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    959,
+                    505,
+                    200,
+                    110
+                ],
+                "expected": "随机模式"
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_入场确认"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 721
+            }
+        }
+    },
+    "模拟军演_角斗场_随机模式_使用体力入场": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "使用体力入场"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_随机模式_选角色"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2252,
+                "y": 777
+            }
+        }
+    },
+    "模拟军演_角斗场_随机模式_选角色": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    150,
+                    480,
+                    950,
+                    100
+                ],
+                "expected": "确定"
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "jdc_select_character",
+                "custom_action_param": {
+                    "left_confirm": [
+                        215,
+                        515,
+                        133,
+                        42
+                    ],
+                    "left_name_roi": [
+                        182,
+                        296,
+                        159,
+                        30
+                    ],
+                    "middle_confirm": [
+                        566,
+                        513,
+                        131,
+                        44
+                    ],
+                    "middle_name_roi": [
+                        532,
+                        295,
+                        156,
+                        29
+                    ],
+                    "right_confirm": [
+                        911,
+                        514,
+                        136,
+                        43
+                    ],
+                    "right_name_roi": [
+                        884,
+                        295,
+                        156,
+                        29
+                    ]
+                }
+            }
+        },
+        "post_delay": 2000,
+        "next": [
+            "模拟军演_角斗场_编队入口",
+            "模拟军演_角斗场_随机模式_选角色"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2572,
+                "y": 781
+            }
+        }
+    },
+    "角斗场": {
+        "next": [
+            "模拟军演_角斗场_初始化"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1949,
+                "y": 69
+            }
+        }
+    },
+    "模拟军演_角斗场_初始化": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "jdc_reset_state",
+        "post_delay": 500,
+        "next": [
+            "首页_出击",
+            "[JumpBack]子任务_进入首页"
+        ]
+    },
+    "$__mpe_external_通用-返回主页_角斗场": {
+        "$__mpe_code": {
+            "position": {
+                "x": 3212,
+                "y": 1463
+            }
+        }
+    },
+    "$__mpe_external_子任务_进入首页_角斗场": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2280,
+                "y": 336
+            }
+        }
+    },
+    "$__mpe_external_首页_出击_角斗场": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2252,
+                "y": 151
+            }
+        }
+    },
+    "角斗场_角色OCR": {
+        "recognition": "OCR",
+        "expected": ".+"
+    }
+}

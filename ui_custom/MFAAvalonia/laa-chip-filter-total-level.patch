@@ -1,0 +1,297 @@
+diff --git a/MFAAvalonia/Features/ChipFilter/ChipFilterPlan.cs b/MFAAvalonia/Features/ChipFilter/ChipFilterPlan.cs
+index 1a1d643..c8a5c17 100644
+--- a/MFAAvalonia/Features/ChipFilter/ChipFilterPlan.cs
++++ b/MFAAvalonia/Features/ChipFilter/ChipFilterPlan.cs
+@@ -65,12 +65,8 @@ public static class ChipFilterCatalog
+     public static Dictionary<string, ChipSubSkillRule> CreateRecommendedConditions() =>
+         MainSkills.ToDictionary(main => main, main => new ChipSubSkillRule
+         {
+-            MinimumLevels = new Dictionary<int, List<string>>
+-            {
+-                [1] = [],
+-                [2] = RecommendedSubSkills[main].ToList(),
+-                [3] = []
+-            }
++            EffectiveSubSkills = RecommendedSubSkills[main].ToList(),
++            MinimumTotalLevel = 3
+         });
+ }
+ 
+@@ -83,7 +79,7 @@ public static class ChipLockModes
+ 
+ public sealed class ChipFilterPlan
+ {
+-    public int Version { get; set; } = 2;
++    public int Version { get; set; } = 3;
+     public string Name { get; set; } = "我的芯片筛选方案";
+     public Dictionary<int, ChipLevelRule> Levels { get; set; } = [];
+ 
+@@ -110,14 +106,13 @@ public sealed class ChipLevelRule
+ 
+ public sealed class ChipSubSkillRule
+ {
+-    public Dictionary<int, List<string>> MinimumLevels { get; set; } = new()
+-    {
+-        [1] = [], [2] = [], [3] = []
+-    };
++    public int MinimumTotalLevel { get; set; } = 3;
++    public List<string> EffectiveSubSkills { get; set; } = [];
+ 
+     public ChipSubSkillRule Clone() => new()
+     {
+-        MinimumLevels = MinimumLevels.ToDictionary(pair => pair.Key, pair => pair.Value.ToList())
++        MinimumTotalLevel = MinimumTotalLevel,
++        EffectiveSubSkills = EffectiveSubSkills.ToList()
+     };
+ }
+ 
+@@ -175,7 +170,7 @@ public static class ChipFilterPlanStore
+ 
+ public static class ChipFilterPlanCodec
+ {
+-    private const string Prefix = "LAA-CF2";
++    private const string Prefix = "LAA-CF3";
+ 
+     public static ChipFilterPlan Normalize(ChipFilterPlan source)
+     {
+@@ -184,7 +179,7 @@ public static class ChipFilterPlanCodec
+             throw new InvalidDataException("方案名称不能为空且不能超过40个字符");
+ 
+         var defaults = ChipFilterPlan.CreateDefault();
+-        var result = new ChipFilterPlan { Name = name, Version = 2 };
++        var result = new ChipFilterPlan { Name = name, Version = 3 };
+         foreach (var level in new[] { 1, 2, 3 })
+         {
+             source.Levels.TryGetValue(level, out var sourceLevel);
+@@ -200,17 +195,16 @@ public static class ChipFilterPlanCodec
+                     if (!sourceLevel.Conditions.TryGetValue(main, out var condition))
+                         continue;
+                     var normalizedCondition = new ChipSubSkillRule();
+-                    var assigned = new HashSet<string>();
+-                    foreach (var threshold in new[] { 1, 2, 3 })
+-                    {
+-                        condition.MinimumLevels.TryGetValue(threshold, out var values);
+-                        var selected = (values ?? [])
+-                            .Where(ChipFilterCatalog.SubSkills.Contains)
+-                            .Where(assigned.Add)
+-                            .OrderBy(value => Array.IndexOf(ChipFilterCatalog.SubSkills, value))
+-                            .ToList();
+-                        normalizedCondition.MinimumLevels[threshold] = selected;
+-                    }
++                    if (condition.MinimumTotalLevel is not (2 or 3 or 4 or 5 or 6))
++                        throw new InvalidDataException($"主词条{level}级“{main}”的有效副词条总等级门槛无效");
++                    normalizedCondition.MinimumTotalLevel = condition.MinimumTotalLevel;
++                    normalizedCondition.EffectiveSubSkills = (condition.EffectiveSubSkills ?? [])
++                        .Where(ChipFilterCatalog.SubSkills.Contains)
++                        .Distinct()
++                        .OrderBy(value => Array.IndexOf(ChipFilterCatalog.SubSkills, value))
++                        .ToList();
++                    if (normalizedCondition.EffectiveSubSkills.Count == 0)
++                        throw new InvalidDataException($"主词条{level}级“{main}”至少需要一个有效副词条");
+                     targetLevel.Conditions[main] = normalizedCondition;
+                 }
+             }
+@@ -239,7 +233,7 @@ public static class ChipFilterPlanCodec
+             throw new InvalidDataException("方案码过长");
+         var prefix = Prefix + "-";
+         if (!compact.StartsWith(prefix, StringComparison.Ordinal))
+-            throw new InvalidDataException("不是受支持的LAA-CF2芯片方案码");
++            throw new InvalidDataException("不是受支持的LAA-CF3芯片方案码");
+         var split = compact[prefix.Length..].Split('-', 2);
+         if (split.Length != 2)
+             throw new InvalidDataException("方案码内容损坏");
+diff --git a/MFAAvalonia/Features/ChipFilter/ChipFilterPlanWindow.cs b/MFAAvalonia/Features/ChipFilter/ChipFilterPlanWindow.cs
+index 066bfbf..36e79d3 100644
+--- a/MFAAvalonia/Features/ChipFilter/ChipFilterPlanWindow.cs
++++ b/MFAAvalonia/Features/ChipFilter/ChipFilterPlanWindow.cs
+@@ -421,16 +421,16 @@ public sealed class ChipFilterPlanWindow : SukiWindow
+ 
+ internal sealed class ChipSubSkillWizard : SukiWindow
+ {
+-    private readonly Dictionary<int, HashSet<string>> _selected = new()
++    private static readonly int[] TotalLevelThresholds = [2, 3, 4, 5, 6];
++    private readonly List<CheckBox> _skillBoxes = [];
++    private readonly WrapPanel _choices = new();
++    private readonly TextBlock _heading = new() { FontSize = 19, FontWeight = FontWeight.SemiBold };
++    private readonly ComboBox _totalLevel = new()
+     {
+-        [1] = [], [2] = [], [3] = []
++        ItemsSource = new[] { "大于等于 2", "大于等于 3", "大于等于 4", "大于等于 5", "大于等于 6" },
++        SelectedIndex = 1,
++        MinWidth = 150
+     };
+-    private readonly StackPanel _choices = new() { Spacing = 8 };
+-    private readonly TextBlock _heading = new() { FontSize = 19, FontWeight = FontWeight.SemiBold };
+-    private readonly TextBlock _stepText = new();
+-    private readonly Button _back = new() { Content = "上一步" };
+-    private readonly Button _next = new() { Content = "确认并继续", Classes = { "Primary" } };
+-    private int _step = 1;
+ 
+     public ChipSubSkillRule Result { get; private set; } = new();
+ 
+@@ -438,93 +438,97 @@ internal sealed class ChipSubSkillWizard : SukiWindow
+     {
+         Title = $"{mainSkill}副词条条件";
+         Width = 720;
+-        Height = 530;
++        Height = 470;
+         MinWidth = 620;
+-        MinHeight = 480;
++        MinHeight = 420;
+         WindowStartupLocation = WindowStartupLocation.CenterOwner;
+         Icon = IconHelper.WindowIcon;
++        var selected = new HashSet<string>(existing?.EffectiveSubSkills ?? []);
++        foreach (var skill in ChipFilterCatalog.SubSkills)
++        {
++            var box = new CheckBox
++            {
++                Content = skill,
++                IsChecked = selected.Contains(skill),
++                Margin = new Thickness(6),
++                MinWidth = 130
++            };
++            _skillBoxes.Add(box);
++            _choices.Children.Add(box);
++        }
+         if (existing != null)
+-            foreach (var level in new[] { 1, 2, 3 })
+-                _selected[level] = new HashSet<string>(existing.MinimumLevels.GetValueOrDefault(level, []));
++            _totalLevel.SelectedIndex = Math.Max(0, Array.IndexOf(TotalLevelThresholds, existing.MinimumTotalLevel));
+ 
+         _heading.Text = $"主词条 {mainLevel} 级 · {mainSkill}";
+         Content = BuildLayout();
+-        RenderStep();
+     }
+ 
+     private Control BuildLayout()
+     {
+-        var root = new Grid { Margin = new Thickness(20), RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto") };
++        var root = new Grid { Margin = new Thickness(20), RowDefinitions = new RowDefinitions("Auto,Auto,*,Auto,Auto") };
+         root.Children.Add(_heading);
+-        _stepText.Margin = new Thickness(0, 8, 0, 12);
+-        Grid.SetRow(_stepText, 1);
+-        root.Children.Add(_stepText);
++        var help = new TextBlock
++        {
++            Text = "勾选对当前主词条有效的副词条；芯片上这些词条的实际等级相加后参与判定。",
++            TextWrapping = TextWrapping.Wrap,
++            Opacity = 0.75,
++            Margin = new Thickness(0, 8, 0, 12)
++        };
++        Grid.SetRow(help, 1);
++        root.Children.Add(help);
+         var scroll = new ScrollViewer { Content = _choices, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+         Grid.SetRow(scroll, 2);
+         root.Children.Add(scroll);
+-        var footer = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 10, Margin = new Thickness(0, 14, 0, 0) };
+-        _back.Click += (_, _) => { if (_step > 1) { _step--; RenderStep(); } };
+-        _next.Click += (_, _) => Advance();
+-        footer.Children.Add(_back);
+-        footer.Children.Add(_next);
+-        Grid.SetRow(footer, 3);
+-        root.Children.Add(footer);
+-        return root;
+-    }
+-
+-    private void RenderStep()
+-    {
+-        _stepText.Text = $"第 {_step}/3 步：副词条等级大于等于 {_step} 级时锁定";
+-        _back.IsEnabled = _step > 1;
+-        _next.Content = _step == 3 ? "完成设置" : "确认并继续";
+-        _choices.Children.Clear();
+-
+-        var usedEarlier = new HashSet<string>(_selected.Where(pair => pair.Key < _step).SelectMany(pair => pair.Value));
+-        var available = ChipFilterCatalog.SubSkills.Where(skill => !usedEarlier.Contains(skill)).ToArray();
+-        var none = new CheckBox { Content = "无", IsChecked = _selected[_step].Count == 0, Margin = new Thickness(4) };
+-        var boxes = new List<CheckBox>();
+-        foreach (var skill in available)
+-        {
+-            var box = new CheckBox { Content = skill, IsChecked = _selected[_step].Contains(skill), Margin = new Thickness(4) };
+-            box.IsCheckedChanged += (_, _) =>
+-            {
+-                if (box.IsChecked == true)
+-                    none.IsChecked = false;
+-                SyncSelection(boxes);
+-            };
+-            boxes.Add(box);
+-            _choices.Children.Add(box);
+-        }
+-        none.IsCheckedChanged += (_, _) =>
++        var totalLevelRow = new StackPanel
+         {
+-            if (none.IsChecked == true)
+-                foreach (var box in boxes) box.IsChecked = false;
+-            SyncSelection(boxes);
++            Orientation = Orientation.Horizontal,
++            Spacing = 10,
++            Margin = new Thickness(0, 12, 0, 0),
++            Children =
++            {
++                new TextBlock
++                {
++                    Text = "所选有效副词条实际总等级",
++                    VerticalAlignment = VerticalAlignment.Center
++                },
++                _totalLevel,
++                new TextBlock
++                {
++                    Text = "时上锁",
++                    Opacity = 0.7,
++                    VerticalAlignment = VerticalAlignment.Center
++                }
++            }
+         };
+-        _choices.Children.Insert(0, none);
+-    }
+-
+-    private void SyncSelection(IEnumerable<CheckBox> boxes)
+-    {
+-        _selected[_step] = boxes.Where(box => box.IsChecked == true).Select(box => box.Content?.ToString() ?? string.Empty)
+-            .Where(value => value.Length > 0).ToHashSet();
+-        foreach (var later in new[] { 1, 2, 3 }.Where(level => level > _step))
+-            _selected[later].ExceptWith(_selected[_step]);
+-    }
+-
+-    private void Advance()
+-    {
+-        if (_step < 3)
+-        {
+-            _step++;
+-            RenderStep();
+-            return;
+-        }
+-        Result = new ChipSubSkillRule
++        Grid.SetRow(totalLevelRow, 3);
++        root.Children.Add(totalLevelRow);
++        var footer = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 10, Margin = new Thickness(0, 14, 0, 0) };
++        var cancel = new Button { Content = "取消", MinWidth = 90 };
++        var confirm = new Button { Content = "完成设置", Classes = { "Primary" }, MinWidth = 100 };
++        cancel.Click += (_, _) => Close(false);
++        confirm.Click += async (_, _) =>
+         {
+-            MinimumLevels = _selected.ToDictionary(pair => pair.Key, pair => pair.Value.ToList())
++            var effective = _skillBoxes.Where(box => box.IsChecked == true)
++                .Select(box => box.Content?.ToString() ?? string.Empty)
++                .Where(value => value.Length > 0)
++                .ToList();
++            if (effective.Count == 0)
++            {
++                await NoticeWindow.ShowAsync(this, "请至少勾选一个有效副词条。");
++                return;
++            }
++            Result = new ChipSubSkillRule
++            {
++                MinimumTotalLevel = TotalLevelThresholds[Math.Max(0, _totalLevel.SelectedIndex)],
++                EffectiveSubSkills = effective
++            };
++            Close(true);
+         };
+-        Close(true);
++        footer.Children.Add(cancel);
++        footer.Children.Add(confirm);
++        Grid.SetRow(footer, 4);
++        root.Children.Add(footer);
++        return root;
+     }
+ }
+ 

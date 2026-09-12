@@ -77,6 +77,14 @@
 
     _如果想要使用别的 [通用 UI](https://github.com/MaaXYZ/MaaFramework/#%E9%80%9A%E7%94%A8-ui)，请自行修改工作流的 [配置文件](/.github/workflows/install.yml)。_
 
+    本仓库 CI 在 Windows / macOS 打包前还会：
+
+    - 运行 `tools/ci/setup_embed_python.py` 生成 `install/python/`
+    - 运行 `tools/ci/download_deps.py` 下载 Agent wheel 到 `install/deps/`
+    - 由 `tools/install.py` 把它们与 `agent/` 一并复制进 Release，并改写 `interface.json` 中的 Python 路径
+
+    详见 [本地开发手册](./local_dev.md#release-包中的-python--agentwindows--macos)。
+
 ## 本机日常开发（MuMu）
 
 若使用 MuMu + MaaDebugger 在本机调试，请另阅 [本地开发手册](./local_dev.md)（含 ADB 路径、Extras 避坑、连接成功判定）。

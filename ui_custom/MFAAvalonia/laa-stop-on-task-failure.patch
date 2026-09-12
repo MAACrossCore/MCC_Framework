@@ -1,0 +1,13 @@
+diff --git a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+--- a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
++++ b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+@@ -4117,7 +4117,8 @@ public class MaaProcessor
+             OwnerViewModel = ViewModel,
+             SourceItem = sourceItem,
+             RunId = runId,
+-            ContinueOnError = InstanceConfiguration.GetValue(ConfigurationKeys.ContinueRunningWhenError, true)
++            // Project policy: a failed task must stop the queue instead of starting the next task.
++            ContinueOnError = false
+         };
+     }
+

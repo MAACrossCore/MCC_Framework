@@ -1,0 +1,294 @@
+{
+    "$__mpe_config_拉黑订单好友": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1789136030624,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MAAlocalhost\\resource\\pipeline\\base\\拉黑订单好友.json",
+            "savedViewport": {
+                "x": 354,
+                "y": -721,
+                "zoom": 0.46
+            },
+            "filename": "拉黑订单好友",
+            "version": "v1.10.0"
+        }
+    },
+    "$__mpe_external_子任务_进入个人配置_拉黑订单好友": {
+        "$__mpe_code": {
+            "position": {
+                "x": 536,
+                "y": 2440
+            }
+        }
+    },
+    "$__mpe_external_子任务_进入首页_拉黑订单好友": {
+        "$__mpe_code": {
+            "position": {
+                "x": 534,
+                "y": 2062
+            }
+        }
+    },
+    "删除登记完成": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "删除登记完成"
+            }
+        },
+        "next": [
+            "取下一待删好友"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 2298
+            }
+        }
+    },
+    "取下一待删好友": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "取下一待删好友"
+            }
+        },
+        "next": [
+            "寻找好友"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 822,
+                "y": 2285
+            }
+        }
+    },
+    "寻找好友": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "我的好友"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    70,
+                    163,
+                    38,
+                    25
+                ]
+            }
+        },
+        "next": [
+            "找到指定好友了",
+            "检测滑动到底了吗",
+            "[JumpBack]滑动好友槽位"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1087,
+                "y": 2002
+            }
+        }
+    },
+    "屏蔽": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "屏蔽"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    944,
+                    230,
+                    48,
+                    22
+                ]
+            }
+        },
+        "next": [
+            "确认"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2114,
+                "y": 1850
+            }
+        }
+    },
+    "找到指定好友了": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "11111111"
+                ]
+            }
+        },
+        "next": [
+            "点击更多"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1491,
+                "y": 1782
+            }
+        }
+    },
+    "拉黑好友流程": {
+        "doc": "入口：按 orders_state.friends 从头逐个屏蔽并移出登记",
+        "next": [
+            "寻找好友",
+            "[JumpBack]子任务_进入个人配置",
+            "[JumpBack]子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 56,
+                "y": 2259
+            }
+        }
+    },
+    "检测滑动到底了吗": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1210,
+                    125,
+                    51,
+                    588
+                ],
+                "template": [
+                    "StartUp/template_1788096029286.png"
+                ]
+            }
+        },
+        "next": [
+            "删除登记完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1540,
+                "y": 2087
+            }
+        }
+    },
+    "清理完毕退出": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    481,
+                    714,
+                    0,
+                    5
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 89,
+                "y": 1944
+            }
+        }
+    },
+    "滑动好友槽位": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    614,
+                    644,
+                    35,
+                    17
+                ],
+                "end": [
+                    [
+                        597,
+                        396,
+                        56,
+                        49
+                    ]
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1545,
+                "y": 2422
+            }
+        }
+    },
+    "点击更多": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1099,
+                    205,
+                    27,
+                    24
+                ]
+            }
+        },
+        "next": [
+            "屏蔽"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1816,
+                "y": 1842
+            }
+        }
+    },
+    "确认": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "确定"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    779,
+                    436,
+                    51,
+                    29
+                ]
+            }
+        },
+        "next": [
+            "删除登记完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2444,
+                "y": 1837
+            }
+        }
+    }
+}

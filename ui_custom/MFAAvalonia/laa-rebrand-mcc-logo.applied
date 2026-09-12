@@ -1,0 +1,12 @@
+LAA/MCC branding: logo.ico replaced
+==================================
+本文件是 laa-rebrand-mcc-logo.patch 的 marker。
+
+为什么用文本文件当 marker：build.ps1 用 Select-String 在 MarkerFile 里查找 Marker，
+而该补丁的产物是二进制 .ico，文本查找拿不到内容，会导致 marker 恒不命中。
+
+补丁内容：
+  MFAAvalonia/Assets/logo.ico   <- 由桌面 logo.png 生成的多尺寸 ICO
+  MFAUpdater/logo.ico           <- 同上
+生成方式见 .tmp/icon-probe（16/24/32/48/64/128/256 共 7 档）。
+用途：in-app 窗口图标（IconHelper 运行时读）+ exe 图标（ApplicationIcon，需重编译）。

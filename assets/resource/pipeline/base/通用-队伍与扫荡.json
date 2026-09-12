@@ -1,0 +1,81 @@
+{
+  "$__mpe_config_通用-队伍与扫荡": {
+    "$__mpe_code": {
+      "prefix": "",
+      "coordinateMode": "absolute-v1",
+      "filename": "通用-队伍与扫荡",
+      "version": "v1.9.2",
+      "savedViewport": { "x": 0, "y": 0, "zoom": 0.6 }
+    }
+  },
+  "通用_队伍下拉": {
+    "recognition": "OCR",
+    "expected": ["队伍", "01"],
+    "roi": [200, 155, 180, 70],
+    "action": "Click",
+    "target": [513, 180, 4, 4],
+    "post_delay": 500,
+    "next": "通用_队伍选择",
+    "$__mpe_code": { "position": { "x": 380, "y": 100 } }
+  },
+  "通用_队伍选择": {
+    "recognition": "OCR",
+    "expected": ["01", "02", "03", "04"],
+    "roi": [270, 220, 300, 290],
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "select_team" },
+    "post_delay": 500,
+    "next": "通用_扫荡读取票数",
+    "$__mpe_code": { "position": { "x": 680, "y": 100 } }
+  },
+  "通用_扫荡读取票数": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "read_tickets" },
+    "next": "活动_扫荡批次分派",
+    "$__mpe_code": { "position": { "x": 980, "y": 100 } }
+  },
+  "通用_扫荡准备批次": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "status:sweep" },
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "prepare_batch" },
+    "next": "活动_扫荡次数与开战",
+    "$__mpe_code": { "position": { "x": 1280, "y": 100 } }
+  },
+  "通用_扫荡调整次数": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "status:batch_ready" },
+    "action": "Custom",
+    "custom_action": "activity_atomic",
+    "custom_action_param": { "operation": "adjust_count" },
+    "post_delay": 300,
+    "next": "活动_点击开始战斗",
+    "$__mpe_code": { "position": { "x": 1580, "y": 100 } }
+  },
+  "通用_掉落加成使用": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "bonus:use" },
+    "action": "Click",
+    "target": [804, 448, 4, 4],
+    "post_delay": 800,
+    "next": "活动任务_扫荡奖励",
+    "$__mpe_code": { "position": { "x": 1880, "y": 0 } }
+  },
+  "通用_掉落加成不使用": {
+    "recognition": "Custom",
+    "custom_recognition": "activity_state",
+    "custom_recognition_param": { "expected": "bonus:skip" },
+    "action": "Click",
+    "target": [478, 448, 4, 4],
+    "post_delay": 800,
+    "next": "活动任务_扫荡奖励",
+    "$__mpe_code": { "position": { "x": 1880, "y": 200 } }
+  }
+}

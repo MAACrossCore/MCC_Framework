@@ -1,0 +1,19 @@
+{
+    "NavMainBottomBar": { "recognition": "OCR", "roi": [493, 580, 773, 137], "expected": [], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainBaseText": { "recognition": "OCR", "roi": [527, 600, 153, 110], "expected": ["基地"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainTaskText": { "recognition": "OCR", "roi": [600, 600, 167, 110], "expected": ["任务"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainFormation": { "recognition": "OCR", "roi": [683, 600, 170, 110], "expected": ["编队"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainMember": { "recognition": "OCR", "roi": [770, 600, 170, 110], "expected": ["队员"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainBuild": { "recognition": "OCR", "roi": [857, 600, 170, 110], "expected": ["构建"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainSupplyStation": { "recognition": "OCR", "roi": [940, 600, 180, 110], "expected": ["补给站"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainSortie": { "recognition": "OCR", "roi": [1047, 533, 200, 173], "expected": ["出击"], "threshold": 0.2, "action": "DoNothing" },
+
+    "NavMainExplorationGuide": { "recognition": "OCR", "roi": [63, 97, 207, 83], "expected": ["勘探指南"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainPeriodicTraining": { "recognition": "OCR", "roi": [63, 177, 207, 83], "expected": ["周期特训"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainLuckyGashapon": { "recognition": "OCR", "roi": [63, 250, 207, 90], "expected": ["幸运扭蛋"], "threshold": 0.2, "action": "DoNothing" },
+
+    "NavMainNewSupply": { "recognition": "OCR", "roi": [880, 77, 127, 103], "expected": ["新途补给"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainTradeVoucher": { "recognition": "OCR", "roi": [990, 77, 127, 103], "expected": ["星贸凭证"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainActivity": { "recognition": "OCR", "roi": [1100, 77, 127, 103], "expected": ["活动"], "threshold": 0.2, "action": "DoNothing" },
+    "NavMainStarRecall": { "recognition": "OCR", "roi": [1093, 173, 137, 110], "expected": ["星辉回溯"], "threshold": 0.2, "action": "DoNothing" }
+}

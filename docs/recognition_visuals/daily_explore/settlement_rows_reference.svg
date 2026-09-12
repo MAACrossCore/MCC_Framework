@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <rect width="1920" height="1080" fill="#17202a"/>
+  <text x="60" y="70" fill="white" font-size="32" font-family="Microsoft YaHei">每日探索芯片结算识别区域（统一 1920×1080 基准）</text>
+  <rect x="840" y="60" width="260" height="700" fill="#ffb300" fill-opacity="0.14" stroke="#ffb300" stroke-width="5"/>
+  <text x="850" y="105" fill="#ffca28" font-size="25" font-family="Microsoft YaHei">扫荡次数 + n/总次数 OCR</text>
+  <rect x="820" y="120" width="700" height="580" fill="#29b6f6" fill-opacity="0.08" stroke="#29b6f6" stroke-width="3" stroke-dasharray="12 8"/>
+  <text x="1120" y="155" fill="#29b6f6" font-size="23" font-family="Microsoft YaHei">安全行中心 Y：120～700</text>
+  <line x1="1250" y1="120" x2="1250" y2="700" stroke="#00e676" stroke-width="5"/>
+  <line x1="1405" y1="120" x2="1405" y2="700" stroke="#ec407a" stroke-width="5"/>
+  <text x="1160" y="745" fill="#00e676" font-size="25" font-family="Microsoft YaHei">第一芯片固定 X=1250</text>
+  <text x="1340" y="790" fill="#ec407a" font-size="25" font-family="Microsoft YaHei">第二芯片固定 X=1405</text>
+  <text x="60" y="930" fill="white" font-size="25" font-family="Microsoft YaHei">结算页必须同时得到有效总次数和至少一行“扫荡次数 + n/总次数”配对，才允许点击加速并进入筛选。</text>
+  <text x="60" y="980" fill="#b0bec5" font-size="22" font-family="Microsoft YaHei">因此仓满弹窗后方残留的“扫荡”标题不会再被当成结算页。</text>
+</svg>

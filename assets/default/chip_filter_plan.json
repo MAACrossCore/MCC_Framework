@@ -1,0 +1,299 @@
+{
+  "version": 3,
+  "name": "我的芯片筛选方案",
+  "levels": {
+    "1": {
+      "mode": "lock",
+      "conditions": {}
+    },
+    "2": {
+      "mode": "conditional",
+      "conditions": {
+        "穿甲": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "切割": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤",
+            "命中"
+          ]
+        },
+        "征服": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "重击": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "速度"
+          ]
+        },
+        "支援": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "精力": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "蓄能": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "收割": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "屏障": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "铁壁": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "灵巧": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "暴怒": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "速度"
+          ]
+        },
+        "致命": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "腐蚀": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "耐久",
+            "命中"
+          ]
+        },
+        "集中": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "耐久",
+            "命中"
+          ]
+        },
+        "金刚": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "痛击": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "扩大": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "物攻": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "能量": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "装填": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "速度"
+          ]
+        },
+        "光幕": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "钝化": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "特防": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "神威": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "神力": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "神速": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "振奋": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "消除": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "重伤": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "坚韧"
+          ]
+        },
+        "连击": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "乘风": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "反击": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "协击": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "引爆": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "耐久",
+            "防御",
+            "速度"
+          ]
+        }
+      }
+    },
+    "3": {
+      "mode": "lock",
+      "conditions": {}
+    }
+  }
+}

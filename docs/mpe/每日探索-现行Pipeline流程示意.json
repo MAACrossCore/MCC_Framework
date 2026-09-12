@@ -1,0 +1,154 @@
+{
+    "$__mpe_config_每日探索现行Pipeline流程示意": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "filename": "每日探索-现行Pipeline流程示意",
+            "version": "v1.9.2",
+            "savedViewport": { "x": 40, "y": 40, "zoom": 0.68 }
+        }
+    },
+    "MPE每日探索_任务入口_出击任务列表": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["MPE每日探索_主界面点击出击", "MPE每日探索_非预期页面返回后重试"],
+        "$__mpe_code": { "position": { "x": 80, "y": 120 } }
+    },
+    "MPE每日探索_非预期页面返回后重试": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_任务入口_出击任务列表",
+        "$__mpe_code": { "position": { "x": 80, "y": 340 } }
+    },
+    "MPE每日探索_主界面点击出击": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_接续点A_出击选择页",
+        "$__mpe_code": { "position": { "x": 360, "y": 120 } }
+    },
+    "MPE每日探索_接续点A_出击选择页": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_Interface选择每日探索",
+        "$__mpe_code": { "position": { "x": 640, "y": 120 } }
+    },
+    "MPE每日探索_Interface选择每日探索": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_接续点B_每日探索分类页",
+        "$__mpe_code": { "position": { "x": 920, "y": 120 } }
+    },
+    "MPE每日探索_接续点B_每日探索分类页": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["MPE每日探索_选择资源采集", "MPE每日探索_选择跃升行动"],
+        "$__mpe_code": { "position": { "x": 1200, "y": 120 } }
+    },
+    "MPE每日探索_选择资源采集": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_接续点C_具体关卡选择页",
+        "$__mpe_code": { "position": { "x": 1480, "y": 20 } }
+    },
+    "MPE每日探索_选择跃升行动": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_接续点C_具体关卡选择页",
+        "$__mpe_code": { "position": { "x": 1480, "y": 220 } }
+    },
+    "MPE每日探索_接续点C_具体关卡选择页": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_Interface选择具体关卡",
+        "$__mpe_code": { "position": { "x": 1760, "y": 120 } }
+    },
+    "MPE每日探索_Interface选择具体关卡": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_接续点D_层数选择页",
+        "$__mpe_code": { "position": { "x": 2040, "y": 120 } }
+    },
+    "MPE每日探索_接续点D_层数选择页": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_Interface选择层数",
+        "$__mpe_code": { "position": { "x": 2320, "y": 120 } }
+    },
+    "MPE每日探索_Interface选择层数": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_接续点E_关卡详情扫荡页",
+        "$__mpe_code": { "position": { "x": 2600, "y": 120 } }
+    },
+    "MPE每日探索_接续点E_关卡详情扫荡页": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_点击扫荡",
+        "$__mpe_code": { "position": { "x": 2880, "y": 120 } }
+    },
+    "MPE每日探索_点击扫荡": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["MPE每日探索_自动次数按体力调整", "MPE每日探索_自定次数增加到目标"],
+        "$__mpe_code": { "position": { "x": 3160, "y": 120 } }
+    },
+    "MPE每日探索_自动次数按体力调整": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["MPE每日探索_体力足够开始战斗", "MPE每日探索_体力不足取消并回主页"],
+        "$__mpe_code": { "position": { "x": 3440, "y": 20 } }
+    },
+    "MPE每日探索_自定次数增加到目标": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_体力足够开始战斗",
+        "$__mpe_code": { "position": { "x": 3440, "y": 220 } }
+    },
+    "MPE每日探索_体力不足取消并回主页": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "$__mpe_code": { "position": { "x": 3720, "y": -100 } }
+    },
+    "MPE每日探索_体力足够开始战斗": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["MPE每日探索_燃料补给弹窗", "MPE每日探索_开启加成", "MPE每日探索_扫荡成功"],
+        "$__mpe_code": { "position": { "x": 3720, "y": 120 } }
+    },
+    "MPE每日探索_燃料补给弹窗": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_使用燃料后回到开始战斗",
+        "$__mpe_code": { "position": { "x": 4000, "y": -100 } }
+    },
+    "MPE每日探索_使用燃料后回到开始战斗": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_体力足够开始战斗",
+        "$__mpe_code": { "position": { "x": 4280, "y": -100 } }
+    },
+    "MPE每日探索_开启加成": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_扫荡成功",
+        "$__mpe_code": { "position": { "x": 4000, "y": 120 } }
+    },
+    "MPE每日探索_扫荡成功": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["MPE每日探索_升级弹窗", "MPE每日探索_关闭扫荡奖励"],
+        "$__mpe_code": { "position": { "x": 4280, "y": 120 } }
+    },
+    "MPE每日探索_升级弹窗": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_关闭扫荡奖励",
+        "$__mpe_code": { "position": { "x": 4560, "y": 20 } }
+    },
+    "MPE每日探索_关闭扫荡奖励": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": "MPE每日探索_接续点E_关卡详情扫荡页",
+        "$__mpe_code": { "position": { "x": 4560, "y": 220 } }
+    }
+}

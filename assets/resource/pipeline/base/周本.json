@@ -1,0 +1,1120 @@
+{
+    "$__mpe_config_周本": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1788453105837,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\workwork\\MAA\\MAA_Practice\\assets\\resource\\pipeline\\base\\周本.json",
+            "savedViewport": {
+                "x": -4810,
+                "y": -535,
+                "zoom": 1.39
+            },
+            "filename": "周本",
+            "version": "v1.9.2"
+        }
+    },
+    "周本": {
+        "next": [
+            "首页_出击",
+            "[JumpBack]子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 252,
+                "y": 12
+            }
+        }
+    },
+    "活动探索": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    540,
+                    98,
+                    215,
+                    95
+                ],
+                "expected": [
+                    "活动探索"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "活动探索_碎星虚影",
+            "活动探索"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3532,
+                "y": 363
+            }
+        }
+    },
+    "活动探索_上滑": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    617,
+                    196,
+                    40,
+                    40
+                ],
+                "end": [
+                    [
+                        617,
+                        385,
+                        40,
+                        40
+                    ]
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 12
+            }
+        }
+    },
+    "活动探索_下滑": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    617,
+                    385,
+                    40,
+                    40
+                ],
+                "end": [
+                    [
+                        617,
+                        196,
+                        40,
+                        40
+                    ]
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 4492,
+                "y": 393
+            }
+        }
+    },
+    "活动探索_关闭第二队": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    1153,
+                    380,
+                    21,
+                    14
+                ],
+                "method": 4,
+                "lower": [
+                    220,
+                    180,
+                    60
+                ],
+                "upper": [
+                    255,
+                    220,
+                    100
+                ],
+                "count": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 1039
+            }
+        }
+    },
+    "活动探索_已存在": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    86,
+                    623,
+                    152,
+                    40
+                ],
+                "expected": [
+                    "600/600",
+                    "6007600",
+                    "6001600"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    208,
+                    37,
+                    20,
+                    20
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 4812,
+                "y": 281
+            }
+        }
+    },
+    "活动探索_开始": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    615,
+                    200,
+                    89
+                ],
+                "expected": [
+                    "开始战斗"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "[JumpBack]活动探索_奖励上限确认",
+            "[JumpBack]活动探索_确认",
+            "[JumpBack]活动探索_关闭第二队",
+            "活动探索_开始行动",
+            "活动探索_开始",
+            "活动探索_步骤1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 274,
+                "y": 1426
+            }
+        }
+    },
+    "活动探索_开始行动": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    615,
+                    200,
+                    89
+                ],
+                "expected": [
+                    "开始行动"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "活动探索_步骤1",
+            "活动探索_开始行动"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 1709
+            }
+        }
+    },
+    "活动探索_戈里刻虚影": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    100,
+                    333,
+                    500,
+                    154
+                ],
+                "expected": [
+                    "戈里刻虚影"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "活动探索_第五关",
+            "[JumpBack]活动探索_下滑",
+            "活动探索_戈里刻虚影"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4172,
+                "y": 403
+            }
+        }
+    },
+    "活动探索_战斗中1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1169,
+                    27,
+                    105,
+                    59
+                ],
+                "template": "Combat/Combat_Combating.png"
+            }
+        },
+        "next": [
+            "[JumpBack]跳过首领演出动画",
+            "[JumpBack]跳过首领演出动画_OCR",
+            "[JumpBack]战斗_自动战斗",
+            "[JumpBack]战斗_启用二倍速",
+            "活动探索_战斗结束1",
+            "活动探索_战斗中1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 1763
+            }
+        }
+    },
+    "活动探索_战斗中2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1169,
+                    27,
+                    105,
+                    59
+                ],
+                "template": "Combat/Combat_Combating.png"
+            }
+        },
+        "next": [
+            "[JumpBack]跳过首领演出动画",
+            "[JumpBack]跳过首领演出动画_OCR",
+            "[JumpBack]战斗_自动战斗",
+            "[JumpBack]战斗_启用二倍速",
+            "活动探索_战斗结束2",
+            "活动探索_战斗中2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2572,
+                "y": 1628
+            }
+        }
+    },
+    "活动探索_战斗中3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1169,
+                    27,
+                    105,
+                    59
+                ],
+                "template": "Combat/Combat_Combating.png"
+            }
+        },
+        "next": [
+            "[JumpBack]跳过首领演出动画",
+            "[JumpBack]跳过首领演出动画_OCR",
+            "[JumpBack]子任务_获得物品",
+            "[JumpBack]战斗_自动战斗",
+            "[JumpBack]战斗_启用二倍速",
+            "活动探索_战斗结束3",
+            "活动探索_战斗中3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3836,
+                "y": 1211
+            }
+        }
+    },
+    "活动探索_战斗结束1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    210,
+                    410,
+                    97,
+                    152
+                ],
+                "expected": [
+                    "等级"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack]子任务_获得物品",
+            "活动探索_步骤3",
+            "活动探索_战斗结束1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 1551
+            }
+        }
+    },
+    "活动探索_战斗结束2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    210,
+                    410,
+                    97,
+                    152
+                ],
+                "expected": [
+                    "等级"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack]子任务_获得物品",
+            "活动探索_步骤4",
+            "活动探索_战斗结束2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2892,
+                "y": 1638
+            }
+        }
+    },
+    "活动探索_战斗结束3": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    210,
+                    410,
+                    97,
+                    152
+                ],
+                "expected": [
+                    "等级"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack]子任务_获得物品",
+            "活动探索_第五关",
+            "活动探索_战斗结束3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4172,
+                "y": 1227
+            }
+        }
+    },
+    "活动探索_步骤1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1052,
+                    11,
+                    130,
+                    64
+                ],
+                "expected": [
+                    "行动"
+                ]
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    705,
+                    284,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_步骤2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 1742
+            }
+        }
+    },
+    "活动探索_步骤2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1052,
+                    11,
+                    130,
+                    64
+                ],
+                "expected": [
+                    "行动"
+                ]
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    588,
+                    221,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_战斗中1",
+            "活动探索_步骤2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 1713
+            }
+        }
+    },
+    "活动探索_步骤3": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1052,
+                    11,
+                    130,
+                    64
+                ],
+                "expected": [
+                    "行动"
+                ]
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    777,
+                    331,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_战斗中2",
+            "活动探索_步骤3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2252,
+                "y": 1529
+            }
+        }
+    },
+    "活动探索_步骤4": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1052,
+                    11,
+                    130,
+                    64
+                ],
+                "expected": [
+                    "行动"
+                ]
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    592,
+                    186,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_步骤5"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3212,
+                "y": 1517
+            }
+        }
+    },
+    "活动探索_步骤5": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1052,
+                    11,
+                    130,
+                    64
+                ],
+                "expected": [
+                    "行动"
+                ]
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    592,
+                    186,
+                    20,
+                    20
+                ]
+            }
+        },
+        "timeout": 40000,
+        "next": [
+            "活动探索_战斗中3",
+            "活动探索_步骤5"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3532,
+                "y": 1507
+            }
+        }
+    },
+    "活动探索_奖励上限确认": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    300,
+                    260,
+                    700,
+                    127
+                ],
+                "expected": [
+                    "本周可领取的上限已满",
+                    "是否确认进入"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    788,
+                    435,
+                    30,
+                    30
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1310
+            }
+        }
+    },
+    "活动探索_确认": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    722,
+                    405,
+                    190,
+                    94
+                ],
+                "expected": [
+                    "开启"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 1389
+            }
+        }
+    },
+    "活动探索_碎星虚影": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    450,
+                    443,
+                    302,
+                    98
+                ],
+                "expected": [
+                    "碎星虚影",
+                    "碎星虛影"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_已存在",
+            "活动探索_戈里刻虚影",
+            "活动探索_碎星虚影"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3852,
+                "y": 353
+            }
+        }
+    },
+    "活动探索_第五关": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    682,
+                    456,
+                    180,
+                    180
+                ],
+                "expected": [
+                    "虚影宙斯"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "活动探索_已存在",
+            "活动探索_第五关开始"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4492,
+                "y": 641
+            }
+        }
+    },
+    "活动探索_第五关开始": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    615,
+                    200,
+                    89
+                ],
+                "expected": [
+                    "开始战斗"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "[JumpBack]活动探索_奖励上限确认",
+            "[JumpBack]活动探索_确认",
+            "[JumpBack]活动探索_关闭第二队",
+            "活动探索_第五关开始行动",
+            "活动探索_第五关开始",
+            "活动探索_第五关步骤1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 874
+            }
+        }
+    },
+    "活动探索_第五关开始行动": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    615,
+                    200,
+                    89
+                ],
+                "expected": [
+                    "开始行动"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 2000,
+        "next": [
+            "活动探索_第五关步骤1",
+            "活动探索_第五关开始行动"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 719
+            }
+        }
+    },
+    "活动探索_第五关步骤1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1052,
+                    11,
+                    130,
+                    64
+                ],
+                "expected": [
+                    "行动"
+                ]
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    538,
+                    564,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_第五关步骤2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 809
+            }
+        }
+    },
+    "活动探索_第五关步骤2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1052,
+                    11,
+                    130,
+                    64
+                ],
+                "expected": [
+                    "行动"
+                ]
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    415,
+                    384,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_第五关步骤3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 809
+            }
+        }
+    },
+    "活动探索_第五关步骤3": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    375,
+                    415,
+                    40,
+                    40
+                ],
+                "method": 4,
+                "lower": [
+                    80,
+                    135,
+                    55
+                ],
+                "upper": [
+                    120,
+                    180,
+                    120
+                ],
+                "count": 1
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    332,
+                    260,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_第五关步骤4"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 761
+            }
+        }
+    },
+    "活动探索_第五关步骤4": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    377,
+                    419,
+                    40,
+                    40
+                ],
+                "method": 4,
+                "lower": [
+                    80,
+                    135,
+                    55
+                ],
+                "upper": [
+                    120,
+                    180,
+                    120
+                ],
+                "count": 1
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    503,
+                    295,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "活动探索_第五关步骤5"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 761
+            }
+        }
+    },
+    "活动探索_第五关步骤5": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    808,
+                    291,
+                    40,
+                    40
+                ],
+                "method": 4,
+                "lower": [
+                    80,
+                    135,
+                    55
+                ],
+                "upper": [
+                    120,
+                    180,
+                    120
+                ],
+                "count": 1
+            }
+        },
+        "pre_delay": 2000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    680,
+                    224,
+                    20,
+                    20
+                ]
+            }
+        },
+        "timeout": 40000,
+        "next": [
+            "活动探索_战斗中3",
+            "活动探索_第五关步骤5"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2572,
+                "y": 751
+            }
+        }
+    },
+    "活动探索_虚影阿瑞斯": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    653,
+                    204,
+                    180,
+                    55
+                ],
+                "expected": [
+                    "虚影阿瑞斯"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "活动探索_已存在",
+            "活动探索_开始"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 256
+            }
+        }
+    },
+    "$__mpe_external_首页_出击_周本": {
+        "$__mpe_code": {
+            "position": {
+                "x": 572,
+                "y": 36
+            }
+        }
+    },
+    "$__mpe_external_子任务_进入首页_周本": {
+        "$__mpe_code": {
+            "position": {
+                "x": 572,
+                "y": 176
+            }
+        }
+    },
+    "$__mpe_external_战斗_自动战斗_周本": {
+        "$__mpe_code": {
+            "position": {
+                "x": 4172,
+                "y": 1477
+            }
+        }
+    },
+    "$__mpe_external_战斗_启用二倍速_周本": {
+        "$__mpe_code": {
+            "position": {
+                "x": 4172,
+                "y": 1877
+            }
+        }
+    },
+    "$__mpe_external_子任务_获得物品_周本": {
+        "$__mpe_code": {
+            "position": {
+                "x": 4492,
+                "y": 1430
+            }
+        }
+    }
+}
