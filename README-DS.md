@@ -258,7 +258,7 @@ RootView.axaml:181/184  ResourceName 与 ResourceVersion 共用 IsResourceNameVi
 每日探索_第几层
   → 每日探索_体力药准备(prepare)   读设置 → 读当前体力 → 算计划 → 认领本次药量
   → 分派（按 next 顺序逐个识别）：
-        ├─ 每日探索_计划结束收尾   plan:finished  → finish 动作 → 出击任务列表（正常结束）
+        ├─ 每日探索_计划结束收尾   plan:finished  → finish 动作 → 通用-返回主页（正常结束，勿回出击任务列表）
         ├─ 每日探索_待使用体力药   potion:pending → 打开体力药 → 药量页 → 确认 → 回关卡页
         └─ 扫荡                    （DirectHit 兜底）
   → 扫荡 → 扫荡次数选择
@@ -297,7 +297,7 @@ _build_plan: 指定次数 且 不使用体力药 且 summary.shortfall
    → log「当前自选次数X次，体力不足，未执行刷取操作（当前体力=…，单次消耗=…，最多只能扫N次）」
    → _SESSION["plan_finished"] = "insufficient_stamina"；batches=[]；返回 False
 prepare:     见 plan_finished → 返回 True → 分派节点
-plan:finished 命中 → finish 动作（什么都不点，只打日志）→ 出击任务列表 → 任务成功结束
+plan:finished 命中 → finish 动作（什么都不点，只打日志）→ 通用-返回主页 → 任务成功结束
 ```
 
 双保险：`set_sweep_count_by_stamina` / `set_sweep_count` 开头都检查 `plan_aborted`，命中直接返回。

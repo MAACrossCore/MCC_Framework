@@ -1,5 +1,10 @@
 # LAA MFAAvalonia customization
 
+> **CI 现状**：正式包 UI 来自自有仓
+> [`MAACrossCore/MCCAvalonia`](https://github.com/MAACrossCore/MCCAvalonia)
+>（当前钉 `v0.1.0`）。`.github/workflows/install.yml` **不再**对本目录执行
+> `apply-patches.sh`。定制请合进 MCCAvalonia；本目录 patch 仅作历史备份/移植参考。
+
 This directory keeps the reproducible UI patch used by LAA. It targets upstream
 MFAAvalonia commit `6065fe33798b72906c5079fa6f210646801d9a5c` (v2.15.2).
 
