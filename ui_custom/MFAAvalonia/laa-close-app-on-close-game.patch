@@ -1,0 +1,72 @@
+diff --git a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+index 1dab627..686abd2 100644
+--- a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
++++ b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+@@ -4418,6 +4418,67 @@ public class MaaProcessor
+                 Instances.RestartSystem();
+                 break;
+         }
++
++        // LAA: 「关闭游戏」任务勾了「关闭本程序」时，任务队列跑完由本进程自己退出。
++        // 做法与 MAA 一致：进程内调用 ShutdownApplication，而不是从外部去杀进程。
++        if (ShouldCloseApplicationForCloseGameTask())
++            Instances.ShutdownApplication();
++    }
++
++    /// <summary>
++    /// LAA: 判断「关闭游戏」任务是否勾选了「关闭本程序」。
++    /// 直接读实例配置文件，避免依赖 InstanceConfiguration 的内部取值 API：
++    ///   TaskItems[] 中 entry == "关闭游戏" 且 default_check == true 的那一项，
++    ///   其 option[] 里 name == "关闭本程序" 的 index（switch 的第 0 个 case 即 Yes）。
++    /// </summary>
++    private bool ShouldCloseApplicationForCloseGameTask()
++    {
++        const string CloseGameEntry = "关闭游戏";
++        const string CloseAppOption = "关闭本程序";
++        try
++        {
++            var path = InstanceConfiguration.GetConfigFilePath();
++            if (string.IsNullOrEmpty(path) || !System.IO.File.Exists(path))
++                return false;
++
++            var root = Newtonsoft.Json.Linq.JObject.Parse(
++                System.IO.File.ReadAllText(path, System.Text.Encoding.UTF8));
++
++            var items = root[ConfigurationKeys.TaskItems] as Newtonsoft.Json.Linq.JArray;
++            LoggerHelper.Info($"关闭本程序判定：配置文件={path} TaskItems数={(items?.Count ?? -1)}");
++
++            var task = items?
++                .FirstOrDefault(t => (string?)t["entry"] == CloseGameEntry
++                                     && (bool?)t["default_check"] == true);
++            if (task == null)
++            {
++                var names = string.Join(",",
++                    (items ?? new Newtonsoft.Json.Linq.JArray())
++                        .Select(x => $"{(string?)x["entry"]}/{(bool?)x["default_check"]}"));
++                LoggerHelper.Info($"关闭本程序判定：未找到已勾选的「关闭游戏」任务。队列={names}");
++                return false;
++            }
++
++            var option = (task["option"] as Newtonsoft.Json.Linq.JArray)?
++                .FirstOrDefault(o => (string?)o["name"] == CloseAppOption);
++            if (option == null)
++            {
++                var existing = string.Join(", ",
++                    (task["option"] as Newtonsoft.Json.Linq.JArray)?
++                        .Select(o => (string?)o["name"]) ?? System.Linq.Enumerable.Empty<string>());
++                LoggerHelper.Info($"关闭本程序判定：该任务没有「{CloseAppOption}」选项；现有选项={existing}");
++                return false;
++            }
++
++            var index = (int?)option["index"];
++            LoggerHelper.Info($"关闭本程序判定：选项 index={index}（0=Yes 才会关闭）");
++            return index == 0;
++        }
++        catch (Exception ex)
++        {
++            LoggerHelper.Warning($"关闭游戏-关闭本程序 判定失败：{ex.Message}");
++            return false;
++        }
+     }
+ 
+     public static void CloseSoftwareAndRestartMFA(MaaProcessor? processor = null)

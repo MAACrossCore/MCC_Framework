@@ -17,9 +17,10 @@ laa-simplified-settings.patch
 laa-project-profiles-scheduler.patch
 laa-emulator-minimize-setting.patch
 laa-simplified-start-end-actions.patch
+laa-close-app-on-close-game.patch
 laa-settings-runtime-fixes.patch
-# After every other TaskOptionGenerator change: adds the option-name Tag and conditional row visibility.
 laa-arena-conditional-option.patch
+# After every other TaskOptionGenerator change: adds the option-name Tag and conditional row visibility.
 # After laa-chip-task-checkbox (same view): collapsible task groups in the task queue list.
 laa-task-queue-groups.patch
 # After emulator-minimize: Strings.resx has MinimizeEmulatorAfterLaunch between AutomaticMinimize and AutomaticUpdateMFA.
