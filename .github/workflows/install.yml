@@ -8,7 +8,7 @@ env:
   # 自有 UI：https://github.com/MAACrossCore/MCCAvalonia
   # 附件名仍为 MFAAvalonia-*-{win|osx|linux}-{x64|arm64}.*（与上游命名兼容）
   # ui_custom/MFAAvalonia 的 patch 链暂不在 CI 使用；定制请直接合进 MCCAvalonia。
-  MFAA_VERSION: "v0.1.0"
+  MFAA_VERSION: "v0.1.1"
 
 on:
   # 练习/日常开发不自动打包，避免 artifact 配额被打满。
