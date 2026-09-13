@@ -339,18 +339,23 @@ def choose_instance(manager, requested=None, preferred_serial="", cached_index=N
                     return candidate
         return None
 
-    running = [item for item in found if item[1].get("is_android_started")]
-    if choice := unique(running):
-        return choice
-    process_started = [item for item in found if item[1].get("is_process_started")]
-    if choice := unique(process_started):
-        return choice
+    # 优先级调整（LAA）：把「上次成功用过的实例」提到「当前活动的实例」之前。
+    # 原顺序是 running -> process_started -> cached -> fallback，导致只要别的实例在活动，
+    # 就永远选活动那个 —— 表现为"上次用 1 打开过游戏，1 关掉、0 活动时又切成 0"。
+    # 需求：以最近一次成功使用 / 人手选择的实例为准，哪怕它没在活动。
     if cached_index is not None:
         if choice := pick(int(cached_index)):
             return choice
     if fallback_index is not None:
         if choice := pick(int(fallback_index)):
             return choice
+
+    running = [item for item in found if item[1].get("is_android_started")]
+    if choice := unique(running):
+        return choice
+    process_started = [item for item in found if item[1].get("is_process_started")]
+    if choice := unique(process_started):
+        return choice
     if len(found) == 1:
         return found[0]
     main_instances = [item for item in found if item[1].get("is_main")]

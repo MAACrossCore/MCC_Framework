@@ -10,6 +10,7 @@ laa-limited-trade-chip-options.patch
 laa-chip-task-checkbox.patch
 laa-pretask-path-resolution.patch
 laa-pretask-config-sync.patch
+laa-connection-target-stability.patch
 laa-stop-on-task-failure.patch
 laa-no-autostart.patch
 laa-reset-task-confirmation.patch

@@ -73,6 +73,7 @@ $patchMarkers = @{
     'laa-emulator-minimize-setting.patch' = @{ MarkerFile = 'MFAAvalonia\Configuration\ConfigurationKeys.cs'; Marker = 'MinimizeEmulatorAfterLaunch' }
     'laa-simplified-start-end-actions.patch' = @{ MarkerFile = 'MFAAvalonia\ViewModels\UsersControls\Settings\StartSettingsUserControlModel.cs'; Marker = 'NormalizeBeforeTask' }
     'laa-close-app-on-close-game.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\MaaFW\MaaProcessor.cs'; Marker = 'ShouldCloseApplicationForCloseGameTask' }
+    'laa-connection-target-stability.patch' = @{ MarkerFile = 'MFAAvalonia\ViewModels\Pages\TaskQueueViewModel.cs'; Marker = 'SetAdbRecoverySelectionLock' }
     'laa-settings-runtime-fixes.patch' = @{ MarkerFile = 'MFAAvalonia\Extensions\GlobalStartManager.cs'; Marker = '未进入运行状态' }
     'laa-arena-conditional-option.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\TaskOptionGenerator.cs'; Marker = 'ApplyConditionalOptionVisibility' }
     'laa-task-queue-groups.patch' = @{ MarkerFile = 'MFAAvalonia\Helper\ValueType\DragItemViewModel.cs'; Marker = 'IsHiddenByGroup' }

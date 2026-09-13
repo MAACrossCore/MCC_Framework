@@ -1,0 +1,177 @@
+diff --git a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+index 686abd2..638169b 100644
+--- a/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
++++ b/MFAAvalonia/Extensions/MaaFW/MaaProcessor.cs
+@@ -1506,8 +1506,26 @@ public class MaaProcessor
+                 InstanceConfiguration.ReloadFromDisk();
+                 if (MaaProcessorManager.Instance.Current.InstanceId == InstanceId)
+                     await Instances.ReloadConfigurationForSwitchAsync(refreshTask: false);
++
++                // LAA: 把「连接目标」同步成配置里刚写回的 ADB。
++                // pretask 会按用户选的 MuMu 实例改写配置里的 ADB；但 CurrentDevice 不会被
++                // ReloadFromDisk 更新，于是控制器仍连着旧实例（实测：0 活动、手动选 1，点开始仍切到 0）。
++                // SyncCurrentAdbSelectionToActiveConfig() 是按【配置里的 AdbPath+AdbSerial】匹配的，
++                // 既能用上 pretask 的结果，又不会像 AutoDetectDevice 那样挑"当前活动的模拟器"。
++                var deviceBeforeSync = ViewModel?.CurrentDevice?.ToString();
++                ViewModel?.SyncCurrentAdbSelectionToActiveConfig();
++                var deviceAfterSync = ViewModel?.CurrentDevice?.ToString();
++                LoggerHelper.Info($"pretask 后同步连接目标：{deviceBeforeSync ?? "(空)"} -> {deviceAfterSync ?? "(空)"}");
+             }
+-            if (preTaskExecuted && ViewModel?.CurrentController != MaaControllerTypes.PlayCover && ViewModel?.CurrentDevice == null)
++            // LAA: 这里【不要】再调用 AutoDetectDevice。
++            //  · pretask 已经把正确实例的 ADB 写回配置，上面的 ReloadFromDisk() 已把它读进内存；
++            //  · 而 AutoDetectDevice 是按"当前活动的模拟器"选的，会把用户手动选的实例
++            //    覆盖成活动的那个（实测：0 活动、手动选 1，点开始仍会切到 0）；
++            //  · 曾经用"pretask 前后 CurrentDevice 是否变化"当判据，但 pretask 自己就会写回
++            //    配置，该值必然变化，判据无效。
++            // 所以只在完全没有设备时才探测。
++            if (preTaskExecuted && ViewModel?.CurrentController != MaaControllerTypes.PlayCover
++                && string.IsNullOrEmpty(ViewModel?.CurrentDevice?.ToString()))
+             {
+                 await Task.Run(() => ViewModel.AutoDetectDevice(token, showToast: false), token);
+             }
+@@ -4425,6 +4443,30 @@ public class MaaProcessor
+             Instances.ShutdownApplication();
+     }
+ 
++    /// <summary>
++    /// LAA: 把选项的下标解析成 case 名（找不到返回 null）。
++    /// 用于避免"假定 index 0 就是 Yes"这种顺序依赖。
++    /// </summary>
++    private string? ResolveCaseName(string optionName, int index)
++    {
++        try
++        {
++            if (index < 0) return null;
++            if (Interface?.Option != null
++                && Interface.Option.TryGetValue(optionName, out var opt)
++                && opt?.Cases != null
++                && index < opt.Cases.Count)
++            {
++                return opt.Cases[index]?.Name;
++            }
++        }
++        catch (Exception ex)
++        {
++            LoggerHelper.Warning($"解析选项 case 失败（{optionName}[{index}]）：{ex.Message}");
++        }
++        return null;
++    }
++
+     /// <summary>
+     /// LAA: 判断「关闭游戏」任务是否勾选了「关闭本程序」。
+     /// 直接读实例配置文件，避免依赖 InstanceConfiguration 的内部取值 API：
+@@ -4470,9 +4512,11 @@ public class MaaProcessor
+                 return false;
+             }
+ 
+-            var index = (int?)option["index"];
+-            LoggerHelper.Info($"关闭本程序判定：选项 index={index}（0=Yes 才会关闭）");
+-            return index == 0;
++            var index = (int?)option["index"] ?? -1;
++            var effective = ResolveCaseName(CloseAppOption, index);
++            LoggerHelper.Info($"关闭本程序判定：index={index} 对应 case=\"{effective ?? "(未知)"}\"");
++            // 按 case 名判定，避免 cases 顺序被调整后判定反向
++            return string.Equals(effective, "Yes", StringComparison.OrdinalIgnoreCase);
+         }
+         catch (Exception ex)
+         {
+diff --git a/MFAAvalonia/Helper/TaskOptionGenerator.cs b/MFAAvalonia/Helper/TaskOptionGenerator.cs
+index d8308a0..66613e0 100644
+--- a/MFAAvalonia/Helper/TaskOptionGenerator.cs
++++ b/MFAAvalonia/Helper/TaskOptionGenerator.cs
+@@ -255,8 +255,6 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+             }
+         }
+ 
+-        // LAA: 面板生成完再统一处理选项之间的联动显示
+-        ApplyConditionalOptionVisibility(panel);
+ 
+         if (dragItem.InterfaceItem?.Advanced != null)
+         {
+@@ -266,8 +264,6 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+             }
+         }
+ 
+-        // LAA: 面板生成完再统一处理选项之间的联动显示
+-        ApplyConditionalOptionVisibility(panel);
+     }
+ 
+     public void GenerateCommonPanelContent(StackPanel panel, DragItemViewModel dragItem)
+@@ -292,8 +288,8 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+             }
+         }
+     
+-        // LAA: 面板生成完再统一处理选项之间的联动显示
+-        ApplyConditionalOptionVisibility(panel);
++    // LAA: 面板生成完再统一处理选项之间的联动显示
++    ApplyConditionalOptionVisibility(panel);
+     }
+ 
+     public void GenerateAdvancedPanelContent(StackPanel panel, DragItemViewModel dragItem)
+@@ -306,8 +302,8 @@ public class TaskOptionGenerator(TaskQueueViewModel viewModel, Action saveConfig
+             }
+         }
+     
+-        // LAA: 面板生成完再统一处理选项之间的联动显示
+-        ApplyConditionalOptionVisibility(panel);
++    // LAA: 面板生成完再统一处理选项之间的联动显示
++    ApplyConditionalOptionVisibility(panel);
+     }
+ 
+     public void GenerateResourceOptionPanelContent(StackPanel panel, DragItemViewModel dragItem)
+diff --git a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs b/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
+index ecd7469..7073ee5 100644
+--- a/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
++++ b/MFAAvalonia/ViewModels/Pages/TaskQueueViewModel.cs
+@@ -1684,6 +1684,14 @@ public partial class TaskQueueViewModel : ViewModelBase, IDisposable
+ 
+         ChangedDevice(value);
+ 
++        // LAA: 用户手动选择设备时解除"选择锁"。
++        // 刷新期间会把锁打开（避免被探测到的活动实例覆盖），但用户自己的选择必须能生效，
++        // 所以这里一旦识别出是手动选择（非内部触发/同步）就立刻解锁。
++        if (!_suppressAutoConnect && !_isSyncing && IsSelectableDevice(value))
++        {
++            SetAdbRecoverySelectionLock(false);
++        }
++
+         // 仅 ComboBox 手动选中设备时，根据"刷新后尝试连接"设置自动连接
+         if (!_suppressAutoConnect
+             && !_isSyncing
+@@ -2056,7 +2064,34 @@ public partial class TaskQueueViewModel : ViewModelBase, IDisposable
+         var controllerType = CurrentController;
+         TaskManager.RunTask(() =>
+             {
+-                AutoDetectDevice(_refreshCancellationTokenSource.Token);
++                // LAA: 手动刷新只更新设备列表，不改变当前连接目标。
++                // AutoDetectDevice 是按"当前活动的设备"选的；UpdateDeviceList 里本来就有
++                // 「恢复期间保留当前选中目标不变」的锁，这里在刷新期间把它打开，从根上避免
++                // 把活动的另一个实例设成当前控制器（只在选中过设备时锁）。
++                var deviceBeforeRefresh = CurrentDevice;
++                // 注意：不能以"刷新前是否已选中设备"为前提 —— 实测刷新前 CurrentDevice 可能是
++                // <none>，那时锁不会上，AutoDetectDevice 就把活动的实例设成了当前目标。
++                // ADB 一律上锁，刷完再按【配置里已保存的设备】同步回来。
++                var lockSelection = CurrentController == MaaControllerTypes.Adb;
++                if (lockSelection)
++                    SetAdbRecoverySelectionLock(true);
++                try
++                {
++                    AutoDetectDevice(_refreshCancellationTokenSource.Token);
++                }
++                finally
++                {
++                    if (lockSelection)
++                        SetAdbRecoverySelectionLock(false);
++                }
++
++                if (lockSelection)
++                {
++                    // 刷新只更新设备列表；连接目标以配置里已保存的设备（= 上次/人手选择）为准
++                    SyncCurrentAdbSelectionToActiveConfig();
++                    LoggerHelper.Info($"刷新后连接目标：{deviceBeforeRefresh?.ToString() ?? "(空)"}"
++                                      + $" -> {CurrentDevice?.ToString() ?? "(空)"}（以配置中的设备为准）");
++                }
+ 
+                 // 刷新后自动连接（仅按钮触发的刷新）
+                 if (CurrentDevice != null
