@@ -5,8 +5,9 @@ env:
   # - 设置 VERSION 为空字符串时，下载 latest 版本
   # - 设置 VERSION 为具体版本号时（如 v1.2.3），下载指定版本
   MAAFW_VERSION: ""
-  # UI patches under ui_custom/MFAAvalonia target this exact release.
-  MFAA_VERSION: "v2.15.2"
+  # UI：https://github.com/MAACrossCore/MCCAvalonia（Release 附件名仍为 MFAAvalonia-*）
+  # 空字符串 = 始终拉最新 Release；需要钉版本时写 tag，例如 "v0.1.2"
+  MFAA_VERSION: ""
 
 on:
   # 练习/日常开发不自动打包，避免 artifact 配额被打满。
@@ -85,25 +86,33 @@ jobs:
           out-file-path: "deps"
           extract: true
 
-      - name: Download MFAAvalonia
+      - name: Download MCCAvalonia
         if: matrix.os != 'android'
         id: download_mfa
         uses: robinraju/release-downloader@v1
         with:
-          repository: SweetSmellFox/MFAAvalonia
+          repository: MAACrossCore/MCCAvalonia
           fileName: "MFAAvalonia-*-${{ (matrix.os == 'win' && 'win') || (matrix.os == 'macos' && 'osx') || (matrix.os == 'linux' && 'linux') }}-${{ (matrix.arch == 'x86_64' && 'x64') || (matrix.arch == 'aarch64' && 'arm64') }}*"
           latest: ${{ env.MFAA_VERSION == '' }}
           tag: ${{ env.MFAA_VERSION }}
           out-file-path: "MFA"
           extract: true
 
-      - name: Clean up MFAAvalonia archive
+      - name: Clean up / extract MCCAvalonia archive
         if: matrix.os != 'android'
         shell: bash
         run: |
+          set -euo pipefail
+          shopt -s nullglob
+          # Windows 多为 zip（release-downloader 已解压）；Linux/macOS 正式包为 tar.gz，需手动解压
+          for archive in MFA/*.tar.gz MFA/*.tgz; do
+            echo "Extracting $archive"
+            tar -xzf "$archive" -C MFA
+            rm -f "$archive"
+          done
           ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mfa.outputs.downloaded_files)[0] }}"
-          rm -f "${ARCHIVE_FILE_PATH}"
-          echo "Archive cleanup command executed for MFAAvalonia."
+          rm -f "${ARCHIVE_FILE_PATH}" || true
+          echo "MCCAvalonia archive ready under MFA/"
 
       - name: Remove built-in runtime in MFA
         if: matrix.os != 'android'
@@ -146,34 +155,6 @@ jobs:
           python -m pip install -r ./requirements.txt
           python ./install.py ${{ needs.meta.outputs.tag }} ${{ matrix.os }} ${{ matrix.arch }}
           cd ..
-
-      - name: Set up .NET for customized MFAAvalonia core
-        if: matrix.os != 'android'
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Build and install customized MFAAvalonia core
-        if: matrix.os != 'android'
-        shell: bash
-        run: |
-          git clone https://github.com/SweetSmellFox/MFAAvalonia.git .tmp/MFAAvalonia-src
-          git -C .tmp/MFAAvalonia-src checkout 6065fe33798b72906c5079fa6f210646801d9a5c
-          bash ui_custom/MFAAvalonia/apply-patches.sh .tmp/MFAAvalonia-src
-
-          case "${{ matrix.os }}-${{ matrix.arch }}" in
-            win-x86_64) rid=win-x64 ;;
-            win-aarch64) rid=win-arm64 ;;
-            macos-x86_64) rid=osx-x64 ;;
-            macos-aarch64) rid=osx-arm64 ;;
-            linux-x86_64) rid=linux-x64 ;;
-            linux-aarch64) rid=linux-arm64 ;;
-            *) echo "Unsupported MFA runtime"; exit 1 ;;
-          esac
-
-          dotnet restore .tmp/MFAAvalonia-src/MFAAvalonia.Desktop/MFAAvalonia.Desktop.csproj -r "$rid"
-          dotnet build .tmp/MFAAvalonia-src/MFAAvalonia.Desktop/MFAAvalonia.Desktop.csproj -c Release -r "$rid" --no-restore
-          cp .tmp/MFAAvalonia-src/bin/AnyCPU/Release/MFAAvalonia.Core.dll install/libs/MFAAvalonia.Core.dll
 
       - uses: actions/upload-artifact@v4
         with:

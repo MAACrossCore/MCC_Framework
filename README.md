@@ -33,7 +33,7 @@
    **Linux 包不含内置 Python**，需本机 `python3` 并自行 `pip install -r agent/requirements.txt`。
 3. 若使用 **添加订单好友 / 拉黑订单好友**：复制 `config/orders_source.example.json` 为 `config/orders_source.json`，填入你的订单页 URL；正文每行 `UID|类型`（如 `123456|8-1`）
 4. 确认 **MuMu** 可用（可先手动开；勾选「启动游戏」时 pretask 只会自动启模拟器/ADB，**不会**替你开游戏客户端）
-5. 运行解压目录中的 `MFAAvalonia.exe`（以实际文件名为准）
+5. 运行解压目录中的 `MFAAvalonia.exe`（UI 来自 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)，附件名仍兼容上游）
 6. 选择资源（**官服 / B 服**须与模拟器里安装的客户端一致）、勾选任务后开始运行
 
 > 当前安装包显示名仍可能为模板默认的 `MaaXXX`，后续会随 `interface.json` 一并调整。
@@ -48,7 +48,7 @@
 2. 模拟器建议使用 `16:9` 分辨率，例如 `1920×1080`、`1280×720`。
 3. 软件内更新后若看不到新任务选项，可关闭程序后删除根目录 `config/config.json` 再打开（需重新配置部分选项）。
 4. Agent 报错 / Action is null：确认使用的是最新 Release 包（解压后根目录应含 `python/`、`deps/`、`agent/`）；Windows 可再跑 `Install-Agent-Deps.bat`。旧版包或只下了源码仓库会缺少这些目录。
-5. pretask 报找不到 `python`、路径落在 `resource\base\...`：说明 `interface.json` 里 pretask 被改成了 Release 路径，但本地 MFAAvalonia **未打 pretask 路径补丁**。请用最新 Release 包，或确保 B 服/官服资源里存在 `resource/base/ensure_mumu.cmd`（源码开发目录在 `assets/resource/base/`）。
+5. pretask 报找不到 `python`、路径落在 `resource\base\...`：请确认用的是**本仓库最新 Release**（内置 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia) ≥ `v0.1.1`，含 pretask 路径解析）。临时兜底：确保资源里存在 `resource/base/ensure_mumu.cmd`（源码目录在 `assets/resource/base/`）。
 6. 开发调试也可用 MaaDebugger，详见 [本地开发手册](./docs/zh_cn/develop/local_dev.md)。
 
 ## 功能说明
@@ -99,6 +99,8 @@
 ## 开发相关
 
 源码仓库路径为 **`assets/resource/`**（不是根目录 `resource/` 镜像）。改完 pipeline / `interface.json` 后，Release 本地联调可将 `assets/` 同步到解压目录（个人脚本见 `.gitignore`，维护者自用）。
+
+**UI 定制不在本仓**：客户端壳来自 [MAACrossCore/MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)。CI（`install.yml` 的 `MFAA_VERSION`）下载其 Release；改设置页 / 任务列表 / pretask 等请在 UI 仓改并打 tag，再 bump Framework 的版本钉。
 
 * [如何开发](./docs/zh_cn/develop/how_to_develop.md)
 * [本地开发手册（MuMu + MaaDebugger）](./docs/zh_cn/develop/local_dev.md)

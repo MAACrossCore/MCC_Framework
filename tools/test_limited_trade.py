@@ -149,12 +149,6 @@ def test_interface_exposes_nested_chip_box_controls():
         quality = options[case["option"][0]]
         assert quality["type"] == "checkbox"
         assert [item["name"] for item in quality["cases"]] == ["R4", "R5"]
-    compact_patch = (
-        ROOT / "ui_custom" / "MFAAvalonia" / "laa-limited-trade-chip-options.patch"
-    ).read_text(encoding="utf-8-sig")
-    assert "IsLimitedTradeChipTypeOption" in compact_patch
-    assert "compactColumn == 2" in compact_patch
-    assert "FontSize = isCompactChipChoice ? 12 : 14" in compact_patch
 
 
 def test_chip_quality_controls_default_to_both_rarities():
@@ -169,27 +163,6 @@ def test_chip_quality_controls_default_to_both_rarities():
     for case in chip_types["cases"]:
         quality = options[case["option"][0]]
         assert quality["default_case"] == ["R4", "R5"], case["name"]
-
-
-def test_ui_patch_keeps_parent_child_chip_sync():
-    """UI 补丁必须保留三处关键实现。
-
-    联动与存档规范化都是 C# 侧实现的（见 TaskOptionGenerator），
-    这里钉住补丁里确实有这些逻辑，避免重新生成补丁时被漏掉：
-
-      1. LimitedTradeChipTypeNameOf —— 由品质选项名反推上级类型名；
-      2. LimitedTradeChipTypeToggles —— 类级注册表，避开「闭包里的旧按钮引用失效」；
-      3. NormalizeLimitedTradeChipQualityOptions —— 面板级把空品质补成 R4+R5；
-      4. SyncChipQualityParent —— 品质全不勾时取消上级。
-    """
-    patch = (
-        ROOT / "ui_custom" / "MFAAvalonia" / "laa-limited-trade-chip-options.patch"
-    ).read_text(encoding="utf-8-sig")
-    assert "LimitedTradeChipTypeNameOf" in patch
-    assert "LimitedTradeChipTypeToggles" in patch
-    assert "NormalizeLimitedTradeChipQualityOptions" in patch
-    assert "SyncChipQualityParent" in patch
-    assert "LAA: 品质全不勾时，上级类型一起取消选" in patch
 
 
 def test_unchecked_chip_qualities_never_reach_the_whitelist():

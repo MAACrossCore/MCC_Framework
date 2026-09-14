@@ -96,7 +96,7 @@ def sweep_runs_for_stamina(stamina, cost, sweep_limit=BATCH_LIMIT):
 
     这是扫荡弹窗里次数的唯一来源（取代原红/白识别循环）：
     弹窗每次最多选 sweep_limit 次，所以次数取上限内的整数部分；
-    连 1 次都扫不起时返回 0，由调用方报错停止，不做任何猜测性点击。
+    连 1 次都扫不起时返回 0，由调用方走收尾回主页（正常结束），不做任何猜测性点击。
     """
     cost = max(0, int(cost or 0))
     stamina = max(0, int(stamina or 0))

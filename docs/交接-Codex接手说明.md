@@ -50,16 +50,14 @@ Copy-Item -Path 'agent\*' -Destination 'install\agent\' -Recurse -Force
 
 MFA → MCC：Logo、文案、exe 图标，以及顶部去 `MaaXXX`（用零宽空格 `\u200B` 隐藏 `label`）。
 
-配套：
-- `build.ps1` 增加 **rcedit 设置 exe 图标**步骤且 fail-closed
-- `.gitignore` 加 `!ui_custom/MFAAvalonia/tools/rcedit-x64.exe` 例外
-- Windows 图标缓存问题：改完图标可能仍显示旧图，需清 `%LOCALAPPDATA%\Microsoft\Windows\Explorer\iconcache_*.db` + `thumbcache_*`，重启 explorer，`ie4uinit.exe -show`
+配套（历史）：曾用本仓 `build.ps1` + rcedit 换 exe 图标；现已迁入 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)，本仓不再保留 `ui_custom` / rcedit 例外。
+Windows 图标缓存问题：改完图标可能仍显示旧图，需清 `%LOCALAPPDATA%\Microsoft\Windows\Explorer\iconcache_*.db` + `thumbcache_*`，重启 explorer，`ie4uinit.exe -show`
 
 ### 2.2 更新到上游 Release v0.5.11
 
 - 本地 `huangtong` 曾停在 v0.4.2（源码里的 `version` 字段），而 Release 是 v0.5.11 —— 原因是 `tools/install.py <tag>` 在组装 `install/` 时会**注入 `interface["version"] = tag`**，所以仓库源码永远是 `v0.4.2`，只有构建产物才显示真实版本。
 - 最终做法：把 Release zip 完整解压覆盖 `install/`（1494/1495 文件字节一致，仅 `MFAAvalonia.exe` 因重新加了 MCC 图标而不同）。
-- 上游把 `laa-daily-chip-stage-schedule.patch` 并入了 `laa-limited-trade-chip-options.patch`，补丁顺序改由 `patches.list` 统一提供。
+- 历史上游曾把 `laa-daily-chip-stage-schedule.patch` 并入限时贸易补丁；排期逻辑现已在 MCCAvalonia 源码中。
 - **`agent/bootstrap.py` 的 Bug**：`ensure_dependencies()` 只要 `find_spec("maa")` 成功就立即返回，导致**用 Release zip 覆盖已有 install 时永远不会升级 maafw**（Python 绑定停在 5.12.3、原生 DLL 已是 5.13.0）。本次手动修好：
   ```powershell
   install\python\python.exe -m pip install -U -r install\agent\requirements.txt `
@@ -104,66 +102,32 @@ MFA → MCC：Logo、文案、exe 图标，以及顶部去 `MaaXXX`（用零宽�
 
 ### 2.5 修复与文档
 
-- 修 `tools/test_daily_chip_schedule.py`：上游 v0.5.11 把排期补丁并入 `laa-limited-trade-chip-options.patch`，旧断言还在找补丁文件名。已核对 `Core.dll` 里 `DailyChipStageSchedule` / `visibleCases` / `DayOfWeek` 都在，逻辑没丢。
+- Framework 侧 `tools/test_daily_chip_schedule.py` 现只校验 `interface.json`（芯片本扫荡后回首页）；周几排期 UI 逻辑在 MCCAvalonia，不再用本仓补丁断言。
 - 修 `tools/test_arena_logic.py` 等测试。
 - 新增 `docs/任务列表分组实现说明.md`（含 **8 条踩坑记录**，改这块之前必读）。
 
 ---
 
-## 三、补丁工作流（改 UI 必看）
+## 三、UI 工作流（改客户端必看）
 
-MFA 的 UI 改动通过**补丁链**管理，源树在 `.tmp/MFAAvalonia-src`（gitignore）。
+本仓 **不再** 维护 `ui_custom` 补丁链。客户端壳来自 [MAACrossCore/MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)。
 
-### 3.1 文件
+### 3.1 分工
 
-| 文件 | 作用 |
+| 仓 | 职责 |
 |---|---|
-| `ui_custom/MFAAvalonia/patches.list` | **补丁顺序的唯一来源** |
-| `ui_custom/MFAAvalonia/build.ps1` | Windows 构建（读 `patches.list` + `$patchMarkers`）|
-| `ui_custom/MFAAvalonia/apply-patches.sh` | bash 等价实现 |
-| `ui_custom/MFAAvalonia/*.patch` | 补丁本体，**必须 LF 行尾**（`.gitattributes`: `* text=auto eol=lf`）|
+| **MCC_Framework**（本仓） | `interface.json` / `resource` / `agent` / 打包；`install.yml` 的 `MFAA_VERSION` 钉 UI Release |
+| **MCCAvalonia** | 设置页、任务列表、pretask 路径、品牌化等 C# UI |
 
-### 3.2 新增一个补丁的完整流程
+### 3.2 改 UI 的流程
 
-1. 在 `.tmp/MFAAvalonia-src` 里改源码
-2. 生成补丁（**推荐用自动法**，见下）
-3. 在 **三处** 注册，缺一处 build 会直接抛异常：
-   - `patches.list` 加一行
-   - `build.ps1` 的 `$patchMarkers` 加 `'文件名' = @{ MarkerFile=...; Marker=... }`
-   - `apply-patches.sh` 的 `marker_file_for` + `marker_pattern_for` 各加一行
-4. 确认补丁是 **LF** 行尾
-5. 反向校验：`git apply --reverse --check <补丁>`（exit 0 = 与当前源码吻合）
-6. **跑 `build.ps1` 从上游完整重建**（决定性测试：能发现补丁间的冲突/重复包含）
+1. 在 MCCAvalonia 改源码并本地 `dotnet build`
+2. 打 tag（如 `v0.1.2`）→ 跑 UI 仓 Cross-Platform Release
+3. 本仓 bump `MFAA_VERSION` → 跑 `install` 发 Framework 包
 
-### 3.3 自动生成补丁（比手工思路可靠）
+### 3.3 本机联调（可选）
 
-思路：**从上游原始状态重建基线**，再与当前源码 diff。
-
-```
-1. 从旧补丁里取出涉及的文件列表
-2. 快照当前源码 (A)
-3. git checkout -- <这些文件>          # 回到上游原始状态
-4. 按 patches.list 顺序，对其它补丁执行
-   git apply --include=<每个文件> <补丁>   # 只取涉及这些文件的 hunk
-5. 快照基线 (B)，然后恢复 A
-6. diff(B, A) 写出新补丁
-```
-
-脚本在 `.tmp/arena/regen_patch.py`（本次会话产物，`.tmp/` 被忽略，可随时重建）。
-
-### 3.4 构建
-
-```powershell
-# 必须先关闭 MCC！脚本会拒绝在 MFA 运行时覆盖 DLL
-# 还要杀掉残留的 install\python\python.exe（它会锁住 install\python\*.dll）
-Get-Process MFAAvalonia | Stop-Process -Force
-
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ui_custom\MFAAvalonia\build.ps1'
-# 结尾应打印：Installed customized UI core: ...\install\libs\MFAAvalonia.Core.dll
-#             Installed exe icon: ...\install\MFAAvalonia.exe
-```
-
-**注意**：本机只有 Windows PowerShell 5.1，**没有 `pwsh`**。
+用 Framework Release 解压目录，或把本地编好的 MCCAvalonia 输出覆盖到 `install/` 后重启进程（DLL/exe 仅启动时加载）。
 
 ---
 
@@ -209,16 +173,15 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ui_custom\MFAAvalonia\b
 ## 六、验证手段（每次改完都跑）
 
 ```powershell
-# 14 个测试文件，应全过
+# 测试文件应全过
 Get-ChildItem tools\test_*.py | ForEach-Object { & .\.venv\Scripts\python.exe -B $_.FullName }
 
 # schema 校验
 .\.venv\Scripts\python.exe -B tools\validate_schema.py --schema-dir deps/tools `
     --resource-dirs assets/resource --interface-files assets/interface.json
-
-# 改过 UI 补丁的话，还要从上游完整重建
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ui_custom\MFAAvalonia\build.ps1'
 ```
+
+改过 UI 时：在 MCCAvalonia 仓构建并发版，再 bump 本仓 `MFAA_VERSION` 重跑 `install`。
 
 离线辅助工具：
 - `tools/ocr_screenshot.py` —— 对已保存 PNG 跑 MaaFW OCR（`--roi` 是 **1280 基准**）。**注意它走 `tasker.post_task`，识别的是实机当前画面，不是传入的 PNG**（只用于坐标换算）
@@ -234,9 +197,9 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'ui_custom\MFAAvalonia\b
    - **先搜同类副作用，再动自己的代码**（空行问题我连续三轮在自己新写的代码里找原因，真凶是上游既有方法在覆盖 `IsVisible`）
    - **只保留有证据支撑的改动**（"顺手加的保险"条件反而把任务整行弄没了）
 3. **定位问题优先看数据，不要靠推理**。本项目已有成熟的日志手段：`LoggerHelper.UserAction` 打业务日志、`install/logs/log-*.log` 看 agent 输出、必要时加临时诊断日志再重编。这次竞技场和分组两个功能都是靠**打日志看真实数据**才定位到根因的。
-4. **遇到"改了没效果"，先确认补丁/数据真的生效了**：
+4. **遇到"改了没效果"，先确认产物真的生效了**：
    - agent 改动 → 确认 `install/agent/` 已同步
-   - UI 改动 → 确认跑过 `build.ps1` 且用 `strings` 在 `install/libs/MFAAvalonia.Core.dll` 里搜到新符号
+   - UI 改动 → 确认用的是含改动的 MCCAvalonia Release（或本地覆盖后**重启**进程）
    - 数据改动 → 确认 `install/interface.json` 已同步且版本号未被改回
 
 ---

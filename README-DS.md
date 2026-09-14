@@ -1,7 +1,7 @@
 # README-DS
 
 > DeepSeek Harness（DSH）会话的工作记录。
-> 最后更新：**2026-09-11** · 记录范围：**2026-09-09 起的 DSH 会话**
+> 最后更新：**2026-09-14** · 记录范围：**2026-09-09 起的 DSH 会话**
 > 维护者：DSH Agent（每次会话结束前更新本文档）
 
 ## 本文件位置与归属（勿删）
@@ -27,7 +27,8 @@
 | 2026-09-11 | MFA → MCC 品牌化（Logo / 文案 / exe 图标 / 顶部去 `MaaXXX`） | ✅ 全部生效 | 本文 §2.6 |
 | 2026-09-12 | 竞技场：可挑战最高战力 / 最低挑战积分 / 兜底挑战 2、3 位 | ✅ 已实现待实机 | 本文 §8 |
 | 2026-09-12 | 任务列表「分组折叠」（周常） | ✅ **实机验证通过** | **`docs/任务列表分组实现说明.md`** |
-| 2026-09-12 | 交接给 codex 的接手说明（补丁工作流 / 环境坑 / 待办） | ✅ | **`docs/交接-Codex接手说明.md`** |
+| 2026-09-12 | 交接给 codex 的接手说明（UI 工作流 / 环境坑 / 待办） | ✅（2026-09-14 已改为 MCCAvalonia） | **`docs/交接-Codex接手说明.md`** |
+| 2026-09-14 | 删除 `ui_custom/`；CI 只拉 MCCAvalonia Release | ✅ | `install.yml` / README |
 
 ---
 
@@ -75,11 +76,11 @@
 
 | 项 | 内容 |
 |---|---|
-| 源码 | `.tmp/MFAAvalonia-src`（上游 `6065fe3`，各补丁已打） |
+| UI 仓 | [MAACrossCore/MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)（自 `v0.1.1` 起已含本功能） |
 | 改动文件 | `MFAAvalonia/Helper/TaskOptionGenerator.cs` |
-| 补丁 | `ui_custom/MFAAvalonia/laa-limited-trade-chip-options.patch` |
-| 构建 | `ui_custom/MFAAvalonia/build.ps1` |
-| 产物 | `install/libs/MFAAvalonia.Core.dll` |
+| Framework 打包 | `.github/workflows/install.yml` 的 `MFAA_VERSION` 下载 UI Release（**不再**维护本仓 `ui_custom` 补丁） |
+
+> **2026-09-14**：本仓已删除 `ui_custom/`。下列 §2.5 起关于 `build.ps1` / patch 链的内容仅作历史记录；改 UI 请直接改 MCCAvalonia 并发版。
 
 **代码要点**：
 
@@ -134,9 +135,11 @@ UI 勾选 3 个类型           -> 白名单精确产出 6 个箱子（每类型
 | 回归测试 | ✅ `tools/test_limited_trade.py` 25 项（+7） |
 | 全量测试 | ✅ 14 个文件 184 项通过 |
 
-### 2.5 build.ps1 的三个 Bug（2026-09-11 已修，端到端跑通）
+### 2.5 build.ps1 的三个 Bug（历史：2026-09-11 已修）
 
-`ui_custom/MFAAvalonia/build.ps1` 负责：按序打补丁 → `dotnet restore/build` →
+> **已过时**：`ui_custom/MFAAvalonia/build.ps1` 与补丁链已从本仓移除。UI 在 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia) 直接维护。下文保留排查记录。
+
+当时 `build.ps1` 负责：按序打补丁 → `dotnet restore/build` →
 把 `MFAAvalonia.Core.dll` 装进 `install/libs`。它**此前一直跑不通**，三个独立问题：
 
 | # | Bug | 现象 | 修法 |
@@ -148,13 +151,11 @@ UI 勾选 3 个类型           -> 白名单精确产出 6 个箱子（每类型
 > ⚠️ 改 `build.ps1` 时**务必保留 BOM**。用编辑器（含本仓库的 `edit` 工具）保存常会把
 > BOM 丢掉，之后直接跑就会报语法错误。用 Python 写回并显式加 `\ufeff` 最稳。
 
-**现在可用**：
+**当时可用**（路径已失效，仅作考古）：
 
 ```powershell
-cd E:\MAA_crosscore
-# 先关闭 MFA（脚本会拒绝在 MFA 运行时覆盖 DLL）
-.\ui_custom\MFAAvalonia\build.ps1
-# 结尾应打印：Installed customized UI core: ...\install\libs\MFAAvalonia.Core.dll
+# 历史：.\ui_custom\MFAAvalonia\build.ps1
+# 现在：在 MCCAvalonia 仓 dotnet build，打 tag 发 Release，再 bump Framework MFAA_VERSION
 ```
 
 > ⚠️ **DLL 只在进程启动时加载**：装完必须重启 MFA，否则界面还是旧的。
@@ -258,7 +259,7 @@ RootView.axaml:181/184  ResourceName 与 ResourceVersion 共用 IsResourceNameVi
 每日探索_第几层
   → 每日探索_体力药准备(prepare)   读设置 → 读当前体力 → 算计划 → 认领本次药量
   → 分派（按 next 顺序逐个识别）：
-        ├─ 每日探索_计划结束收尾   plan:finished  → finish 动作 → 出击任务列表（正常结束）
+        ├─ 每日探索_计划结束收尾   plan:finished  → finish 动作 → 通用-返回主页（正常结束，勿回出击任务列表）
         ├─ 每日探索_待使用体力药   potion:pending → 打开体力药 → 药量页 → 确认 → 回关卡页
         └─ 扫荡                    （DirectHit 兜底）
   → 扫荡 → 扫荡次数选择
@@ -297,7 +298,7 @@ _build_plan: 指定次数 且 不使用体力药 且 summary.shortfall
    → log「当前自选次数X次，体力不足，未执行刷取操作（当前体力=…，单次消耗=…，最多只能扫N次）」
    → _SESSION["plan_finished"] = "insufficient_stamina"；batches=[]；返回 False
 prepare:     见 plan_finished → 返回 True → 分派节点
-plan:finished 命中 → finish 动作（什么都不点，只打日志）→ 出击任务列表 → 任务成功结束
+plan:finished 命中 → finish 动作（什么都不点，只打日志）→ 通用-返回主页 → 任务成功结束
 ```
 
 双保险：`set_sweep_count_by_stamina` / `set_sweep_count` 开头都检查 `plan_aborted`，命中直接返回。
@@ -528,6 +529,8 @@ Select-String -Path install\debug\maafw.log -Pattern 'msg=Node\.PipelineNode\.(S
 | 2026-09-12 | §10 记录本会话犯的 6 个错与「该量数据时在推断」的教训；调试开关用法 |
 | 2026-09-12 | 分组表头间距 `Margin 0,5,0,1 -> 0,5,0,5`；移除三条刷屏日志（任务列表分组/分组收拢/分组锚点）|
 | 2026-09-12 | ⚠️ **组内任务自由换序（2b）未修成**：改五版均失败并三次弄坏已验证功能，最终回退到 round 5 版本。详见 `docs/任务列表分组实现说明.md` §七 |
+| 2026-09-14 | UI 迁至 MCCAvalonia；删除本仓 `ui_custom/`；`MFAA_VERSION=""` 拉最新 UI Release |
+| 2026-09-14 | merge `origin/huangtong`：保留异星灰域/扫荡等 Framework 改动；**丢弃**其 `ui_custom` 增量（需另移植到 MCCAvalonia） |
 
 ---
 
