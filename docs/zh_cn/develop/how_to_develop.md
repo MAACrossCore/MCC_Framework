@@ -62,7 +62,7 @@
 
 5. 发布您的版本
 
-    本模板附带 GitHub Actions 工作流的 [配置文件](/.github/workflows/install.yml)，CI 检测到 tag 会自动进行打包和发布。默认的配置文件会将 [MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia) 与你的项目一同打包和发版。
+    本模板附带 GitHub Actions 工作流的 [配置文件](/.github/workflows/install.yml)，CI 检测到 tag 会自动进行打包和发布。默认会将 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)（自有 Avalonia UI）与项目资源一同打包；版本由 `env.MFAA_VERSION` 钉定。
 
     > [!NOTE]
     > 第一次操作前，需要**先**修改 GitHub 仓库设置 `Settings` - `Actions` - `General` - `Read and write permissions` - `Save`
@@ -75,7 +75,7 @@
 
     执行上述命令后，CI 会自动进行打包和发布，你可以在项目仓库的 `Actions` 页面中看到工作流的执行情况。如果一切顺利，运行结束后你可以在项目仓库的 `Releases` 页面中看到新发布的版本。更多有关 GitHub Actions 的内容请参考 [GitHub Actions 文档](https://docs.github.com/zh/actions)。
 
-    _如果想要使用别的 [通用 UI](https://github.com/MaaXYZ/MaaFramework/#%E9%80%9A%E7%94%A8-ui)，请自行修改工作流的 [配置文件](/.github/workflows/install.yml)。_
+    _若要换用别的 [通用 UI](https://github.com/MaaXYZ/MaaFramework/#%E9%80%9A%E7%94%A8-ui)，请改 `install.yml` 里的 `repository` / `MFAA_VERSION`。_
 
     本仓库 CI 在 Windows / macOS 打包前还会：
 

@@ -15,6 +15,6 @@ MFA 在每次生成“每日探索 -> 关卡选择”设置面板时读取电脑
 | 迅刃嵌合 |  |  |  | ✓ |  | ✓ | ✓ |
 | 矛盾嵌合 |  |  |  |  | ✓ | ✓ | ✓ |
 
-可复现 UI 补丁位于
-`ui_custom/MFAAvalonia/laa-daily-chip-stage-schedule.patch`。日期映射集中在
-`TaskOptionGenerator.DailyChipStageSchedule`，后续调整开放日时只需修改该表。
+可复现实现位于 UI 仓 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)
+的 `TaskOptionGenerator.DailyChipStageSchedule`；后续调整开放日时改该表并发新 UI
+Release，再 bump Framework `install.yml` 的 `MFAA_VERSION`。

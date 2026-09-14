@@ -1,7 +1,7 @@
 # README-DS
 
 > DeepSeek Harness（DSH）会话的工作记录。
-> 最后更新：**2026-09-11** · 记录范围：**2026-09-09 起的 DSH 会话**
+> 最后更新：**2026-09-14** · 记录范围：**2026-09-09 起的 DSH 会话**
 > 维护者：DSH Agent（每次会话结束前更新本文档）
 
 ## 本文件位置与归属（勿删）
@@ -27,7 +27,8 @@
 | 2026-09-11 | MFA → MCC 品牌化（Logo / 文案 / exe 图标 / 顶部去 `MaaXXX`） | ✅ 全部生效 | 本文 §2.6 |
 | 2026-09-12 | 竞技场：可挑战最高战力 / 最低挑战积分 / 兜底挑战 2、3 位 | ✅ 已实现待实机 | 本文 §8 |
 | 2026-09-12 | 任务列表「分组折叠」（周常） | ✅ **实机验证通过** | **`docs/任务列表分组实现说明.md`** |
-| 2026-09-12 | 交接给 codex 的接手说明（补丁工作流 / 环境坑 / 待办） | ✅ | **`docs/交接-Codex接手说明.md`** |
+| 2026-09-12 | 交接给 codex 的接手说明（UI 工作流 / 环境坑 / 待办） | ✅（2026-09-14 已改为 MCCAvalonia） | **`docs/交接-Codex接手说明.md`** |
+| 2026-09-14 | 删除 `ui_custom/`；CI 只拉 MCCAvalonia Release | ✅ | `install.yml` / README |
 
 ---
 
@@ -75,11 +76,11 @@
 
 | 项 | 内容 |
 |---|---|
-| 源码 | `.tmp/MFAAvalonia-src`（上游 `6065fe3`，各补丁已打） |
+| UI 仓 | [MAACrossCore/MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)（自 `v0.1.1` 起已含本功能） |
 | 改动文件 | `MFAAvalonia/Helper/TaskOptionGenerator.cs` |
-| 补丁 | `ui_custom/MFAAvalonia/laa-limited-trade-chip-options.patch` |
-| 构建 | `ui_custom/MFAAvalonia/build.ps1` |
-| 产物 | `install/libs/MFAAvalonia.Core.dll` |
+| Framework 打包 | `.github/workflows/install.yml` 的 `MFAA_VERSION` 下载 UI Release（**不再**维护本仓 `ui_custom` 补丁） |
+
+> **2026-09-14**：本仓已删除 `ui_custom/`。下列 §2.5 起关于 `build.ps1` / patch 链的内容仅作历史记录；改 UI 请直接改 MCCAvalonia 并发版。
 
 **代码要点**：
 
@@ -134,9 +135,11 @@ UI 勾选 3 个类型           -> 白名单精确产出 6 个箱子（每类型
 | 回归测试 | ✅ `tools/test_limited_trade.py` 25 项（+7） |
 | 全量测试 | ✅ 14 个文件 184 项通过 |
 
-### 2.5 build.ps1 的三个 Bug（2026-09-11 已修，端到端跑通）
+### 2.5 build.ps1 的三个 Bug（历史：2026-09-11 已修）
 
-`ui_custom/MFAAvalonia/build.ps1` 负责：按序打补丁 → `dotnet restore/build` →
+> **已过时**：`ui_custom/MFAAvalonia/build.ps1` 与补丁链已从本仓移除。UI 在 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia) 直接维护。下文保留排查记录。
+
+当时 `build.ps1` 负责：按序打补丁 → `dotnet restore/build` →
 把 `MFAAvalonia.Core.dll` 装进 `install/libs`。它**此前一直跑不通**，三个独立问题：
 
 | # | Bug | 现象 | 修法 |
@@ -148,13 +151,11 @@ UI 勾选 3 个类型           -> 白名单精确产出 6 个箱子（每类型
 > ⚠️ 改 `build.ps1` 时**务必保留 BOM**。用编辑器（含本仓库的 `edit` 工具）保存常会把
 > BOM 丢掉，之后直接跑就会报语法错误。用 Python 写回并显式加 `\ufeff` 最稳。
 
-**现在可用**：
+**当时可用**（路径已失效，仅作考古）：
 
 ```powershell
-cd E:\MAA_crosscore
-# 先关闭 MFA（脚本会拒绝在 MFA 运行时覆盖 DLL）
-.\ui_custom\MFAAvalonia\build.ps1
-# 结尾应打印：Installed customized UI core: ...\install\libs\MFAAvalonia.Core.dll
+# 历史：.\ui_custom\MFAAvalonia\build.ps1
+# 现在：在 MCCAvalonia 仓 dotnet build，打 tag 发 Release，再 bump Framework MFAA_VERSION
 ```
 
 > ⚠️ **DLL 只在进程启动时加载**：装完必须重启 MFA，否则界面还是旧的。
@@ -521,3 +522,4 @@ Select-String -Path install\debug\maafw.log -Pattern 'msg=Node\.PipelineNode\.(S
 | 2026-09-11 | MFA → MCC 品牌化：Logo、resx 文案、硬编码标题、隐藏顶部 `MaaXXX`（§2.6）|
 | 2026-09-11 | `build.ps1` 结尾自动用 rcedit 换 exe 内嵌图标；踩到 Windows 图标缓存（§5.7）|
 | 2026-09-11 | 图标步骤改为失败关闭（编译前 throw）；`.gitignore` 给 rcedit 开 `!` 例外（§2.6 ③）|
+| 2026-09-14 | UI 迁至 MCCAvalonia；删除本仓 `ui_custom/`；`install.yml` 钉 `MFAA_VERSION=v0.1.1` |

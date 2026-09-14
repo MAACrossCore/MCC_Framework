@@ -1,4 +1,4 @@
-# 本地开发手册（MuMu 12 + MFAAvalonia）
+# 本地开发手册（MuMu 12 + MCCAvalonia）
 
 本文说明 Windows 下运行和调试本项目的推荐方式。项目不依赖开发者电脑上的固定盘符、ADB 端口或 MuMu 实例编号。
 
@@ -9,7 +9,7 @@
 - **开发环境**需本机 Python 3.10+ 与 `maafw`
 - **Release 包（Windows / macOS）**已内置 `python/` 与 `deps/`，用户一般无需自行安装 Python
 - **Release 包（Linux）**仍使用系统 `python3`，需自行安装 Agent 依赖
-- 从 Release 下载完整程序包；仅下载 GitHub 源码不会包含 MFAAvalonia、MaaFramework 运行库、OCR 模型和内置 Python
+- 从 Release 下载完整程序包；仅下载 GitHub 源码不会包含 UI 壳（[MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia)）、MaaFramework 运行库、OCR 模型和内置 Python
 
 开发环境可在仓库根目录创建虚拟环境：
 
@@ -31,7 +31,7 @@ CI 打包时（`tools/install.py`）会把以下内容写入解压目录：
 
 用户侧流程：
 
-1. **pretask**（勾选「启动游戏」时）：MFAAvalonia 用内置 Python 执行 `./agent/ensure_mumu.py`（仅标准库，不依赖 `maafw`）。
+1. **pretask**（勾选「启动游戏」时）：UI 用内置 Python 执行 `./agent/ensure_mumu.py`（仅标准库，不依赖 `maafw`）。
 2. **Agent 任务**：客户端用 `./python/python.exe -u ./agent/main.py <socket_id>` 拉起 Agent。
 3. **`agent/main.py`** 启动时会 `chdir` 到程序根目录、把 `agent/` 加入 `sys.path`（嵌入式 Python 默认不会加脚本目录），再调用 **`bootstrap.ensure_dependencies()`**：优先从 `deps/` 离线安装，失败再尝试镜像在线安装。
 
@@ -92,7 +92,7 @@ pretask **不会**打开交错战线。开游戏由 pipeline「启动游戏」�
 | `assets/resource/pipeline/` | Pipeline 识别与动作流程 |
 | `assets/resource/image/` | 经过裁剪的识别模板 |
 | `agent/` | 订单好友、竞技场/芯片/角斗场 Custom、`bootstrap.py`、MuMu pretask |
-| `ui_custom/MFAAvalonia/` | LAA 使用的 MFAAvalonia 可复现补丁（含 pretask 路径解析） |
+| （外部）[MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia) | 客户端 UI；由 CI 按 `MFAA_VERSION` 下载 Release，不在本仓维护 |
 
 ### Pipeline 与 Agent 分工
 
