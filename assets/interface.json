@@ -199,7 +199,8 @@
             "name": "关闭游戏",
             "entry": "关闭游戏",
             "option": [
-                "并关闭模拟器"
+                "关闭模拟器",
+                "关闭本程序"
             ]
         },
         {
@@ -894,35 +895,6 @@
                     "name": "No",
                     "pipeline_override": {
                         "领取奖励_跳过邮箱": {
-                            "enabled": true
-                        }
-                    }
-                }
-            ]
-        },
-        "并关闭模拟器": {
-            "type": "switch",
-            "label": "并关闭模拟器",
-            "default_case": "Yes",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "pipeline_override": {
-                        "关闭游戏_并关闭模拟器": {
-                            "enabled": true
-                        },
-                        "关闭游戏_仅关闭游戏": {
-                            "enabled": false
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "pipeline_override": {
-                        "关闭游戏_并关闭模拟器": {
-                            "enabled": false
-                        },
-                        "关闭游戏_仅关闭游戏": {
                             "enabled": true
                         }
                     }
@@ -2630,6 +2602,48 @@
                             "enabled": true
                         }
                     }
+                }
+            ]
+        },
+        "关闭模拟器": {
+            "type": "switch",
+            "label": "关闭模拟器",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "关闭游戏_并关闭模拟器": {
+                            "enabled": true
+                        },
+                        "关闭游戏_仅关闭游戏": {
+                            "enabled": false
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "关闭游戏_并关闭模拟器": {
+                            "enabled": false
+                        },
+                        "关闭游戏_仅关闭游戏": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        },
+        "关闭本程序": {
+            "type": "switch",
+            "label": "关闭本程序",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes"
+                },
+                {
+                    "name": "No"
                 }
             ]
         }

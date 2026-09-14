@@ -222,3 +222,78 @@ class AlienShopBroke(CustomRecognition):
             detail={"name": name, "remain": remain, "unit": unit,
                     "need": need, "tokens": tokens},
         )
+
+def _row_state(results, name, price):
+    """返回 (状态, 名字框)。状态：True=售罄 False=可买(有价格且无售罄) None=不在视野/状态不明。
+    名字框用于让上层 Click 点到商品名字上（MAAFW 的 Click 默认用识别结果的框）。"""
+    names = [r for r in results if name in _text_of(r)]
+    if not names:
+        log("  [row_state] %s：OCR %d 条里没有这个名字（不在当前视野）" % (name, len(results)))
+        return None, None
+
+    def same_col_gap(box, ncx, ny, nh):
+        px, py, pw, ph = box
+        if abs((px + pw / 2.0) - ncx) > MAX_COLUMN_OFFSET:
+            return None
+        gap = py - (ny + nh)
+        return gap if MIN_GAP <= gap <= MAX_GAP else None
+
+    for n in names:
+        nb = _box_of(n)
+        if nb is None:
+            continue
+        nx, ny, nw, nh = nb
+        ncx = nx + nw / 2.0
+
+        # 价格位置出现「售罄」-> 售罄
+        for r in results:
+            if "售罄" not in _text_of(r):
+                continue
+            rb = _box_of(r)
+            if rb is None:
+                continue
+            if same_col_gap(rb, ncx, ny, nh) is not None:
+                log("  [row_state] %s：该行价格位置读到「售罄」-> 售罄" % name)
+                return True, (nx, ny, nw, nh)
+
+        # 价格位置有对应单价 -> 可买
+        for r in results:
+            dd = _digits(_text_of(r))
+            if not dd or dd != price:
+                continue
+            rb = _box_of(r)
+            if rb is None:
+                continue
+            if same_col_gap(rb, ncx, ny, nh) is not None:
+                log("  [row_state] %s：该行读到单价 %s -> 可买" % (name, dd))
+                return False, (nx, ny, nw, nh)
+
+    log("  [row_state] %s：有名字但既无售罄也无单价，状态不明" % name)
+    return None, None
+
+
+@AgentServer.custom_recognition("alien_shop_row_state")
+class AlienShopRowState(CustomRecognition):
+    """按【名字 + 价格】绑定到具体那一行，判定它是售罄还是可买。
+
+    param: {"name": "进化之息", "price": "40", "expect": "soldout"|"buyable"}
+      expect=soldout -> 该行价格位置出现「售罄」时命中
+      expect=buyable -> 该行有单价且没有「售罄」时命中
+    取代原先"整片区域找售罄"的写法：那种写法下任何一件售罄都会让所有商品被误判。
+    """
+
+    def analyze(self, context, argv):
+        param = _param(argv)
+        name = str(param.get("name", ""))
+        price = _digits(str(param.get("price", ""))) or str(param.get("price", ""))
+        expect = str(param.get("expect", "soldout"))
+        roi = list(param.get("roi") or argv.roi or DEFAULT_ROI)[:4]
+
+        state, box = _row_state(_ocr(context, argv, roi), name, price)
+        hit = (state is True) if expect == "soldout" else (state is False)
+        if not hit:
+            return None
+        return CustomRecognition.AnalyzeResult(
+            box=box or (0, 0, 0, 0),
+            detail={"name": name, "expect": expect, "state": state}
+        )

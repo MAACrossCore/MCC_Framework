@@ -6,8 +6,8 @@ env:
   # - 设置 VERSION 为具体版本号时（如 v1.2.3），下载指定版本
   MAAFW_VERSION: ""
   # UI：https://github.com/MAACrossCore/MCCAvalonia（Release 附件名仍为 MFAAvalonia-*）
-  # 空字符串 = latest；钉版本时写 tag，例如 v0.1.1
-  MFAA_VERSION: "v0.1.1"
+  # 空字符串 = 始终拉最新 Release；需要钉版本时写 tag，例如 "v0.1.2"
+  MFAA_VERSION: ""
 
 on:
   # 练习/日常开发不自动打包，避免 artifact 配额被打满。
