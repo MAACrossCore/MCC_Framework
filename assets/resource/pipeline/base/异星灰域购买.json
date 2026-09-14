@@ -14,6 +14,7 @@
     },
     "异星灰域购买": {
         "next": [
+            "异星灰域_本周已完成",
             "[JumpBack]子任务_关闭公告",
             "[JumpBack]子任务_获得物品",
             "异星灰域_点异星灰域页签",
@@ -174,6 +175,7 @@
     },
     "异星灰域_购买分派": {
         "next": [
+            "异星灰域_本周已完成",
             "异星灰域_买不起_传说星尘券",
             "异星灰域_售罄跳过_传说星尘券",
             "异星灰域_购买_传说星尘券",
@@ -210,6 +212,7 @@
             "异星灰域_买不起_数据协议",
             "异星灰域_售罄跳过_数据协议",
             "异星灰域_购买_数据协议",
+            "异星灰域_右滑回上页",
             "异星灰域_左滑看更多",
             "异星灰域购买_完成"
         ],
@@ -224,18 +227,14 @@
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "传说星尘券"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "传说星尘券",
+                    "price": "50",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -245,7 +244,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_传说星尘券"
+            "异星灰域_购买_传说星尘券",
+            "异星灰域_标记完成_传说星尘券"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -307,24 +307,7 @@
     },
     "异星灰域_售罄跳过_传说星尘券": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -334,28 +317,26 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "传说星尘券"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "传说星尘券",
+                    "price": "50",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_售罄跳过_构建蓝图": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -365,24 +346,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "构建蓝图"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "构建蓝图",
+                    "price": "150",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_构建蓝图": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "构建蓝图"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "构建蓝图",
+                    "price": "150",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -392,7 +384,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_构建蓝图"
+            "异星灰域_购买_构建蓝图",
+            "异星灰域_标记完成_构建蓝图"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -404,24 +397,7 @@
     },
     "异星灰域_售罄跳过_赤狼星源": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -431,24 +407,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "赤狼星源"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "赤狼星源",
+                    "price": "150",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_赤狼星源": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "赤狼星源"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "赤狼星源",
+                    "price": "150",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -458,7 +445,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_赤狼星源"
+            "异星灰域_购买_赤狼星源",
+            "异星灰域_标记完成_赤狼星源"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -470,24 +458,7 @@
     },
     "异星灰域_售罄跳过_破碎程式x50": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -497,24 +468,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "破碎程式x50"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "破碎程式x50",
+                    "price": "50",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_破碎程式x50": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "破碎程式"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "破碎程式x50",
+                    "price": "50",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -524,7 +506,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_破碎程式x50"
+            "异星灰域_购买_破碎程式x50",
+            "异星灰域_标记完成_破碎程式x50"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -536,24 +519,7 @@
     },
     "异星灰域_售罄跳过_稀有礼物箱": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -563,24 +529,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "稀有礼物箱"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "稀有礼物箱",
+                    "price": "16",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_稀有礼物箱": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "稀有礼物"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "稀有礼物箱",
+                    "price": "16",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -590,7 +567,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_稀有礼物箱"
+            "异星灰域_购买_稀有礼物箱",
+            "异星灰域_标记完成_稀有礼物箱"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -602,24 +580,7 @@
     },
     "异星灰域_售罄跳过_家具币x10": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -629,24 +590,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "家具币x10"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "家具币x10",
+                    "price": "10",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_家具币x10": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "家具币"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "家具币x10",
+                    "price": "10",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -656,7 +628,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_家具币x10"
+            "异星灰域_购买_家具币x10",
+            "异星灰域_标记完成_家具币x10"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -668,24 +641,7 @@
     },
     "异星灰域_售罄跳过_装饰券x5": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -695,24 +651,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "装饰券x5"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "装饰券x5",
+                    "price": "20",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_装饰券x5": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "装饰券"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "装饰券x5",
+                    "price": "20",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -722,7 +689,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_装饰券x5"
+            "异星灰域_购买_装饰券x5",
+            "异星灰域_标记完成_装饰券x5"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -734,24 +702,7 @@
     },
     "异星灰域_售罄跳过_总队长星源": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -761,24 +712,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "总队长星源"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "总队长星源",
+                    "price": "300",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_总队长星源": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "总队长星源"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "总队长星源",
+                    "price": "300",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -788,7 +750,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_总队长星源"
+            "异星灰域_购买_总队长星源",
+            "异星灰域_标记完成_总队长星源"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -800,24 +763,7 @@
     },
     "异星灰域_售罄跳过_罕见星尘券x20": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -827,24 +773,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "罕见星尘券x20"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "罕见星尘券x20",
+                    "price": "10",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_罕见星尘券x20": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "罕见星尘券"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "罕见星尘券x20",
+                    "price": "10",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -854,7 +811,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_罕见星尘券x20"
+            "异星灰域_购买_罕见星尘券x20",
+            "异星灰域_标记完成_罕见星尘券x20"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -866,24 +824,7 @@
     },
     "异星灰域_售罄跳过_高纯硅化剂": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -893,24 +834,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "高纯硅化剂"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "高纯硅化剂",
+                    "price": "75",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_高纯硅化剂": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "高纯硅化剂"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "高纯硅化剂",
+                    "price": "75",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -920,7 +872,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_高纯硅化剂"
+            "异星灰域_购买_高纯硅化剂",
+            "异星灰域_标记完成_高纯硅化剂"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -932,24 +885,7 @@
     },
     "异星灰域_售罄跳过_进化之息": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -959,24 +895,35 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "进化之息"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "进化之息",
+                    "price": "40",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_进化之息": {
         "enabled": false,
         "max_hit": 1,
         "recognition": {
-            "type": "OCR",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    140,
-                    270,
-                    970,
-                    310
-                ],
-                "expected": [
-                    "进化之息"
-                ],
-                "threshold": 0.2
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "进化之息",
+                    "price": "40",
+                    "expect": "buyable"
+                }
             }
         },
         "action": {
@@ -986,7 +933,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_进化之息"
+            "异星灰域_购买_进化之息",
+            "异星灰域_标记完成_进化之息"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -998,24 +946,7 @@
     },
     "异星灰域_售罄跳过_数据协议": {
         "enabled": false,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    140,
-                    240,
-                    970,
-                    360
-                ],
-                "expected": [
-                    "售罄"
-                ],
-                "threshold": 0.2
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
         "max_hit": 1,
         "$__mpe_code": {
             "position": {
@@ -1025,7 +956,22 @@
         },
         "next": [
             "异星灰域_购买分派"
-        ]
+        ],
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "数据协议"
+        },
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "alien_shop_row_state",
+                "custom_recognition_param": {
+                    "name": "数据协议",
+                    "price": "10",
+                    "expect": "soldout"
+                }
+            }
+        }
     },
     "异星灰域_购买_数据协议": {
         "enabled": false,
@@ -1033,10 +979,11 @@
         "recognition": {
             "type": "Custom",
             "param": {
-                "custom_recognition": "alien_shop_item",
+                "custom_recognition": "alien_shop_row_state",
                 "custom_recognition_param": {
                     "name": "数据协议",
-                    "price": "10"
+                    "price": "10",
+                    "expect": "buyable"
                 }
             }
         },
@@ -1047,7 +994,8 @@
         "next": [
             "异星灰域_数量最大",
             "异星灰域_点购买",
-            "异星灰域_购买_数据协议"
+            "异星灰域_购买_数据协议",
+            "异星灰域_标记完成_数据协议"
         ],
         "timeout": 20000,
         "$__mpe_code": {
@@ -1401,5 +1349,175 @@
                 "y": 900
             }
         }
+    },
+    "异星灰域_本周已完成": {
+        "recognition": "Custom",
+        "custom_recognition": "alien_shop_week_done",
+        "action": "DoNothing",
+        "next": [
+            "异星灰域购买_完成"
+        ],
+        "focus": null
+    },
+    "异星灰域_标记完成_传说星尘券": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "传说星尘券"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_构建蓝图": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "构建蓝图"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_赤狼星源": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "赤狼星源"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_破碎程式x50": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "破碎程式x50"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_稀有礼物箱": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "稀有礼物箱"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_家具币x10": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "家具币x10"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_装饰券x5": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "装饰券x5"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_总队长星源": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "总队长星源"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_罕见星尘券x20": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "罕见星尘券x20"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_高纯硅化剂": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "高纯硅化剂"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_进化之息": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "进化之息"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_标记完成_数据协议": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "alien_shop_mark",
+        "custom_action_param": {
+            "item": "数据协议"
+        },
+        "next": [
+            "异星灰域_购买分派"
+        ]
+    },
+    "异星灰域_右滑回上页": {
+        "recognition": "Custom",
+        "custom_recognition": "alien_shop_has_missing",
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    200,
+                    270,
+                    40,
+                    40
+                ],
+                "end": [
+                    [
+                        1050,
+                        270,
+                        40,
+                        40
+                    ]
+                ],
+                "duration": 500
+            }
+        },
+        "post_delay": 900,
+        "max_hit": 4,
+        "next": [
+            "异星灰域_购买分派"
+        ]
     }
 }

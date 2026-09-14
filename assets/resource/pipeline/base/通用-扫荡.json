@@ -388,7 +388,8 @@
                 "x": 1681,
                 "y": 207
             }
-        }
+        },
+        "max_hit": 3
     },
     "扫荡次数选择": {
         "enabled": true,
@@ -464,7 +465,6 @@
             }
         }
     },
-
     "检查体力-白": {
         "recognition": {
             "type": "ColorMatch",
