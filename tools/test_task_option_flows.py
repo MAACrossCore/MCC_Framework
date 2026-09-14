@@ -30,10 +30,10 @@ def test_close_emulator_switch_for_both_resources():
     base = load("assets/resource/pipeline/base/关闭游戏.json")
     bilibili = load("assets/resource/bilibili/pipeline/shutdown.json")
     task = next(item for item in interface["task"] if item["entry"] == "关闭游戏")
-    option = interface["option"]["并关闭模拟器"]
+    option = interface["option"]["关闭模拟器"]
     expected_next = ["关闭游戏_并关闭模拟器", "关闭游戏_仅关闭游戏"]
 
-    assert "并关闭模拟器" in task["option"]
+    assert "关闭模拟器" in task["option"]
     assert option["type"] == "switch" and option["default_case"] == "Yes"
     assert base["关闭游戏"]["next"] == expected_next
     assert bilibili["关闭游戏"]["next"] == expected_next
