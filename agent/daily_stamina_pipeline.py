@@ -271,6 +271,15 @@ class DailyStaminaAction(CustomAction):
                 _SESSION.get("potion_count", 0) if use_potion else 0,
                 cost, stamina, potion_type,
             )
+            # 「消耗完体力」：连 1 次都扫不起时走收尾回主页（正常结束，不是失败）。
+            # 以前只在「指定次数」里做了兜底，消耗完会硬进扫荡弹窗再报错。
+            if int(summary.get("runs") or 0) < 1:
+                log.info(
+                    "消耗完体力：体力不足一次扫荡，未执行刷取"
+                    "（当前体力=%d，单次消耗=%d）",
+                    stamina, cost,
+                )
+                return DailyStaminaAction._mark_plan_finished(summary)
         else:
             steps, summary = plan_actions(
                 custom_runs, cost, stamina, potion_type, use_potion=use_potion,
@@ -284,15 +293,7 @@ class DailyStaminaAction(CustomAction):
                     "（当前体力=%d，单次消耗=%d，最多只能扫%d次）",
                     custom_runs, stamina, cost, summary.get("planned", 0),
                 )
-                _SESSION["plan_finished"] = "insufficient_stamina"
-                _SESSION["plan_aborted"] = "insufficient_stamina"
-                _SESSION["steps"] = []
-                _SESSION["plan_summary"] = summary
-                _SESSION["batches"] = []
-                _SESSION["batch_index"] = 0
-                _SESSION["potion_steps"] = []
-                _SESSION["potion_index"] = 0
-                return False
+                return DailyStaminaAction._mark_plan_finished(summary)
         _SESSION.pop("plan_aborted", None)
         _SESSION.pop("plan_finished", None)
         _SESSION["steps"] = steps
@@ -319,6 +320,33 @@ class DailyStaminaAction(CustomAction):
         log.info("每日探索体力计划：%s；步骤=%s",
                  json.dumps(summary, ensure_ascii=False),
                  " -> ".join("%s%d" % (s["action"], s["count"]) for s in steps) or "无")
+        return True
+
+    @staticmethod
+    def _mark_plan_finished(summary=None):
+        """标记「体力不足不刷」：prepare 会走收尾节点 → 通用-返回主页。"""
+        _SESSION["plan_finished"] = "insufficient_stamina"
+        _SESSION["plan_aborted"] = "insufficient_stamina"
+        _SESSION["steps"] = []
+        _SESSION["plan_summary"] = summary or _SESSION.get("plan_summary") or {}
+        _SESSION["batches"] = []
+        _SESSION["batch_index"] = 0
+        _SESSION["potion_steps"] = []
+        _SESSION["potion_index"] = 0
+        return False
+
+    @staticmethod
+    def _redirect_insufficient_home(context, argv, stamina, cost):
+        """扫荡弹窗里才发现不够扫：改走收尾回主页，不要把任务打成失败。"""
+        log.info(
+            "体力不足一次扫荡：体力=%d，单次消耗=%d，返回主页",
+            stamina, cost,
+        )
+        DailyStaminaAction._mark_plan_finished(_SESSION.get("plan_summary") or {
+            "planned": 0, "runs": 0, "final_stamina": stamina,
+        })
+        node = getattr(argv, "node_name", None) or "每日探索_按体力计算次数"
+        context.override_next(node, ["每日探索_计划结束收尾"])
         return True
 
     @staticmethod
@@ -596,9 +624,13 @@ class DailyStaminaAction(CustomAction):
                 # 「消耗完体力」：次数不再靠红/白识别试错，直接按体力算
                 # （当前体力 = 识别到的体力 + 用掉的体力药恢复量）。
                 #
-                # 计划阶段判定「体力不足、一次都不扫」时直接中止（日志已在计划里给过）
+                # 计划阶段已判定不足时，改走收尾回主页（不要 False 把整任务打红）
                 if _SESSION.get("plan_aborted"):
-                    return False
+                    return self._redirect_insufficient_home(
+                        context, argv,
+                        int(_SESSION.get("final_stamina") or _SESSION.get("stamina") or 0),
+                        int(_SESSION.get("cost") or 0),
+                    )
                 #
                 # 护栏：「指定次数」走的是 batches 那条链（每日探索_按次数扫荡）。
                 # 万一弹窗节点的 next 变了、把本操作也带进来，按体力算会覆盖用户
@@ -621,11 +653,10 @@ class DailyStaminaAction(CustomAction):
                         "缺少体力或关卡消耗，无法按体力计算次数（体力=%s，单次消耗=%s）",
                         stamina, cost,
                     )
-                    return False
+                    return self._redirect_insufficient_home(context, argv, stamina, cost)
                 target = sweep_runs_for_stamina(stamina, cost)
                 if target < 1:
-                    log.error("体力不足一次扫荡：体力=%d，单次消耗=%d，停止", stamina, cost)
-                    return False
+                    return self._redirect_insufficient_home(context, argv, stamina, cost)
                 planned = int(_SESSION.get("sweep_runs") or 0)
                 if planned != target:
                     log.warning("计划次数=%d 与实际体力算出的次数=%d 不一致，按体力为准",
@@ -668,16 +699,15 @@ class DailyStaminaAction(CustomAction):
                 return False
 
             if operation == "finish":
-                # 正常收尾：例如「指定次数 + 不使用体力药」但体力不够。
-                # 这里什么界面都不点，让流水线走到任务出口，任务按成功结束。
+                # 正常收尾：体力不够一次扫荡。不点界面，由 next 走通用-返回主页。
                 summary = _SESSION.get("plan_summary") or {}
                 log.info(
-                    "每日探索结束：自选%d次，当前体力=%d，单次消耗=%d，"
-                    "体力不足未执行刷取（最多可扫%d次）",
-                    int(_SESSION.get("custom_runs") or 0),
+                    "每日探索结束：方式=%s，当前体力=%d，单次消耗=%d，"
+                    "体力不足未执行刷取（计划可扫%d次）",
+                    _SESSION.get("mode") or "?",
                     int(_SESSION.get("stamina") or 0),
                     int(_SESSION.get("cost") or 0),
-                    int(summary.get("planned") or 0),
+                    int(summary.get("planned") or summary.get("runs") or 0),
                 )
                 return True
 
