@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
+from importlib.metadata import PackageNotFoundError, version
 from importlib.util import find_spec
 from pathlib import Path
 
@@ -50,11 +52,47 @@ def _run_pip(args: list[str]) -> bool:
         return False
 
 
+def required_maafw_version(requirements: Path) -> str | None:
+    """Return the exact maafw version pinned by requirements.txt, if present."""
+    try:
+        lines = requirements.read_text(encoding="utf-8-sig").splitlines()
+    except OSError:
+        return None
+    for line in lines:
+        match = re.match(r"^\s*maafw\s*==\s*([^\s;#]+)", line, re.IGNORECASE)
+        if match:
+            return match.group(1)
+    return None
+
+
+def dependencies_are_ready(root: Path) -> bool:
+    if find_spec("maa") is None:
+        return False
+
+    expected = required_maafw_version(requirements_path(root))
+    if expected is None:
+        return True
+
+    try:
+        installed = version("maafw")
+    except PackageNotFoundError:
+        return False
+
+    if installed == expected:
+        return True
+
+    print(
+        f"[agent] maafw version mismatch: installed={installed}, expected={expected}; "
+        "repairing embedded dependencies"
+    )
+    return False
+
+
 def ensure_dependencies() -> None:
-    if find_spec("maa") is not None:
+    root = project_root()
+    if dependencies_are_ready(root):
         return
 
-    root = project_root()
     req = requirements_path(root)
     if not req.is_file():
         print(f"[agent] missing requirements file: {req}")
@@ -80,7 +118,7 @@ def ensure_dependencies() -> None:
                 "--no-index",
             ]
         )
-        if ok and find_spec("maa") is not None:
+        if ok and dependencies_are_ready(root):
             return
         print("[agent] local wheel install failed, trying online mirrors")
 
