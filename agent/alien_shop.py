@@ -8,8 +8,8 @@
    纯 pipeline 表达不了「同一张卡上名字 AND 价格」，所以写在这里。
    注意：代币图标会被 OCR 读成前导 0（10 -> '010'），价格必须去前导零后比较。
 
-2) alien_shop_broke —— 容错：代币不足以买下「当前商品的全部余量」时命中，
-   父节点据此直接进入任务结束流程，不再识别和购买后续商品。
+2) alien_shop_broke —— 容错：代币不足以买下「当前商品的全部余量」时，
+   仅在本轮暂缓该商品，并继续识别和购买后续商品。
 """
 
 import json
@@ -31,6 +31,7 @@ MIN_GAP, MAX_GAP = 0, 140  # 价格相对名字底边的垂直间距范围
 REMAIN_GAP = (0, 90)       # 「剩余N」相对名字顶边的垂直间距范围（在名字上方）
 
 LOG_FILE = Path(__file__).resolve().parent.parent / "logs" / "alien_shop.log"
+_DEFERRED_BY_TASK = {}
 
 
 def log(message):
@@ -66,6 +67,18 @@ def _digits(text):
     """取数字部分并去前导零：'010'->'10'（代币图标被读成前导 0）。"""
     d = re.sub(r"\D", "", text)
     return (d.lstrip("0") or "0") if d else ""
+
+
+def _task_id(argv):
+    return int(getattr(getattr(argv, "task_detail", None), "task_id", 0) or 0)
+
+
+def deferred_items(task_id):
+    return set(_DEFERRED_BY_TASK.get(int(task_id or 0), set()))
+
+
+def _defer_item(argv, item):
+    _DEFERRED_BY_TASK.setdefault(_task_id(argv), set()).add(item)
 
 
 def _ocr(context, argv, roi):
@@ -164,7 +177,7 @@ class AlienShopItem(CustomRecognition):
         param = _param(argv)
         name = str(param.get("name", "数据协议"))
         price = _digits(str(param.get("price", "10"))) or "10"
-        roi = list(param.get("roi") or argv.roi or DEFAULT_ROI)[:4]
+        roi = list(param.get("roi") or DEFAULT_ROI)[:4]
 
         results = _ocr(context, argv, roi)
         log("alien_shop_item name=%r price=%r：OCR %d 条" % (name, price, len(results)))
@@ -181,18 +194,22 @@ class AlienShopItem(CustomRecognition):
 
 @AgentServer.custom_recognition("alien_shop_broke")
 class AlienShopBroke(CustomRecognition):
-    """容错：代币不足买下「当前商品全部余量」时命中 -> 父节点直接结束任务。
+    """容错：代币不足买下「当前商品全部余量」时，本轮暂缓该商品。
 
     只检查本商品（名字 + 单价 + 剩余）。分派按固定顺序逐个调用，轮到谁就是谁。
-    商品不在可买区（售罄/已买）时不算"买不起"，返回未命中，交给后续节点处理。
+    商品不在可买区（售罄/已买）时不算"买不起"；余额不足时也返回未命中，
+    但把商品加入当前任务的暂缓集合，确保购买节点不再误点它。
     """
 
     def analyze(self, context, argv):
         param = _param(argv)
         name = str(param.get("name", "数据协议"))
         price = _digits(str(param.get("price", "10"))) or "10"
-        roi = list(param.get("roi") or argv.roi or DEFAULT_ROI)[:4]
+        roi = list(param.get("roi") or DEFAULT_ROI)[:4]
         tokens_roi = list(param.get("tokens_roi") or DEFAULT_TOKENS_ROI)[:4]
+
+        if name in deferred_items(_task_id(argv)):
+            return None
 
         results = _ocr(context, argv, roi)
         card = _find_card(results, name, price)
@@ -215,13 +232,12 @@ class AlienShopBroke(CustomRecognition):
                 % (name, remain, unit, need, tokens))
             return None
 
-        log("  ⛔ %s 剩余%d x 单价%d = 需要 %d，代币只有 %d -> 结束任务"
+        log("  ⛔ %s 剩余%d x 单价%d = 需要 %d，代币只有 %d -> 本轮跳过该商品"
             % (name, remain, unit, need, tokens))
-        return CustomRecognition.AnalyzeResult(
-            box=box,
-            detail={"name": name, "remain": remain, "unit": unit,
-                    "need": need, "tokens": tokens},
-        )
+        _defer_item(argv, name)
+        # 返回未命中，让同一次分派继续检查后续商品；购买/售罄识别会根据
+        # _DEFERRED_BY_TASK 跳过本商品，避免又点击一次。
+        return None
 
 def _row_state(results, name, price):
     """返回 (状态, 名字框)。状态：True=售罄 False=可买(有价格且无售罄) None=不在视野/状态不明。
@@ -287,12 +303,19 @@ class AlienShopRowState(CustomRecognition):
         name = str(param.get("name", ""))
         price = _digits(str(param.get("price", ""))) or str(param.get("price", ""))
         expect = str(param.get("expect", "soldout"))
-        roi = list(param.get("roi") or argv.roi or DEFAULT_ROI)[:4]
+        roi = list(param.get("roi") or DEFAULT_ROI)[:4]
+
+        if name in deferred_items(_task_id(argv)):
+            return None
 
         state, box = _row_state(_ocr(context, argv, roi), name, price)
         hit = (state is True) if expect == "soldout" else (state is False)
         if not hit:
             return None
+        if expect == "buyable":
+            # 这里只记录候选商品；真正写入本周完成标记必须等「获得物品」弹窗命中。
+            from alien_shop_marker import remember_pending_purchase
+            remember_pending_purchase(_task_id(argv), name)
         return CustomRecognition.AnalyzeResult(
             box=box or (0, 0, 0, 0),
             detail={"name": name, "expect": expect, "state": state}

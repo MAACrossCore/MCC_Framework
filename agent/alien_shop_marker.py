@@ -14,7 +14,9 @@
 注意：MCC 调 agent 时 print 不进 MFA 日志，所以日志落文件（与 alien_shop.py 一致）。
 """
 
+import hashlib
 import json
+import os
 import time
 from datetime import date, timedelta
 from pathlib import Path
@@ -24,15 +26,13 @@ from maa.custom_action import CustomAction
 from maa.custom_recognition import CustomRecognition
 
 _ROOT = Path(__file__).resolve().parent.parent
-MARKER_FILE = _ROOT / "config" / "alien_shop_week.json"
 LOG_FILE = _ROOT / "logs" / "alien_shop_week.log"
 
 # 分派列表里的 12 件商品（与 pipeline 节点名一一对应）
 # 连续多少次判定"仍有未确定项"后就放弃回滑（防止找不到的商品导致无限滑动）
 GIVE_UP_AFTER = 5
-_MISSING_TRIES = {"key": None, "count": 0, "ts": 0.0}
-# 距上次判定超过这么多秒，视为新的一次任务运行，计数重置
-RESET_AFTER_SECONDS = 20
+_MISSING_TRIES = {}
+_PENDING_PURCHASES = {}
 
 ALL_ITEMS = [
     "传说星尘券", "构建蓝图", "赤狼星源", "破碎程式x50", "稀有礼物箱",
@@ -64,10 +64,59 @@ def this_monday():
     return today - timedelta(days=today.weekday())
 
 
-def load_marker():
+def instance_config_path():
+    """返回当前 MFA 实例配置，避免从多个配置中误取第一个启用项。"""
+    configured = (
+        os.environ.get("MAA_INSTANCE_CONFIG", "").strip()
+        or os.environ.get("MFA_INSTANCE_CONFIG_PATH", "").strip()
+    )
+    instance_id = os.environ.get("MFA_INSTANCE_ID", "").strip()
+    candidates = [
+        Path(configured) if configured else None,
+        _ROOT / "config" / "instances" / (instance_id + ".json") if instance_id else None,
+        _ROOT / "config" / "instances" / "default.json",
+    ]
+    for path in candidates:
+        if path and path.is_file():
+            return path
+    files = sorted((_ROOT / "config" / "instances").glob("*.json"))
+    return files[0] if len(files) == 1 else None
+
+
+def _load_instance():
+    path = instance_config_path()
+    if not path:
+        return None, {}
     try:
-        if MARKER_FILE.exists():
-            data = json.loads(MARKER_FILE.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+        return path, data if isinstance(data, dict) else {}
+    except Exception as exc:
+        log("读取当前实例配置失败：%s" % exc)
+        return path, {}
+
+
+def marker_scope():
+    """配置文件、资源服和模拟器实例共同构成周标记作用域。"""
+    path, cfg = _load_instance()
+    device = cfg.get("AdbDevice") or {}
+    parts = [
+        str(path.resolve()) if path else "unknown-config",
+        str(cfg.get("Resource") or "unknown-resource"),
+        str(device.get("AdbSerial") or device.get("Name") or "unknown-device"),
+    ]
+    return "|".join(parts)
+
+
+def marker_file():
+    digest = hashlib.sha256(marker_scope().encode("utf-8")).hexdigest()[:12]
+    return _ROOT / "config" / ("alien_shop_week_%s.json" % digest)
+
+
+def load_marker():
+    path = marker_file()
+    try:
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
             if isinstance(data, dict):
                 return data
     except Exception as exc:
@@ -76,10 +125,15 @@ def load_marker():
 
 
 def save_marker(data):
+    path = marker_file()
     try:
-        MARKER_FILE.parent.mkdir(parents=True, exist_ok=True)
-        MARKER_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n",
-                               encoding="utf-8")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        payload = dict(data)
+        payload["scope"] = marker_scope()
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        temporary.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                             encoding="utf-8")
+        temporary.replace(path)
         return True
     except Exception as exc:
         log("标记写入失败：%s" % exc)
@@ -96,28 +150,36 @@ def selected_items():
           有该键但为空列表，表示用户一件都没勾 -> 返回空列表（无事可做）。
     """
     try:
-        for cfg_file in sorted((_ROOT / "config" / "instances").glob("*.json")):
-            try:
-                cfg = json.loads(cfg_file.read_text(encoding="utf-8-sig"))
-            except Exception:
+        _, cfg = _load_instance()
+        for task in cfg.get("TaskItems", []) or []:
+            if task.get("entry") != "异星灰域购买":
                 continue
-            for task in cfg.get("TaskItems", []) or []:
-                if task.get("entry") != "异星灰域购买" or not task.get("default_check"):
+            for option in task.get("option", []) or []:
+                if option.get("name") != "异星灰域_购买物品选择":
                     continue
-                for option in task.get("option", []) or []:
-                    if option.get("name") != "异星灰域_购买物品选择":
-                        continue
-                    if "selected_cases" in option:
-                        raw = option.get("selected_cases") or []
-                        picked = [c for c in raw if c in ALL_ITEMS]
-                        log("勾选项（selected_cases %d 项）：%s"
-                            % (len(picked), "、".join(picked) or "（空）"))
-                        return picked
-                    log("选项里没有 selected_cases 键，按全部商品判定")
-                    return list(ALL_ITEMS)
+                if "selected_cases" in option:
+                    raw = option.get("selected_cases") or []
+                    picked = [c for c in raw if c in ALL_ITEMS]
+                    log("勾选项（selected_cases %d 项）：%s"
+                        % (len(picked), "、".join(picked) or "（空）"))
+                    return picked
+                log("选项里没有 selected_cases 键，按全部商品判定")
+                return list(ALL_ITEMS)
     except Exception as exc:
         log("读取勾选项失败（按全部商品判定）：%s" % exc)
     return list(ALL_ITEMS)
+
+
+def actionable_missing(argv):
+    """本周尚未完成、且本次运行没有因余额不足而暂缓的商品。"""
+    marker = load_marker()
+    done = set(marker.get("done") or []) if marker.get("week") == current_week() else set()
+    try:
+        from alien_shop import deferred_items
+        deferred = deferred_items(_task_id(argv))
+    except Exception:
+        deferred = set()
+    return [item for item in selected_items() if item not in done and item not in deferred]
 
 
 @AgentServer.custom_recognition("alien_shop_week_done")
@@ -165,32 +227,41 @@ class AlienShopHasMissing(CustomRecognition):
         marker = load_marker()
         if marker.get("week") != current_week():
             return None
-        done = set(marker.get("done") or [])
-        missing = [i for i in selected_items() if i not in done]
+        missing = actionable_missing(argv)
         if not missing:
-            _MISSING_TRIES.update({"key": None, "count": 0, "ts": 0.0})
+            _MISSING_TRIES.pop(_task_id(argv), None)
             return None
 
         key = "|".join(missing)
-        now = time.time()
-        stale = (now - _MISSING_TRIES.get("ts", 0.0)) > RESET_AFTER_SECONDS
-        if _MISSING_TRIES.get("key") == key and not stale:
-            _MISSING_TRIES["count"] += 1
+        task_id = _task_id(argv)
+        state = _MISSING_TRIES.setdefault(task_id, {"key": None, "count": 0})
+        if state.get("key") == key:
+            state["count"] += 1
         else:
-            # 新的未确定项集合，或距上次判定已久（新的一次任务运行）-> 重新计数
-            _MISSING_TRIES["key"] = key
-            _MISSING_TRIES["count"] = 1
-        _MISSING_TRIES["ts"] = now
+            state.update({"key": key, "count": 1})
 
-        if _MISSING_TRIES["count"] > GIVE_UP_AFTER:
+        if state["count"] > GIVE_UP_AFTER:
             log("未确定商品 %s 已回滑查找 %d 次仍未找到 -> 放弃，交给后续节点"
-                % ("、".join(missing), _MISSING_TRIES["count"] - 1))
+                % ("、".join(missing), state["count"] - 1))
             return None
 
         log("仍有未确定商品 %d 件（%s）-> 回上一页查找（第 %d 次）"
-            % (len(missing), "、".join(missing), _MISSING_TRIES["count"]))
+            % (len(missing), "、".join(missing), state["count"]))
         return CustomRecognition.AnalyzeResult(
-            box=(0, 0, 0, 0), detail={"missing": missing, "try": _MISSING_TRIES["count"]}
+            box=(0, 0, 0, 0), detail={"missing": missing, "try": state["count"]}
+        )
+
+
+@AgentServer.custom_recognition("alien_shop_has_actionable_missing")
+class AlienShopHasActionableMissing(CustomRecognition):
+    """翻到后续页面前的无计数闸门；余额不足的商品不再触发无意义滑动。"""
+
+    def analyze(self, context, argv):
+        missing = actionable_missing(argv)
+        if not missing:
+            return None
+        return CustomRecognition.AnalyzeResult(
+            box=(0, 0, 0, 0), detail={"missing": missing}
         )
 
 
@@ -210,16 +281,59 @@ class AlienShopMark(CustomAction):
             log("标记参数无效：%r" % (item,))
             return False
 
-        week = current_week()
-        marker = load_marker()
-        if marker.get("week") != week:
-            marker = {"week": week, "done": []}
-        done = marker.setdefault("done", [])
-        if item not in done:
-            done.append(item)
-            save_marker(marker)
-        log("已标记完成：%s（本周 %d/%d）" % (item, len(done), len(ALL_ITEMS)))
-        return True
+        return mark_item(item)
+
+
+def mark_item(item):
+    if item not in ALL_ITEMS:
+        log("标记参数无效：%r" % (item,))
+        return False
+    week = current_week()
+    marker = load_marker()
+    if marker.get("week") != week:
+        marker = {"week": week, "done": []}
+    done = marker.setdefault("done", [])
+    if item not in done:
+        done.append(item)
+        if not save_marker(marker):
+            return False
+    selected = set(selected_items())
+    selected_done = len(selected.intersection(done))
+    log("已标记完成：%s（本周勾选项 %d/%d）" % (item, selected_done, len(selected)))
+    return True
+
+
+def _task_id(argv):
+    return int(getattr(getattr(argv, "task_detail", None), "task_id", 0) or 0)
+
+
+def remember_pending_purchase(task_id, item):
+    if item in ALL_ITEMS:
+        _PENDING_PURCHASES[int(task_id or 0)] = {"item": item, "ts": time.time()}
+        log("已识别待购买商品，等待购买成功弹窗确认：%s" % item)
+
+
+@AgentServer.custom_action("alien_shop_confirm_purchase")
+class AlienShopConfirmPurchase(CustomAction):
+    """仅在识别到「获得物品」后落周标记，并关闭奖励弹窗。"""
+
+    def run(self, context, argv) -> bool:
+        task_id = _task_id(argv)
+        pending = _PENDING_PURCHASES.get(task_id) or {}
+        item = pending.get("item")
+        if item not in ALL_ITEMS:
+            log("识别到购买成功弹窗，但当前任务没有待确认商品；交给通用弹窗处理")
+            return False
+        marked = mark_item(item)
+        try:
+            x, y, w, h = argv.box
+            context.tasker.controller.post_click(int(x + w / 2), int(y + h / 2)).wait()
+        except Exception as exc:
+            log("购买成功后关闭获得物品弹窗失败：%s" % exc)
+            return False
+        _PENDING_PURCHASES.pop(task_id, None)
+        log("购买成功已确认：%s" % item)
+        return marked
 
 
 @AgentServer.custom_action("alien_shop_reset")

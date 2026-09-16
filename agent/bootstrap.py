@@ -52,16 +52,17 @@ def _run_pip(args: list[str]) -> bool:
         return False
 
 
-def expected_maafw_version(req: Path) -> str | None:
-    """Parse exact pin `maafw==x.y.z` from requirements.txt (None if unpinned)."""
-    if not req.is_file():
+def required_maafw_version(requirements: Path) -> str | None:
+    """Return the exact maafw version pinned by requirements.txt, if present."""
+    try:
+        lines = requirements.read_text(encoding="utf-8-sig").splitlines()
+    except OSError:
         return None
-    for raw in req.read_text(encoding="utf-8").splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#"):
+    for line in lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
             continue
-        # maafw==5.13.0  /  maafw == 5.13.0
-        match = re.match(r"(?i)^maafw\s*==\s*([^\s#;]+)", line)
+        match = re.match(r"^\s*maafw\s*==\s*([^\s;#]+)", stripped, re.IGNORECASE)
         if match:
             return match.group(1).strip()
     return None
@@ -85,30 +86,39 @@ def installed_maafw_version() -> str | None:
         return None
 
 
-def needs_maafw_install(expected: str | None) -> bool:
-    installed = installed_maafw_version()
-    if find_spec("maa") is None or installed is None:
+def dependencies_are_ready(root: Path) -> bool:
+    if find_spec("maa") is None:
         print("[agent] maafw not installed yet")
-        return True
-    if expected is None:
-        # Unpinned requirements: keep historical "already present => skip" behavior.
         return False
-    if installed != expected:
-        print(f"[agent] maafw version mismatch: installed={installed}, expected={expected}")
+
+    expected = required_maafw_version(requirements_path(root))
+    if expected is None:
         return True
-    print(f"[agent] maafw OK ({installed})")
+
+    installed = installed_maafw_version()
+    if installed is None:
+        print("[agent] maafw package metadata missing; repairing embedded dependencies")
+        return False
+
+    if installed == expected:
+        print(f"[agent] maafw OK ({installed})")
+        return True
+
+    print(
+        f"[agent] maafw version mismatch: installed={installed}, expected={expected}; "
+        "repairing embedded dependencies"
+    )
     return False
 
 
 def ensure_dependencies() -> None:
     root = project_root()
+    if dependencies_are_ready(root):
+        return
+
     req = requirements_path(root)
     if not req.is_file():
         print(f"[agent] missing requirements file: {req}")
-        return
-
-    expected = expected_maafw_version(req)
-    if not needs_maafw_install(expected):
         return
 
     cfg = read_pip_config(root)
@@ -116,7 +126,7 @@ def ensure_dependencies() -> None:
         print("[agent] pip install disabled in config/pip_config.json")
         return
 
-    # Exact pin + mismatch: force reinstall so pip will also downgrade 5.13 -> 5.12.
+    # Exact pin + mismatch: force reinstall so pip can also downgrade (e.g. 5.13 -> 5.12.3).
     install_args = [
         "install",
         "--upgrade",
@@ -137,7 +147,7 @@ def ensure_dependencies() -> None:
                 "--no-index",
             ]
         )
-        if ok and not needs_maafw_install(expected):
+        if ok and dependencies_are_ready(root):
             return
         print("[agent] local wheel install failed or still mismatched, trying online mirrors")
 
@@ -150,10 +160,10 @@ def ensure_dependencies() -> None:
         online_args.extend(["--extra-index-url", backup])
     _run_pip(online_args)
 
-    if needs_maafw_install(expected):
+    if not dependencies_are_ready(root):
         print(
             "[agent] WARNING: maafw still mismatched after install; "
-            "Agent may fail against bundled MaaFramework natives. "
+            "Agent may fail against bundled MaaFramework natives / UI runtimes. "
             "Re-extract a fresh Release or install the pinned wheel from deps/."
         )
 
