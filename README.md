@@ -48,8 +48,9 @@
 2. 模拟器建议使用 `16:9` 分辨率，例如 `1920×1080`、`1280×720`。
 3. 软件内更新后若看不到新任务选项，可关闭程序后删除根目录 `config/config.json` 再打开（需重新配置部分选项）。
 4. Agent 报错 / Action is null：确认使用的是最新 Release 包（解压后根目录应含 `python/`、`deps/`、`agent/`）；Windows 可再跑 `Install-Agent-Deps.bat`。旧版包或只下了源码仓库会缺少这些目录。
-5. pretask 报找不到 `python`、路径落在 `resource\base\...`：请确认用的是**本仓库最新 Release**（内置 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia) ≥ `v0.1.1`，含 pretask 路径解析）。临时兜底：确保资源里存在 `resource/base/ensure_mumu.cmd`（源码目录在 `assets/resource/base/`）。
-6. 开发调试也可用 MaaDebugger，详见 [本地开发手册](./docs/zh_cn/develop/local_dev.md)。
+5. 提示 `maafw` 与 MaaFramework 版本不兼容：内置 Python 里的绑定必须和包内原生库同号。发版已钉死 `maafw==` 与 `MAAFW_VERSION`；可双击 `Install-Agent-Deps.bat` 强制按 `deps/` 重装，或删掉目录后重新解压完整 Release。不要用系统 pip 往解压目录里乱升 `maafw`。
+6. pretask 报找不到 `python`、路径落在 `resource\base\...`：请确认用的是**本仓库最新 Release**（内置 [MCCAvalonia](https://github.com/MAACrossCore/MCCAvalonia) ≥ `v0.1.1`，含 pretask 路径解析）。临时兜底：确保资源里存在 `resource/base/ensure_mumu.cmd`（源码目录在 `assets/resource/base/`）。
+7. 开发调试也可用 MaaDebugger，详见 [本地开发手册](./docs/zh_cn/develop/local_dev.md)。
 
 ## 功能说明
 

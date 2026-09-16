@@ -14,10 +14,12 @@ if not defined PY (
 )
 
 echo Using: %PY%
-%PY% -m pip install -U -r "%~dp0agent\requirements.txt" --find-links "%~dp0deps" --no-index
+REM Pin in agent\requirements.txt (maafw==x.y.z) must match bundled MaaFramework.
+REM --force-reinstall so a newer wrong binding can be downgraded to the pin.
+%PY% -m pip install --upgrade --force-reinstall -r "%~dp0agent\requirements.txt" --find-links "%~dp0deps" --no-index --no-warn-script-location
 if errorlevel 1 (
   echo Local deps install failed, trying online mirrors...
-  %PY% -m pip install -U -r "%~dp0agent\requirements.txt"
+  %PY% -m pip install --upgrade --force-reinstall -r "%~dp0agent\requirements.txt" --no-warn-script-location
 )
 if errorlevel 1 (
   echo [ERROR] pip install failed.

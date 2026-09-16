@@ -1,2 +1,4 @@
-maafw>=5.12.0
+# 必须与 .github/workflows/install.yml 的 MAAFW_VERSION 对齐（去掉 v 前缀）。
+# 不要用 >=：线上 pip 会把绑定升到比原生 DLL 更新的版本，导致不兼容。
+maafw==5.13.0
 numpy

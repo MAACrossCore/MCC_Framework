@@ -4,7 +4,8 @@ env:
   # 版本控制：
   # - 设置 VERSION 为空字符串时，下载 latest 版本
   # - 设置 VERSION 为具体版本号时（如 v1.2.3），下载指定版本
-  MAAFW_VERSION: ""
+  # 原生 MaaFramework 必须与 agent/requirements.txt 的 maafw== 同号（本处 v5.13.0 ↔ maafw==5.13.0）
+  MAAFW_VERSION: "v5.13.0"
   # UI：https://github.com/MAACrossCore/MCCAvalonia（Release 附件名仍为 MFAAvalonia-*）
   # 空字符串 = 始终拉最新 Release；需要钉版本时写 tag，例如 "v0.1.2"
   MFAA_VERSION: ""
