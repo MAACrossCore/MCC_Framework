@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#111827"/>
+  <rect x="900" y="300" width="380" height="300" fill="#2563eb" fill-opacity="0.18" stroke="#60a5fa" stroke-width="4"/>
+  <text x="915" y="330" fill="#bfdbfe" font-family="sans-serif" font-size="22">TemplateMatch ROI [900, 300, 380, 300]</text>
+  <rect x="990" y="375" width="260" height="150" rx="14" fill="#db2777" fill-opacity="0.45" stroke="#f9a8d4" stroke-width="3"/>
+  <text x="1050" y="455" fill="#fff" font-family="sans-serif" font-size="28">活动入口</text>
+  <g font-family="sans-serif" font-size="22" text-anchor="middle">
+    <rect x="80" y="105" width="250" height="66" rx="12" fill="#1d4ed8"/>
+    <text x="205" y="146" fill="#fff">第1次识别</text>
+    <rect x="390" y="105" width="250" height="66" rx="12" fill="#1d4ed8"/>
+    <text x="515" y="146" fill="#fff">第2次识别</text>
+    <rect x="700" y="105" width="250" height="66" rx="12" fill="#1d4ed8"/>
+    <text x="825" y="146" fill="#fff">第3次识别</text>
+    <rect x="990" y="105" width="250" height="66" rx="12" fill="#047857"/>
+    <text x="1115" y="146" fill="#fff">正常结束活动任务</text>
+  </g>
+  <g stroke="#94a3b8" stroke-width="4" fill="none" marker-end="url(#arrow)">
+    <path d="M330 138 H390"/>
+    <path d="M640 138 H700"/>
+    <path d="M950 138 H990"/>
+  </g>
+  <text x="360" y="95" fill="#fbbf24" font-family="sans-serif" font-size="18">1.5s</text>
+  <text x="670" y="95" fill="#fbbf24" font-family="sans-serif" font-size="18">1.5s</text>
+  <text x="640" y="660" fill="#d1d5db" font-family="sans-serif" font-size="22" text-anchor="middle">任意一次命中即点击模板中心并进入活动页；三次全部未命中时不报错</text>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+</svg>

@@ -16,6 +16,7 @@ from limited_trade import (  # noqa: E402
     CHIP_TYPES,
     CHIP_REWARD_LOCK_POINT,
     CHIP_REWARD_POINT,
+    COIN_BALANCE_ROI,
     DEFAULT_SETTINGS,
     MATERIAL_ITEMS,
     MODULE_ITEMS,
@@ -35,11 +36,21 @@ from limited_trade import (  # noqa: E402
     chip_box_rarity,
     is_chip_box,
     merge_page_items,
+    parse_coin_balance,
     product_is_sold_out,
     select_purchase_plan,
     _param,
     _SESSION,
 )
+
+
+def test_coin_balance_parser_accepts_only_standalone_top_right_totals():
+    assert parse_coin_balance("16826113") == 16826113
+    assert parse_coin_balance("16,826,113") == 16826113
+    assert parse_coin_balance(" 16826113 ") == 16826113
+    assert parse_coin_balance("星币16826113") is None
+    assert parse_coin_balance("价格 20000") is None
+    assert parse_coin_balance("") is None
 
 
 def test_default_whitelist_preserves_existing_categories_without_new_chip_boxes():
@@ -71,6 +82,7 @@ def test_saved_nested_options_are_loaded():
             "name": "限时贸易所购买",
             "entry": "限时贸易所购买",
             "option": [
+                {"name": "限时贸易_星币保留阈值", "data": {"星币下限": "250000"}},
                 {"name": "限时贸易_购买素材", "index": 1},
                 {
                     "name": "限时贸易_购买武装技能训练",
@@ -107,6 +119,7 @@ def test_saved_nested_options_are_loaded():
         path.write_text(json.dumps(task, ensure_ascii=False), encoding="utf-8")
         settings = load_settings(path)
     assert build_whitelist(settings) == ["技能2", "R5连击芯片箱"]
+    assert settings["coin_floor"] == 250000
     assert settings["strategies"]["training"] == STRATEGY_ONE
     assert settings["strategies"]["chip_boxes"] == STRATEGY_ALL
 
@@ -115,12 +128,19 @@ def test_interface_exposes_nested_chip_box_controls():
     interface = json.loads((ROOT / "assets" / "interface.json").read_text(encoding="utf-8-sig"))
     task = next(item for item in interface["task"] if item["entry"] == "限时贸易所购买")
     assert task["option"] == [
+        "限时贸易_星币保留阈值",
         "限时贸易_购买素材",
         "限时贸易_购买武装技能训练",
         "限时贸易_购买模块",
         "限时贸易_购买芯片箱",
     ]
     options = interface["option"]
+    coin_floor = options["限时贸易_星币保留阈值"]
+    assert coin_floor["type"] == "input"
+    assert coin_floor["label"] == "星币低于（）时不购买任何物品"
+    assert coin_floor["inputs"][0]["label"] == "星币低于（）时不购买任何物品"
+    assert coin_floor["inputs"][0]["default"] == "200000"
+    assert coin_floor["inputs"][0]["verify"] == "^[0-9]+$"
     expected_defaults = {
         "限时贸易_素材购买策略": STRATEGY_FALLBACK,
         "限时贸易_技能书购买策略": STRATEGY_ONE,
@@ -343,6 +363,22 @@ def test_pipeline_delegates_item_location_to_original_fullscreen_ocr():
     entry = pipeline["限时贸易所购买"]
     assert entry["action"] == "Custom"
     assert entry["custom_action"] == "limited_trade_setup"
+    coin_ocr = pipeline["LimitedTradeCoinOCR"]
+    assert coin_ocr["recognition"] == "OCR"
+    assert coin_ocr["roi"] == COIN_BALANCE_ROI == [1080, 5, 200, 70]
+    assert coin_ocr["expected"] == [r"^\d{1,12}$"]
+    coin_read = pipeline["限时贸易_读取星币"]
+    assert coin_read["custom_action_param"] == {"operation": "read_coin_balance"}
+    assert coin_read["next"] == "限时贸易_星币阈值分派"
+    assert pipeline["限时贸易_星币阈值分派"]["next"] == [
+        "限时贸易所购买_星币不足完成",
+        "限时贸易_扫描两页商品",
+    ]
+    assert pipeline["限时贸易所购买_星币不足完成"]["custom_recognition_param"] == {
+        "expected": "coin_below_floor"
+    }
+    assert pipeline["LimitedStoreReady"]["next"][0] == "限时贸易_读取星币"
+    assert pipeline["time_limited"]["next"][0] == "限时贸易_读取星币"
     ocr = pipeline["LimitedTradeProductOCR"]
     assert ocr["recognition"] == "OCR"
     assert ocr["roi"] == [0, 0, 0, 0]
@@ -362,6 +398,12 @@ def test_pipeline_delegates_item_location_to_original_fullscreen_ocr():
     no_items = pipeline["限时贸易所购买_无可购完成"]
     assert no_items["custom_recognition_param"] == {"expected": "no_items"}
     assert no_items["focus"] == "当前无符合要求物品，未执行购买操作"
+
+
+def test_coin_floor_comparison_is_strictly_less_than():
+    source = (ROOT / "agent" / "limited_trade.py").read_text(encoding="utf-8-sig")
+    assert "below_floor = balance < floor" in source
+    assert "balance <= floor" not in source
 
 
 def test_two_page_plan_supplements_and_deduplicates_before_purchase():

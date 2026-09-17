@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#17202a"/>
+  <text x="32" y="48" fill="#ffffff" font-size="26" font-family="sans-serif">启动任务：待机时钟识别与唤醒（1280×720 基准）</text>
+  <rect x="320" y="140" width="640" height="440" fill="#3498db" fill-opacity="0.18" stroke="#4fc3f7" stroke-width="4"/>
+  <text x="334" y="176" fill="#4fc3f7" font-size="22" font-family="sans-serif">OCR ROI [320, 140, 640, 440]</text>
+  <text x="334" y="210" fill="#ffffff" font-size="19" font-family="sans-serif">匹配待机页时间：HH:MM / HH：MM / HH.MM</text>
+  <circle cx="640" cy="360" r="16" fill="#ffca28" stroke="#ffffff" stroke-width="3"/>
+  <line x1="610" y1="360" x2="670" y2="360" stroke="#ffca28" stroke-width="3"/>
+  <line x1="640" y1="330" x2="640" y2="390" stroke="#ffca28" stroke-width="3"/>
+  <text x="664" y="352" fill="#ffca28" font-size="22" font-family="sans-serif">点击中心 (640, 360)</text>
+  <text x="32" y="660" fill="#d5d8dc" font-size="18" font-family="sans-serif">命中后等待 1800 ms 并重新识别首页；最多唤醒 3 次，随后才回退到 StartApp。</text>
+  <text x="32" y="690" fill="#d5d8dc" font-size="18" font-family="sans-serif">实际坐标由 MaaFramework 按当前截图分辨率缩放。</text>
+</svg>

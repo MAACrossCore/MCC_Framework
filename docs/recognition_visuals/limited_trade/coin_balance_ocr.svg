@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#161b22"/>
+  <text x="32" y="48" fill="#ffffff" font-size="26" font-family="sans-serif">限时贸易所：右上角星币 OCR（1280×720 基准）</text>
+  <rect x="1080" y="5" width="200" height="70" fill="#3498db" fill-opacity="0.22" stroke="#4fc3f7" stroke-width="4"/>
+  <text x="785" y="112" fill="#4fc3f7" font-size="21" font-family="sans-serif">ROI [1080, 5, 200, 70]</text>
+  <line x1="1010" y1="104" x2="1120" y2="65" stroke="#4fc3f7" stroke-width="3"/>
+  <text x="805" y="150" fill="#ffffff" font-size="19" font-family="sans-serif">OCR 正则：1～12 位纯数字</text>
+  <text x="805" y="180" fill="#ffffff" font-size="19" font-family="sans-serif">实机读数：16826113（置信度 1.0）</text>
+  <text x="32" y="640" fill="#d5d8dc" font-size="18" font-family="sans-serif">只读取右上角总星币；不读取商品名称下方的价格数字。</text>
+  <text x="32" y="670" fill="#d5d8dc" font-size="18" font-family="sans-serif">OCR 星币 &lt; 用户下限：跳过扫描与购买并正常结束；等于下限：继续购买。</text>
+</svg>

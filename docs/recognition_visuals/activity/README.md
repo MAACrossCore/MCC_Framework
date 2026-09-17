@@ -5,6 +5,8 @@
 
 - `first_stage_research_institute.svg`：困难第一关 OCR 区域、OCR 跟随点击方式，
   以及每轮两次向右拖拽的起止点。
+- `activity_entry_retry.svg`：主界面活动入口模板识别区域，以及三次识别失败后
+  正常结束当前活动任务的容错流程。
 
 ## 后续活动替换
 

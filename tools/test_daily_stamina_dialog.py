@@ -23,10 +23,11 @@ from daily_stamina import plan_consume_all  # noqa: E402
 
 
 class Recorder:
-    """记录点击次数与坐标，替代真实控制器。"""
+    """记录点击与动态改写的后继节点，替代真实任务上下文。"""
 
     def __init__(self):
         self.clicks = []
+        self.overrides = []
 
 
 def _ocr_script(values):
@@ -52,7 +53,11 @@ def _make_context(recorder):
         def get(self):
             return object()
 
+    def override_next(node, next_nodes):
+        recorder.overrides.append((node, list(next_nodes)))
+
     return SimpleNamespace(
+        override_next=override_next,
         tasker=SimpleNamespace(
             controller=SimpleNamespace(
                 post_click=post_click,
@@ -68,13 +73,20 @@ def _run(operation, session, ocr_values, param=None):
     original_ocr = pipeline._ocr_digits
     original_click = pipeline._click
     original_guard = pipeline.ensure_running
+    original_sleep = pipeline.time.sleep
     try:
         pipeline.ensure_running = lambda _context: None
         pipeline._click = lambda _context, x, y: recorder.clicks.append((x, y))
         pipeline._ocr_digits = _ocr_script(list(ocr_values))
+        # 离线测试不需要等待真实页面动画；保留重试次数，只跳过实际睡眠。
+        pipeline.time.sleep = lambda _seconds: None
         pipeline._SESSION.clear()
         pipeline._SESSION.update(session)
         argv = SimpleNamespace(
+            node_name={
+                "set_sweep_count_by_stamina": "每日探索_按体力计算次数",
+                "set_sweep_count": "每日探索_按次数扫荡",
+            }.get(operation, operation),
             custom_action_param=json.dumps(
                 {"operation": operation} if param is None else param
             )
@@ -86,6 +98,7 @@ def _run(operation, session, ocr_values, param=None):
         pipeline._ocr_digits = original_ocr
         pipeline._click = original_click
         pipeline.ensure_running = original_guard
+        pipeline.time.sleep = original_sleep
         pipeline._SESSION.clear()
 
 
@@ -105,7 +118,7 @@ def test_runs_are_stamina_divided_by_cost():
     assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 2
 
 
-def test_target_is_capped_at_ten_for_the_dialog():
+def test_target_at_ten_uses_the_dialog_maximum():
     # 体力 350、单次 35 -> 算出来 10 次，弹窗上限也是 10，按 9 下
     ok, recorder, session = _run(
         "set_sweep_count_by_stamina", dict(BASE, final_stamina=350), [350, 0]
@@ -115,7 +128,7 @@ def test_target_is_capped_at_ten_for_the_dialog():
     assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 9
 
 
-def test_count_is_corrected_when_the_dialog_shows_something_else():
+def test_count_correction_uses_the_required_click_sequence():
     # 弹窗停在 1 次（扫荡后=70），目标 3 次（扫荡后=0）：先补 2 下加号，
     # 复核发现还是 70，再按 2 下减号……这里直接验证「按差值校正」这段
     ok, recorder, session = _run(
@@ -167,7 +180,7 @@ def test_potion_recovery_raises_the_count_when_it_matters():
     assert with_potion[1].clicks == [pipeline.SWEEP_PLUS_POINT] * 7
 
 
-def test_target_is_capped_at_ten_for_the_dialog():
+def test_target_above_ten_is_capped_at_ten_for_the_dialog():
     # 体力 5000、单次 35：算出 142 次，弹窗上限 10 -> 按 9 下加号
     ok, recorder, session = _run(
         "set_sweep_count_by_stamina", dict(BASE, final_stamina=5000), [5000, 5000 - 10 * 35]
@@ -177,7 +190,7 @@ def test_target_is_capped_at_ten_for_the_dialog():
     assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 9
 
 
-def test_count_is_corrected_when_the_dialog_shows_something_else():
+def test_count_correction_keeps_the_planned_sweep_runs():
     # 补点后弹窗仍停在 1 次（扫荡后=70），预期 0：按差值减 2 下，复核通过
     ok, recorder, session = _run(
         "set_sweep_count_by_stamina", dict(BASE, final_stamina=105), [105, 70, 0]
@@ -373,18 +386,28 @@ def test_custom_runs_with_potion_is_not_finished_when_stamina_is_short():
     assert sum(out["batches"]) == 10                # 药补够，次数照做
 
 
-def test_finished_plan_makes_sweep_operations_stop_without_clicking():
-    # 收尾标记置位后，算次数/设次数都必须直接停，且一下都不点
-    for operation in ("set_sweep_count_by_stamina", "set_sweep_count"):
-        ok, recorder, _ = _run(
-            operation,
-            {"mode": "指定次数", "plan_finished": "insufficient_stamina",
-             "plan_aborted": "insufficient_stamina",
-             "cost": 35, "final_stamina": 100, "batches": [], "batch_index": 0},
-            [100, 0],
-        )
-        assert ok is False, operation
-        assert recorder.clicks == [], operation
+def test_finished_plan_redirects_stamina_mode_and_stops_batch_mode():
+    session = {
+        "mode": "指定次数", "plan_finished": "insufficient_stamina",
+        "plan_aborted": "insufficient_stamina", "cost": 35,
+        "final_stamina": 100, "batches": [], "batch_index": 0,
+    }
+
+    # 按体力计算节点在运行中才发现不足时，应动态改走正常收尾，不能把任务打红。
+    ok, recorder, _ = _run(
+        "set_sweep_count_by_stamina", dict(session), [100, 0]
+    )
+    assert ok is True
+    assert recorder.clicks == []
+    assert recorder.overrides == [
+        ("每日探索_按体力计算次数", ["每日探索_计划结束收尾"])
+    ]
+
+    # 指定次数的批次节点不需要动态改线，保持停止且不点击。
+    ok, recorder, _ = _run("set_sweep_count", dict(session), [100, 0])
+    assert ok is False
+    assert recorder.clicks == []
+    assert recorder.overrides == []
 
 
 def test_plan_finished_recognition_and_finish_operation():
@@ -533,21 +556,21 @@ def test_pipeline_wires_the_finish_node():
     # 成功路径交给「分派」：先看是否已判定结束，再看要不要补药，最后才是去扫荡
     assert prepare["next"] == ["每日探索_计划结束收尾", "每日探索_待使用体力药", "扫荡"]
     # 只有真错误（读不到设置/体力）才走 on_error
-    assert prepare["on_error"] == ["出击任务列表"]
+    assert prepare["on_error"] == ["通用-返回主页"]
 
     finish = potion["每日探索_计划结束收尾"]
     assert finish["recognition"] == "Custom"
     assert finish["custom_recognition_param"] == {"expected": "plan:finished"}
     assert finish["custom_action_param"] == {"operation": "finish"}
-    # 命中收尾 -> 直接到任务出口（任务正常结束），不再碰任何界面
-    assert finish["next"] == ["出击任务列表"]
+    # 命中收尾 -> 统一回主页并正常结束，不再重新进入每日探索入口
+    assert finish["next"] == ["通用-返回主页"]
 
     pending = potion["每日探索_待使用体力药"]
     assert pending["custom_recognition_param"] == {"expected": "potion:pending"}
     assert pending["next"] == ["每日探索_打开体力药"]
 
 
-def test_missing_stamina_or_cost_stops_without_clicking():
+def test_missing_stamina_or_cost_redirects_home_without_clicking():
     for session in (
         dict(BASE, final_stamina=0),
         dict(BASE, final_stamina=None),
@@ -555,17 +578,23 @@ def test_missing_stamina_or_cost_stops_without_clicking():
         {"mode": "消耗完体力"},
     ):
         ok, recorder, _ = _run("set_sweep_count_by_stamina", session, [105, 0])
-        assert ok is False, session
+        assert ok is True, session
         assert recorder.clicks == [], session
+        assert recorder.overrides == [
+            ("每日探索_按体力计算次数", ["每日探索_计划结束收尾"])
+        ], session
 
 
-def test_not_enough_stamina_for_one_run_stops():
-    # 体力 30、单次 35：0 次，必须报错退出而不是硬选 1 次
+def test_not_enough_stamina_for_one_run_redirects_home():
+    # 体力 30、单次 35：0 次，必须正常收尾而不是硬选 1 次或把任务打红
     ok, recorder, _ = _run(
         "set_sweep_count_by_stamina", dict(BASE, final_stamina=30), [30, 0]
     )
-    assert ok is False
+    assert ok is True
     assert recorder.clicks == []
+    assert recorder.overrides == [
+        ("每日探索_按体力计算次数", ["每日探索_计划结束收尾"])
+    ]
 
 
 def test_unreadable_dialog_value_stops_without_blind_clicks():
@@ -677,7 +706,7 @@ def test_entry_runs_prepare_in_both_modes():
     prepare = potion["每日探索_体力药准备"]
     assert prepare["custom_action_param"] == {"operation": "prepare"}
     # 成功路径先过分派（收尾 / 补药 / 扫荡）；on_error 只留给「读设置或体力失败」
-    assert prepare["on_error"] == ["出击任务列表"]
+    assert prepare["on_error"] == ["通用-返回主页"]
     assert prepare["next"] == ["每日探索_计划结束收尾", "每日探索_待使用体力药", "扫荡"]
 
 

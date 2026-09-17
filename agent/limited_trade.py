@@ -7,6 +7,7 @@ import json
 import logging
 import os
 from pathlib import Path
+import re
 import time
 
 from maa.custom_action import CustomAction
@@ -50,6 +51,10 @@ STORE_SWIPE_LEFT = (1080, 360, 820, 360, 500)
 STORE_SWIPE_RIGHT = (820, 360, 1080, 360, 500)
 STORE_SWIPE_SETTLE_SECONDS = 1.2
 ITEM_OCR_MISS_LIMIT = 5
+COIN_BALANCE_ROI = [1080, 5, 200, 70]
+COIN_BALANCE_ATTEMPTS = 3
+COIN_FLOOR_OPTION = "限时贸易_星币保留阈值"
+COIN_FLOOR_INPUT = "星币下限"
 CHIP_REWARD_POINT = (960, 575)
 CHIP_REWARD_LOCK_POINT = (1207, 225)
 CHIP_REWARD_RESULT_FILE = PROJECT_ROOT / "config" / "limited_trade_chip_rewards_latest.json"
@@ -57,6 +62,7 @@ CHIP_REWARD_RESULT_FILE = PROJECT_ROOT / "config" / "limited_trade_chip_rewards_
 _SESSION = {}
 
 DEFAULT_SETTINGS = {
+    "coin_floor": 200000,
     "materials": True,
     "training": True,
     "skill_books": set(SKILL_BOOK_TYPES),
@@ -142,8 +148,35 @@ def _select_case(item, case_names, default):
     return case_names[index] if 0 <= index < len(case_names) else default
 
 
+def _nonnegative_input(item, input_name, default=0):
+    if not isinstance(item, dict):
+        return default
+
+    def parse(value):
+        try:
+            return max(0, int(str(value).strip()))
+        except (TypeError, ValueError):
+            return None
+
+    data = item.get("data") or {}
+    if input_name in data:
+        parsed = parse(data[input_name])
+        if parsed is not None:
+            return parsed
+    for value in data.values():
+        parsed = parse(value)
+        if parsed is not None:
+            return parsed
+    for row in (item.get("input") or item.get("inputs") or []):
+        parsed = parse(row.get("value"))
+        if parsed is not None:
+            return parsed
+    return default
+
+
 def load_settings(path=None):
     settings = {
+        "coin_floor": DEFAULT_SETTINGS["coin_floor"],
         "materials": DEFAULT_SETTINGS["materials"],
         "training": DEFAULT_SETTINGS["training"],
         "skill_books": set(DEFAULT_SETTINGS["skill_books"]),
@@ -164,6 +197,10 @@ def load_settings(path=None):
             if item.get("entry") == "限时贸易所购买" or item.get("name") == "限时贸易所购买"
         )
         options = {item.get("name"): item for item in _walk_options(task.get("option", []))}
+        settings["coin_floor"] = _nonnegative_input(
+            options.get(COIN_FLOOR_OPTION), COIN_FLOOR_INPUT,
+            DEFAULT_SETTINGS["coin_floor"],
+        )
         settings["materials"] = _switch_enabled(
             options.get("限时贸易_购买素材"), ("Yes", "No"), True
         )
@@ -370,6 +407,12 @@ def _canonical_item(text, choices):
     )
 
 
+def parse_coin_balance(text):
+    """Parse the top-right total coin count; reject mixed labels and prices."""
+    value = "".join(str(text or "").split()).replace(",", "").replace("，", "")
+    return int(value) if re.fullmatch(r"\d{1,12}", value) else None
+
+
 class LimitedTradeEngine:
     def __init__(self):
         self.viewport = REFERENCE_SIZE
@@ -408,6 +451,37 @@ class LimitedTradeEngine:
                 }
             },
         )
+
+    def coin_balance(self, context):
+        """Read a stable total from the dedicated top-right OCR region."""
+        previous = None
+        last_valid = None
+        for attempt in range(1, COIN_BALANCE_ATTEMPTS + 1):
+            image = self.shot(context)
+            detail = context.run_recognition("LimitedTradeCoinOCR", image)
+            results = list(getattr(detail, "all_results", None) or []) if detail else []
+            best = getattr(detail, "best_result", None) if detail else None
+            if best is not None:
+                results.insert(0, best)
+            values = []
+            for result in results:
+                value = parse_coin_balance(getattr(result, "text", ""))
+                if value is not None and value not in values:
+                    values.append(value)
+            current = values[0] if len(values) == 1 else None
+            if current is None:
+                log.warning("第%d次未能唯一读取限时贸易所右上角星币：%s", attempt, values)
+            elif current == previous:
+                log.info("限时贸易所星币 OCR 稳定读取=%d", current)
+                return current
+            else:
+                previous = current
+                last_valid = current
+                log.info("限时贸易所星币 OCR 第%d次读数=%d，等待复核", attempt, current)
+            if attempt < COIN_BALANCE_ATTEMPTS:
+                self.sleep(context, 0.25)
+        log.error("限时贸易所星币 OCR 未能获得两次一致读数，最后有效读数=%s", last_valid)
+        return None
 
     def scan_items(self, context, image, choices, page, world_x_offset=0):
         detail = self.recognize(context, image, choices)
@@ -649,6 +723,28 @@ class LimitedTradeSetupAction(CustomAction):
                 )
                 return True
 
+            if operation == "read_coin_balance":
+                balance = engine.coin_balance(context)
+                if balance is None:
+                    return False
+                _SESSION["coin_balance"] = balance
+                floor = int((_SESSION.get("settings") or {}).get("coin_floor") or 0)
+                below_floor = balance < floor
+                _SESSION["coin_below_floor"] = below_floor
+                if below_floor:
+                    _SESSION["stage"] = "done"
+                    log.info(
+                        "限时贸易所星币=%d，低于设置下限=%d；"
+                        "不购买任何物品，任务正常结束",
+                        balance, floor,
+                    )
+                else:
+                    log.info(
+                        "限时贸易所星币=%d，设置下限=%d；允许继续购买",
+                        balance, floor,
+                    )
+                return True
+
             if operation == "return_first":
                 engine.shot(context)
                 engine.swipe(context, STORE_SWIPE_RIGHT, "向右拖动返回初始商品页")
@@ -735,6 +831,16 @@ class LimitedTradeRecognition(CustomRecognition):
             if flow._is_reward_popup(context, argv.image):
                 return _hit({"item": item_name, "rarity": chip_box_rarity(item_name)})
             return None
+
+        if (
+            expected == "coin_below_floor"
+            and _SESSION.get("initialized")
+            and _SESSION.get("coin_below_floor")
+        ):
+            return _hit({
+                "balance": int(_SESSION.get("coin_balance") or 0),
+                "floor": int((_SESSION.get("settings") or {}).get("coin_floor") or 0),
+            })
 
         if (
             expected == "no_items"

@@ -197,7 +197,27 @@ def test_activity_returns_home_and_stops_before_exchange_without_stamina():
         "活动_开始前确认主界面",
         "[JumpBack]子任务_进入首页",
     ]
-    assert activity["活动_开始前确认主界面"]["next"] == "活动_主界面已到"
+    assert activity["活动_开始前确认主界面"]["next"] == "活动_活动入口识别_第一次"
+
+    for attempt, wait_or_finish in [
+        ("第一次", "活动_活动入口等待第二次"),
+        ("第二次", "活动_活动入口等待第三次"),
+        ("第三次", "活动_未识别到活动_正常完成"),
+    ]:
+        dispatch = activity[f"活动_活动入口识别_{attempt}"]["next"]
+        assert dispatch == [f"活动_点击活动入口_{attempt}", wait_or_finish]
+        recognition = activity[f"活动_点击活动入口_{attempt}"]
+        assert recognition["recognition"] == "TemplateMatch"
+        assert recognition["template"] == "StartUp/活动图标.png"
+        assert recognition["roi"] == [900, 300, 380, 300]
+        assert recognition["action"] == "Click"
+        assert recognition["next"] == "活动_活动页已到"
+
+    no_activity = activity["活动_未识别到活动_正常完成"]
+    assert no_activity["recognition"] == "DirectHit"
+    assert no_activity["action"] == "DoNothing"
+    assert "next" not in no_activity
+    assert "3次" in no_activity["focus"]
 
     dispatch = activity["活动_活动页分派"]["next"]
     assert dispatch.index("通用_体力药入口") < dispatch.index("活动_待检查兑换体力")

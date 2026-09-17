@@ -31,6 +31,7 @@ from activity_pipeline import ActivityPipelineAction, ActivityPipelineRecognitio
 from shutdown_mumu import ShutdownMumuAction
 from daily_stamina_pipeline import DailyStaminaAction, DailyStaminaRecognition
 from limited_trade import LimitedTradeRecognition, LimitedTradeSetupAction
+from mainstory_pipeline import MainStoryAction, MainStoryRecognition
 from jdc_select_character import JdcSelectCharacter
 from jdc_build_team import JdcBuildTeam
 from jdc_route_push import JdcRoutePush
@@ -50,6 +51,8 @@ AgentServer.custom_action("daily_stamina")(DailyStaminaAction)
 AgentServer.custom_recognition("daily_stamina_state")(DailyStaminaRecognition)
 AgentServer.custom_action("limited_trade_setup")(LimitedTradeSetupAction)
 AgentServer.custom_recognition("limited_trade_state")(LimitedTradeRecognition)
+AgentServer.custom_action("mainstory")(MainStoryAction)
+AgentServer.custom_recognition("mainstory_state")(MainStoryRecognition)
 AgentServer.custom_action("jdc_select_character")(JdcSelectCharacter)
 AgentServer.custom_action("jdc_build_team")(JdcBuildTeam)
 AgentServer.custom_action("jdc_route_push")(JdcRoutePush)

@@ -1,0 +1,1413 @@
+{
+    "$__mpe_config_主线刷取": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "filename": "主线刷取",
+            "version": "v1.9.2",
+            "savedViewport": {
+                "x": 0,
+                "y": 0,
+                "zoom": 0.55
+            }
+        }
+    },
+    "主线刷取_任务": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "mainstory",
+        "custom_action_param": {
+            "operation": "init"
+        },
+        "next": [
+            "主线刷取_开始前返回主页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_开始前返回主页": {
+        "next": [
+            "主线刷取_确认主界面",
+            "[JumpBack]子任务_点击首页按钮",
+            "[JumpBack]子任务_点击返回",
+            "[JumpBack]子任务_获得物品",
+            "[JumpBack]子任务_关闭公告"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 200,
+                "y": 0
+            }
+        },
+        "timeout": 8000
+    },
+    "主线刷取_确认主界面": {
+        "recognition": "OCR",
+        "expected": [
+            "基地",
+            "任务",
+            "编队"
+        ],
+        "roi": [
+            560,
+            570,
+            440,
+            145
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_入口识别_第一次"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 400,
+                "y": 0
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 400,
+            "threshold": 0.95
+        }
+    },
+    "主线刷取_入口识别_第一次": {
+        "next": [
+            "主线刷取_点击虚拟场域_第一次",
+            "主线刷取_入口等待_第二次"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 650,
+                "y": -80
+            }
+        }
+    },
+    "主线刷取_点击虚拟场域_第一次": {
+        "recognition": "OCR",
+        "expected": [
+            "虚拟场域",
+            "琥拟场域",
+            "拟场域"
+        ],
+        "roi": [
+            1060,
+            445,
+            220,
+            90
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 2000,
+        "next": [
+            "主线刷取_主线页已到"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 900,
+                "y": -140
+            }
+        }
+    },
+    "主线刷取_入口等待_第二次": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "post_delay": 1500,
+        "next": [
+            "主线刷取_入口识别_第二次"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 900,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_入口识别_第二次": {
+        "next": [
+            "主线刷取_点击虚拟场域_第二次",
+            "主线刷取_入口等待_第三次"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1150,
+                "y": -80
+            }
+        }
+    },
+    "主线刷取_点击虚拟场域_第二次": {
+        "recognition": "OCR",
+        "expected": [
+            "虚拟场域",
+            "琥拟场域",
+            "拟场域"
+        ],
+        "roi": [
+            1060,
+            445,
+            220,
+            90
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 2000,
+        "next": [
+            "主线刷取_主线页已到"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1400,
+                "y": -140
+            }
+        }
+    },
+    "主线刷取_入口等待_第三次": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "post_delay": 1500,
+        "next": [
+            "主线刷取_入口识别_第三次"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1400,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_入口识别_第三次": {
+        "next": [
+            "主线刷取_点击虚拟场域_第三次",
+            "主线刷取_未找到入口_正常完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1650,
+                "y": -80
+            }
+        }
+    },
+    "主线刷取_点击虚拟场域_第三次": {
+        "recognition": "OCR",
+        "expected": [
+            "虚拟场域",
+            "琥拟场域",
+            "拟场域"
+        ],
+        "roi": [
+            1060,
+            445,
+            220,
+            90
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 2000,
+        "next": [
+            "主线刷取_主线页已到"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1900,
+                "y": -140
+            }
+        }
+    },
+    "主线刷取_未找到入口_正常完成": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "focus": "连续3次未识别到「虚拟场域」入口，当前主线可能未开放，任务正常结束",
+        "next": [
+            "主线刷取_结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1900,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_主线页已到": {
+        "recognition": "OCR",
+        "expected": [
+            "世界树之巅"
+        ],
+        "roi": [
+            560,
+            0,
+            400,
+            40
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_切换困难"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2150,
+                "y": -140
+            }
+        }
+    },
+    "主线刷取_切换困难": {
+        "recognition": "OCR",
+        "expected": "困难",
+        "roi": [
+            190,
+            590,
+            130,
+            60
+        ],
+        "threshold": 0.2,
+        "pre_wait_freezes": {
+            "time": 800,
+            "threshold": 0.95
+        },
+        "action": "Click",
+        "post_delay": 1200,
+        "next": [
+            "主线刷取_区域列表上滑"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2150,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_区域列表上滑": {
+        "recognition": "DirectHit",
+        "action": "Swipe",
+        "begin": [
+            640,
+            560,
+            20,
+            20
+        ],
+        "end": [
+            640,
+            250,
+            20,
+            20
+        ],
+        "duration": 700,
+        "post_delay": 1200,
+        "next": [
+            "主线刷取_区域分派"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2150,
+                "y": 140
+            }
+        }
+    },
+    "主线刷取_区域分派": {
+        "next": [
+            "主线刷取_点击阻隔地带",
+            "主线刷取_点击米德加尔特",
+            "主线刷取_区域再上滑"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2400,
+                "y": 140
+            }
+        }
+    },
+    "主线刷取_区域再上滑": {
+        "recognition": "DirectHit",
+        "action": "Swipe",
+        "begin": [
+            640,
+            560,
+            20,
+            20
+        ],
+        "end": [
+            640,
+            380,
+            20,
+            20
+        ],
+        "duration": 600,
+        "post_delay": 1000,
+        "max_hit": 2,
+        "next": [
+            "主线刷取_区域分派"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2400,
+                "y": 300
+            }
+        }
+    },
+    "主线刷取_点击阻隔地带": {
+        "recognition": "OCR",
+        "expected": "阻隔地带",
+        "roi": [
+            200,
+            400,
+            260,
+            95
+        ],
+        "threshold": 0.2,
+        "pre_wait_freezes": {
+            "time": 800,
+            "threshold": 0.95
+        },
+        "action": "Click",
+        "post_delay": 2200,
+        "next": [
+            "主线刷取_章节页已到"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2650,
+                "y": 40
+            }
+        }
+    },
+    "主线刷取_点击米德加尔特": {
+        "recognition": "OCR",
+        "expected": "米德加尔特",
+        "roi": [
+            1000,
+            400,
+            280,
+            95
+        ],
+        "threshold": 0.2,
+        "pre_wait_freezes": {
+            "time": 800,
+            "threshold": 0.95
+        },
+        "action": "Click",
+        "post_delay": 2200,
+        "next": [
+            "主线刷取_章节页已到"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2650,
+                "y": 200
+            }
+        }
+    },
+    "主线刷取_章节页已到": {
+        "recognition": "OCR",
+        "expected": "章节选择",
+        "roi": [
+            80,
+            120,
+            340,
+            190
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_选关卡"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2900,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_选关卡": {
+        "next": [
+            "主线刷取_点关卡7-6",
+            "主线刷取_未找到关卡_正常完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3150,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_点关卡7-6": {
+        "recognition": "OCR",
+        "expected": "关卡7-6",
+        "roi": [
+            120,
+            150,
+            280,
+            360
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 2200,
+        "next": [
+            "主线刷取_关卡详情已到"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3400,
+                "y": 60
+            }
+        }
+    },
+    "主线刷取_点关卡7-10": {
+        "recognition": "OCR",
+        "expected": "关卡7-10",
+        "roi": [
+            120,
+            150,
+            280,
+            360
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 2200,
+        "next": [
+            "主线刷取_关卡详情已到"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3400,
+                "y": 200
+            }
+        }
+    },
+    "主线刷取_未找到关卡_正常完成": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "focus": "章节页未识别到目标关卡（关卡7-6 / 关卡7-10），任务正常结束",
+        "next": [
+            "主线刷取_结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3400,
+                "y": 340
+            }
+        }
+    },
+    "主线刷取_关卡详情已到": {
+        "recognition": "OCR",
+        "expected": [
+            "掉落物品"
+        ],
+        "roi": [
+            850,
+            360,
+            240,
+            70
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_点扫荡"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3650,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_点扫荡": {
+        "recognition": "OCR",
+        "expected": "扫荡",
+        "roi": [
+            840,
+            618,
+            130,
+            55
+        ],
+        "threshold": 0.2,
+        "pre_wait_freezes": {
+            "time": 800,
+            "threshold": 0.95
+        },
+        "action": "Click",
+        "post_delay": 2500,
+        "next": [
+            "主线刷取_队伍页已到"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3900,
+                "y": 120
+            }
+        },
+        "on_error": [
+            "主线刷取_关卡详情已到"
+        ]
+    },
+    "主线刷取_队伍页已到": {
+        "recognition": "OCR",
+        "expected": [
+            "现在",
+            "队伍"
+        ],
+        "roi": [
+            180,
+            120,
+            900,
+            480
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_打开队伍列表"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4150,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_打开队伍列表": {
+        "recognition": "OCR",
+        "expected": "队伍",
+        "roi": [
+            180,
+            150,
+            300,
+            40
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "target": [
+            345,
+            180,
+            4,
+            4
+        ],
+        "post_delay": 1600,
+        "next": [
+            "主线刷取_队伍选择_分派"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4400,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_队伍选择_分派": {
+        "next": [
+            "主线刷取_未设置队伍_跳过"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4650,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_队伍行1": {
+        "recognition": "OCR",
+        "expected": "01",
+        "roi": [
+            275,
+            213,
+            150,
+            36
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "主线刷取_队伍已选"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4900,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_队伍行2": {
+        "recognition": "OCR",
+        "expected": "02",
+        "roi": [
+            275,
+            267,
+            150,
+            36
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "主线刷取_队伍已选"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4900,
+                "y": 80
+            }
+        }
+    },
+    "主线刷取_队伍行3": {
+        "recognition": "OCR",
+        "expected": "03",
+        "roi": [
+            275,
+            322,
+            150,
+            36
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "主线刷取_队伍已选"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4900,
+                "y": 160
+            }
+        }
+    },
+    "主线刷取_队伍行4": {
+        "recognition": "OCR",
+        "expected": "04",
+        "roi": [
+            275,
+            376,
+            150,
+            36
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "主线刷取_队伍已选"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4900,
+                "y": 240
+            }
+        }
+    },
+    "主线刷取_未设置队伍_跳过": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_关闭队伍列表"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4900,
+                "y": 320
+            }
+        }
+    },
+    "主线刷取_关闭队伍列表": {
+        "recognition": "OCR",
+        "expected": "队伍",
+        "roi": [
+            180,
+            150,
+            300,
+            40
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "target": [
+            640,
+            620,
+            4,
+            4
+        ],
+        "post_delay": 1200,
+        "next": [
+            "主线刷取_队伍已选"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4950,
+                "y": 400
+            }
+        }
+    },
+    "主线刷取_队伍已选": {
+        "recognition": "OCR",
+        "expected": [
+            "现在",
+            "队伍"
+        ],
+        "roi": [
+            180,
+            120,
+            900,
+            480
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_读取体力"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5200,
+                "y": 120
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 500,
+            "threshold": 0.95
+        }
+    },
+    "主线刷取_读取体力": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "mainstory",
+        "custom_action_param": {
+            "operation": "read_stamina"
+        },
+        "post_delay": 400,
+        "next": [
+            "主线刷取_体力药准备"
+        ],
+        "on_error": [
+            "主线刷取_体力药准备"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5450,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_设置次数": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "mainstory",
+        "custom_action_param": {
+            "operation": "set_count"
+        },
+        "post_delay": 400,
+        "next": [
+            "主线刷取_点开始战斗"
+        ],
+        "on_error": [
+            "主线刷取_刷取完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5700,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_点开始战斗": {
+        "recognition": "OCR",
+        "expected": "开始战斗",
+        "roi": [
+            920,
+            525,
+            210,
+            62
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 2500,
+        "next": [
+            "主线刷取_体力药列表",
+            "主线刷取_扫荡中"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5950,
+                "y": 120
+            }
+        },
+        "on_error": [
+            "主线刷取_扫荡中"
+        ]
+    },
+    "主线刷取_扫荡中": {
+        "recognition": "OCR",
+        "expected": "扫荡",
+        "roi": [
+            5,
+            2,
+            530,
+            155
+        ],
+        "threshold": 0.2,
+        "pre_wait_freezes": {
+            "time": 1500,
+            "threshold": 0.95
+        },
+        "action": "Click",
+        "post_delay": 1000,
+        "next": [
+            "主线刷取_扫荡结算检查",
+            "[JumpBack]主线刷取_意外_芯片仓满"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6300,
+                "y": -60
+            }
+        },
+        "on_error": [
+            "主线刷取_回到关卡详情"
+        ]
+    },
+    "主线刷取_扫荡结算检查": {
+        "recognition": "OCR",
+        "expected": "扫荡",
+        "roi": [
+            5,
+            2,
+            530,
+            155
+        ],
+        "threshold": 0.2,
+        "pre_wait_freezes": {
+            "time": 1000,
+            "threshold": 0.95
+        },
+        "action": "Click",
+        "post_delay": 900,
+        "max_hit": 3,
+        "next": [
+            "主线刷取_扫荡结算检查",
+            "[JumpBack]主线刷取_意外_芯片仓满",
+            "主线刷取_回到关卡详情"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6500,
+                "y": -60
+            }
+        }
+    },
+    "主线刷取_回到关卡详情": {
+        "recognition": "OCR",
+        "expected": "掉落物品",
+        "roi": [
+            850,
+            360,
+            240,
+            70
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_记账完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6700,
+                "y": -60
+            }
+        }
+    },
+    "主线刷取_批次判定": {
+        "next": [
+            "主线刷取_还有下一批",
+            "主线刷取_刷取完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6900,
+                "y": -60
+            }
+        }
+    },
+    "主线刷取_完成": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "mainstory",
+        "custom_action_param": {
+            "operation": "finish"
+        },
+        "focus": "主线刷取完成",
+        "$__mpe_code": {
+            "position": {
+                "x": 7100,
+                "y": -60
+            }
+        }
+    },
+    "主线刷取_结束": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "mainstory",
+        "custom_action_param": {
+            "operation": "finish"
+        },
+        "focus": "主线刷取：入口→困难→区域→关卡→扫荡→队伍→体力→次数→开始战斗 完成",
+        "$__mpe_code": {
+            "position": {
+                "x": 6400,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_刷取完成": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_返回主页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7300,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_返回主页": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            220,
+            45,
+            4,
+            4
+        ],
+        "post_delay": 800,
+        "next": [
+            "主线刷取_回到主界面容错"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7500,
+                "y": 120
+            }
+        }
+    },
+    "主线刷取_回到主界面容错": {
+        "next": [
+            "主线刷取_主界面已确认",
+            "[JumpBack]子任务_点击首页按钮",
+            "[JumpBack]子任务_点击返回",
+            "[JumpBack]子任务_获得物品",
+            "[JumpBack]子任务_关闭公告"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7700,
+                "y": 120
+            }
+        },
+        "timeout": 6000
+    },
+    "主线刷取_主界面已确认": {
+        "recognition": "OCR",
+        "expected": [
+            "基地",
+            "任务",
+            "编队"
+        ],
+        "roi": [
+            560,
+            570,
+            440,
+            145
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7900,
+                "y": 120
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 400,
+            "threshold": 0.95
+        }
+    },
+    "主线刷取_还有下一批": {
+        "recognition": "Custom",
+        "custom_recognition": "mainstory_state",
+        "custom_recognition_param": {
+            "expected": "batch:more"
+        },
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_点扫荡"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7050,
+                "y": -60
+            }
+        }
+    },
+    "主线刷取_体力药准备": {
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "mainstory",
+        "custom_action_param": {
+            "operation": "prepare"
+        },
+        "next": [
+            "主线刷取_设置次数"
+        ],
+        "on_error": [
+            "主线刷取_设置次数"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5500,
+                "y": 300
+            }
+        }
+    },
+    "主线刷取_打开体力药": {
+        "recognition": "OCR",
+        "expected": [
+            "\\d+/\\d+"
+        ],
+        "roi": [
+            855,
+            25,
+            90,
+            35
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 1200,
+        "pre_wait_freezes": {
+            "time": 800,
+            "threshold": 0.95
+        },
+        "next": [
+            "主线刷取_体力药列表"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5700,
+                "y": 300
+            }
+        },
+        "enabled": false
+    },
+    "主线刷取_体力药列表": {
+        "recognition": "OCR",
+        "expected": [
+            "燃料补给",
+            "使用后恢复10燃料",
+            "使用后恢复120燃料"
+        ],
+        "roi": [
+            180,
+            90,
+            870,
+            500
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_点击小药使用",
+            "主线刷取_点击大药使用"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5900,
+                "y": 300
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 800,
+            "threshold": 0.95
+        }
+    },
+    "主线刷取_点击小药使用": {
+        "recognition": "Custom",
+        "custom_recognition": "mainstory_state",
+        "custom_recognition_param": {
+            "expected": "potion:small"
+        },
+        "action": "Click",
+        "target": [
+            738,
+            532,
+            4,
+            4
+        ],
+        "post_delay": 1000,
+        "next": [
+            "主线刷取_体力药使用结果",
+            "主线刷取_体力药数量页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6100,
+                "y": 240
+            }
+        }
+    },
+    "主线刷取_点击大药使用": {
+        "recognition": "Custom",
+        "custom_recognition": "mainstory_state",
+        "custom_recognition_param": {
+            "expected": "potion:large"
+        },
+        "action": "Click",
+        "target": [
+            951,
+            532,
+            4,
+            4
+        ],
+        "post_delay": 1000,
+        "next": [
+            "主线刷取_体力药使用结果",
+            "主线刷取_体力药数量页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6100,
+                "y": 360
+            }
+        }
+    },
+    "主线刷取_体力药数量页": {
+        "recognition": "Custom",
+        "custom_recognition": "mainstory_state",
+        "custom_recognition_param": {
+            "expected": "potion:quantity_page"
+        },
+        "action": "Custom",
+        "custom_action": "mainstory",
+        "custom_action_param": {
+            "operation": "set_potion_count"
+        },
+        "next": [
+            "主线刷取_确认使用体力药"
+        ],
+        "on_error": [
+            "主线刷取_点外边缘_一下"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6300,
+                "y": 360
+            }
+        }
+    },
+    "主线刷取_确认使用体力药": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            800,
+            480,
+            4,
+            4
+        ],
+        "post_delay": 1200,
+        "next": [
+            "主线刷取_体力药使用结果",
+            "主线刷取_点外边缘_一下"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6500,
+                "y": 360
+            }
+        }
+    },
+    "主线刷取_体力药使用结果": {
+        "recognition": "OCR",
+        "expected": "点击空白处继续",
+        "roi": [
+            420,
+            400,
+            450,
+            200
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "target": [
+            760,
+            460,
+            4,
+            4
+        ],
+        "post_delay": 1200,
+        "next": [
+            "主线刷取_点外边缘_一下"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6300,
+                "y": 480
+            }
+        }
+    },
+    "主线刷取_补药后回队伍页": {
+        "recognition": "OCR",
+        "expected": [
+            "现在",
+            "队伍"
+        ],
+        "roi": [
+            180,
+            120,
+            900,
+            480
+        ],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_读取体力"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6900,
+                "y": 480
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 500,
+            "threshold": 0.95
+        }
+    },
+    "主线刷取_点外边缘_一下": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1120,
+            360,
+            4,
+            4
+        ],
+        "post_delay": 900,
+        "next": [
+            "主线刷取_点外边缘_两下"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6900,
+                "y": 200
+            }
+        }
+    },
+    "主线刷取_点外边缘_两下": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1120,
+            360,
+            4,
+            4
+        ],
+        "post_delay": 900,
+        "next": [
+            "主线刷取_点外边缘_三下"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7100,
+                "y": 200
+            }
+        }
+    },
+    "主线刷取_点外边缘_三下": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1120,
+            360,
+            4,
+            4
+        ],
+        "post_delay": 900,
+        "next": [
+            "主线刷取_补药后回队伍页",
+            "主线刷取_点外边缘_继续"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7300,
+                "y": 200
+            }
+        }
+    },
+    "主线刷取_点外边缘_继续": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1120,
+            360,
+            4,
+            4
+        ],
+        "post_delay": 900,
+        "timeout": 5000,
+        "next": [
+            "主线刷取_补药后回队伍页",
+            "主线刷取_点外边缘_继续"
+        ],
+        "on_error": [
+            "主线刷取_补药后回队伍页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 7500,
+                "y": 200
+            }
+        }
+    },
+    "主线刷取_记账完成": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "mainstory",
+        "custom_action_param": {
+            "operation": "batch_done"
+        },
+        "next": [
+            "主线刷取_批次判定"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6800,
+                "y": -60
+            }
+        }
+    },
+    "主线刷取_意外_芯片仓满": {
+        "recognition": "OCR",
+        "expected": [
+            "芯片仓库已达上限",
+            "芯片仓库",
+            "超过容量"
+        ],
+        "roi": [
+            280,
+            290,
+            720,
+            60
+        ],
+        "threshold": 0.2,
+        "action": "Click",
+        "target": [
+            638,
+            447,
+            4,
+            4
+        ],
+        "post_delay": 1200,
+        "$__mpe_code": {
+            "position": {
+                "x": 6600,
+                "y": -260
+            }
+        }
+    }
+}
