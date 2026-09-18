@@ -3,17 +3,17 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1789136030624,
+            "lastSyncTime": 1789736435599,
             "isModifiedExternally": false,
             "isDeleted": false,
             "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MAAlocalhost\\resource\\pipeline\\base\\拉黑订单好友.json",
             "savedViewport": {
-                "x": 354,
-                "y": -721,
-                "zoom": 0.46
+                "x": -288,
+                "y": -1116,
+                "zoom": 0.66
             },
             "filename": "拉黑订单好友",
-            "version": "v1.10.0"
+            "version": "v1.10.1"
         }
     },
     "$__mpe_external_子任务_进入个人配置_拉黑订单好友": {
@@ -27,8 +27,8 @@
     "$__mpe_external_子任务_进入首页_拉黑订单好友": {
         "$__mpe_code": {
             "position": {
-                "x": 534,
-                "y": 2062
+                "x": 521,
+                "y": 2071
             }
         }
     },
@@ -61,8 +61,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 822,
-                "y": 2285
+                "x": 792,
+                "y": 2296
             }
         }
     },
@@ -79,10 +79,10 @@
             "type": "Click",
             "param": {
                 "target": [
-                    70,
-                    163,
-                    38,
-                    25
+                    126,
+                    661,
+                    86,
+                    22
                 ]
             }
         },
@@ -124,8 +124,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 2114,
-                "y": 1850
+                "x": 2112,
+                "y": 1823
             }
         }
     },
@@ -166,14 +166,8 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [
-                    1210,
-                    125,
-                    51,
-                    588
-                ],
                 "template": [
-                    "StartUp/template_1788096029286.png"
+                    "StartUp/template_1789742148998.png"
                 ]
             }
         },
@@ -182,8 +176,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1540,
-                "y": 2087
+                "x": 1477,
+                "y": 2060
             }
         }
     },
@@ -205,8 +199,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 89,
-                "y": 1944
+                "x": 70,
+                "y": 1933
             }
         }
     },
@@ -215,9 +209,9 @@
             "type": "Swipe",
             "param": {
                 "begin": [
-                    614,
-                    644,
-                    35,
+                    611,
+                    593,
+                    29,
                     17
                 ],
                 "end": [
@@ -233,8 +227,8 @@
         "post_delay": 2000,
         "$__mpe_code": {
             "position": {
-                "x": 1545,
-                "y": 2422
+                "x": 1390,
+                "y": 2464
             }
         }
     },
@@ -255,8 +249,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1816,
-                "y": 1842
+                "x": 1812,
+                "y": 1793
             }
         }
     },
