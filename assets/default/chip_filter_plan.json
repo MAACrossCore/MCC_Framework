@@ -3,7 +3,7 @@
   "name": "我的芯片筛选方案",
   "levels": {
     "1": {
-      "mode": "lock",
+      "mode": "unlock",
       "conditions": {}
     },
     "2": {
@@ -258,6 +258,14 @@
           ]
         },
         "乘风": {
+          "minimum_total_level": 3,
+          "effective_sub_skills": [
+            "攻击",
+            "瞄准",
+            "暴伤"
+          ]
+        },
+        "压力": {
           "minimum_total_level": 3,
           "effective_sub_skills": [
             "攻击",
