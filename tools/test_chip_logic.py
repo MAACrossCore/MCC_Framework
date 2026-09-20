@@ -67,8 +67,9 @@ def test_grid_is_six_columns_then_next_row():
 
 
 def test_recorded_skill_catalog_is_complete():
-    assert len(MAIN_SKILLS) == 35
-    assert len(set(MAIN_SKILLS)) == 35
+    assert len(MAIN_SKILLS) == 36
+    assert len(set(MAIN_SKILLS)) == 36
+    assert "压力" in MAIN_SKILLS
     assert len(SUB_SKILLS) == 8
     assert len(set(SUB_SKILLS)) == 8
 
@@ -236,6 +237,19 @@ def test_cf3_custom_plan_is_validated_before_any_chip_action():
         )
     )
     validate_filter_plan(plan)
+    assert plan["levels"]["1"]["mode"] == "unlock"
+    assert plan["levels"]["2"]["conditions"]["压力"] == plan["levels"]["2"]["conditions"]["乘风"]
+    assert plan["levels"]["3"]["mode"] == "lock"
+
+    pressure_detail = validate_chip_detail([
+        ("压力", 2), ("速度", 1), ("命中", 1), ("攻击", 1),
+    ])
+    assert pressure_detail is not None
+    assert should_lock_chip(pressure_detail, plan) is False
+    pressure_detail["main_skill"]["level"] = 1
+    assert should_lock_chip(pressure_detail, plan) is False
+    pressure_detail["main_skill"]["level"] = 3
+    assert should_lock_chip(pressure_detail, plan) is True
 
     old_version = copy.deepcopy(plan)
     old_version["version"] = 2
