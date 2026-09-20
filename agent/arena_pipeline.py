@@ -99,7 +99,11 @@ class ArenaPipelineAction(CustomAction):
                     "兜底阈值=%s，兜底最低积分=%d",
                     options["repeat"], options["target"], options["max_power"],
                     options["min_points"],
-                    "从不" if threshold is None else "剩余刷新<=%d" % threshold,
+                    (
+                        "从不" if threshold is None
+                        else "剩余刷新<=剩余挑战次数" if threshold == FALLBACK_REMAINING
+                        else "剩余刷新<=%d" % threshold
+                    ),
                     options["fallback_points"],
                 )
                 return True

@@ -4,8 +4,6 @@
     "label": "​",
     "description": "交错战线助手（基于 MCCA 任务结构）",
     "version": "v0.5.11",
-    "mirrorchyan_rid": "MCC_Framework",
-    "mirrorchyan_multiplatform": true,
     "group": [
         {
             "name": "周常",
@@ -240,9 +238,108 @@
             "name": "拉黑订单好友",
             "entry": "拉黑好友流程",
             "doc": "【兜底】单独拉黑 orders_state.json 中全部 held 好友。日常建议改用「基建」内「添加订单群好友」选项。"
+        },
+        {
+            "name": "芯片制造",
+            "entry": "芯片制作任务开始",
+            "doc": "进入研发中心，按所选等级和芯片名筛选并改造。一次任务只造一种等级、一种芯片。",
+            "option": [
+                "芯片制造_等级",
+                "芯片制造_芯片"
+            ]
         }
     ],
     "option": {
+            "芯片制造_等级": {
+                "type": "select",
+                "label": "芯片等级",
+                "default_case": "R2",
+                "cases": [
+                    {
+                        "name": "R1",
+                        "pipeline_override": {
+                            "选择等级（多选项）": {
+                                "expected": "R1"
+                            }
+                        }
+                    },
+                    {
+                        "name": "R2",
+                        "pipeline_override": {
+                            "选择等级（多选项）": {
+                                "expected": "R2"
+                            }
+                        }
+                    },
+                    {
+                        "name": "R3",
+                        "pipeline_override": {
+                            "选择等级（多选项）": {
+                                "expected": "R3"
+                            }
+                        }
+                    },
+                    {
+                        "name": "R4",
+                        "pipeline_override": {
+                            "选择等级（多选项）": {
+                                "expected": "R4"
+                            }
+                        }
+                    },
+                    {
+                        "name": "R5",
+                        "pipeline_override": {
+                            "选择等级（多选项）": {
+                                "expected": "R5"
+                            }
+                        }
+                    }
+                ]
+            },
+            "芯片制造_芯片": {
+                "type": "select",
+                "label": "芯片",
+                "default_case": "神威",
+                "cases": [
+                    {"name": "穿甲", "pipeline_override": {"选择芯片（多选项）": {"expected": "穿甲"}}},
+                    {"name": "切割", "pipeline_override": {"选择芯片（多选项）": {"expected": "切割"}}},
+                    {"name": "征服", "pipeline_override": {"选择芯片（多选项）": {"expected": "征服"}}},
+                    {"name": "重击", "pipeline_override": {"选择芯片（多选项）": {"expected": "重击"}}},
+                    {"name": "支援", "pipeline_override": {"选择芯片（多选项）": {"expected": "支援"}}},
+                    {"name": "精力", "pipeline_override": {"选择芯片（多选项）": {"expected": "精力"}}},
+                    {"name": "蓄能", "pipeline_override": {"选择芯片（多选项）": {"expected": "蓄能"}}},
+                    {"name": "收割", "pipeline_override": {"选择芯片（多选项）": {"expected": "收割"}}},
+                    {"name": "屏障", "pipeline_override": {"选择芯片（多选项）": {"expected": "屏障"}}},
+                    {"name": "铁壁", "pipeline_override": {"选择芯片（多选项）": {"expected": "铁壁"}}},
+                    {"name": "灵巧", "pipeline_override": {"选择芯片（多选项）": {"expected": "灵巧"}}},
+                    {"name": "暴怒", "pipeline_override": {"选择芯片（多选项）": {"expected": "暴怒"}}},
+                    {"name": "致命", "pipeline_override": {"选择芯片（多选项）": {"expected": "致命"}}},
+                    {"name": "腐蚀", "pipeline_override": {"选择芯片（多选项）": {"expected": "腐蚀"}}},
+                    {"name": "集中", "pipeline_override": {"选择芯片（多选项）": {"expected": "集中"}}},
+                    {"name": "金刚", "pipeline_override": {"选择芯片（多选项）": {"expected": "金刚"}}},
+                    {"name": "痛击", "pipeline_override": {"选择芯片（多选项）": {"expected": "痛击"}}},
+                    {"name": "扩大", "pipeline_override": {"选择芯片（多选项）": {"expected": "扩大"}}},
+                    {"name": "物攻", "pipeline_override": {"选择芯片（多选项）": {"expected": "物攻"}}},
+                    {"name": "能量", "pipeline_override": {"选择芯片（多选项）": {"expected": "能量"}}},
+                    {"name": "装填", "pipeline_override": {"选择芯片（多选项）": {"expected": "装填"}}},
+                    {"name": "光幕", "pipeline_override": {"选择芯片（多选项）": {"expected": "光幕"}}},
+                    {"name": "钝化", "pipeline_override": {"选择芯片（多选项）": {"expected": "钝化"}}},
+                    {"name": "特防", "pipeline_override": {"选择芯片（多选项）": {"expected": "特防"}}},
+                    {"name": "神威", "pipeline_override": {"选择芯片（多选项）": {"expected": "神威"}}},
+                    {"name": "神力", "pipeline_override": {"选择芯片（多选项）": {"expected": "神力"}}},
+                    {"name": "神速", "pipeline_override": {"选择芯片（多选项）": {"expected": "神速"}}},
+                    {"name": "振奋", "pipeline_override": {"选择芯片（多选项）": {"expected": "振奋"}}},
+                    {"name": "消除", "pipeline_override": {"选择芯片（多选项）": {"expected": "消除"}}},
+                    {"name": "重伤", "pipeline_override": {"选择芯片（多选项）": {"expected": "重伤"}}},
+                    {"name": "连击", "pipeline_override": {"选择芯片（多选项）": {"expected": "连击"}}},
+                    {"name": "乘风", "pipeline_override": {"选择芯片（多选项）": {"expected": "乘风"}}},
+                    {"name": "压力", "pipeline_override": {"选择芯片（多选项）": {"expected": "压力"}}},
+                    {"name": "反击", "pipeline_override": {"选择芯片（多选项）": {"expected": "反击"}}},
+                    {"name": "协击", "pipeline_override": {"选择芯片（多选项）": {"expected": "协击"}}},
+                    {"name": "引爆", "pipeline_override": {"选择芯片（多选项）": {"expected": "引爆"}}}
+                ]
+            },
             "主线刷取_关卡": {
                 "type": "select",
                 "label": "刷取关卡选择",
