@@ -4,6 +4,8 @@
     "label": "​",
     "description": "交错战线助手（基于 MCCA 任务结构）",
     "version": "v0.5.11",
+    "mirrorchyan_rid": "MCC_Framework",
+    "mirrorchyan_multiplatform": true,
     "group": [
         {
             "name": "周常",
