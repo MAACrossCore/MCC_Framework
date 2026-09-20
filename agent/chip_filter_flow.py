@@ -151,13 +151,15 @@ def quality_option_is_selected(image, point):
 
 def instance_config_path():
     configured = os.environ.get("MAA_INSTANCE_CONFIG")
+    if configured:
+        return Path(configured)
+    instance_id = os.environ.get("MFA_INSTANCE_ID", "").strip()
+    filename = f"{instance_id}.json" if instance_id else "default.json"
     candidates = [
-        Path(configured) if configured else None,
-        PROJECT_ROOT / "config" / "instances" / "default.json",
-        PROJECT_ROOT / "install" / "config" / "instances" / "default.json",
-        PROJECT_ROOT / "gui" / "config" / "instances" / "default.json",
+        root / "config" / "instances" / filename
+        for root in (PROJECT_ROOT, PROJECT_ROOT / "install", PROJECT_ROOT / "gui")
     ]
-    return next((path for path in candidates if path and path.exists()), candidates[1])
+    return next((path for path in candidates if path.exists()), candidates[0])
 
 
 class ChipFilterFlow(CustomAction):
