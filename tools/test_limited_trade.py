@@ -378,7 +378,8 @@ def test_pipeline_delegates_item_location_to_original_fullscreen_ocr():
         "expected": "coin_below_floor"
     }
     assert pipeline["LimitedStoreReady"]["next"][0] == "限时贸易_读取星币"
-    assert pipeline["time_limited"]["next"][0] == "限时贸易_读取星币"
+    assert pipeline["time_limited"]["next"] == ["LimitedStoreReady", "time_limited"]
+    assert pipeline["time_limited"]["max_hit"] == 4
     ocr = pipeline["LimitedTradeProductOCR"]
     assert ocr["recognition"] == "OCR"
     assert ocr["roi"] == [0, 0, 0, 0]

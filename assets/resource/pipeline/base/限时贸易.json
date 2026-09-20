@@ -61,9 +61,10 @@
         "action": "Click",
         "post_delay": 2000,
         "next": [
-            "限时贸易_读取星币",
-            "限时贸易所购买_完成"
-        ]
+            "LimitedStoreReady",
+            "time_limited"
+        ],
+        "max_hit": 4
     },
     "LimitedTradeCoinOCR": {
         "recognition": "OCR",
