@@ -159,8 +159,8 @@
     },
     "每日探索_扫荡弹窗已打开": {
         "recognition": "OCR",
-        "expected": ["现在", "扫荡后"],
-        "roi": [580, 470, 270, 150],
+        "expected": ["^扫荡$"],
+        "roi": [188, 112, 130, 54],
         "threshold": 0.2,
         "action": "DoNothing",
         "pre_wait_freezes": { "time": 1000, "threshold": 0.95 },

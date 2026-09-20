@@ -658,7 +658,7 @@ def _load_pipeline(name):
 def test_sweep_count_step_still_goes_through_double_reward():
     """按体力算次数只是换了「次数怎么来」，不能把双倍确认绕过去。
 
-    弹窗打开后（`每日探索_扫荡弹窗已打开` 命中「现在 / 扫荡后」）才分派：
+    弹窗打开后（`每日探索_扫荡弹窗已打开` 命中标题「扫荡」）才分派：
     消耗完体力走 `每日探索_按体力计算次数`，指定次数走 `每日探索_按次数扫荡`；
     两条都落在 `开始战斗` 上，而 `开始战斗` 仍把 `开启加成`（双倍/OFF 的确认）
     放在 next 里。
@@ -666,12 +666,13 @@ def test_sweep_count_step_still_goes_through_double_reward():
     sweep = _load_pipeline("通用-扫荡.json")
     potion = _load_pipeline("每日探索-体力药.json")
 
-    # 次数弹窗必须先确认「现在 / 扫荡后」都在，才允许去点加减键
+    # 次数弹窗必须先确认固定标题「扫荡」，才允许去点加减键
     assert sweep["扫荡次数选择"]["next"][0] == "每日探索_扫荡弹窗已打开"
     dialog = potion["每日探索_扫荡弹窗已打开"]
     assert dialog["next"] == ["每日探索_按体力计算次数", "每日探索_按次数扫荡"]
     assert dialog["recognition"] == "OCR"
-    assert set(dialog["expected"]) == {"现在", "扫荡后"}
+    assert dialog["expected"] == ["^扫荡$"]
+    assert dialog["roi"] == [188, 112, 130, 54]
 
     # 两个模式各自落到哪个算次数的节点
     assert potion["每日探索_按体力计算次数"]["next"] == ["开始战斗"]
