@@ -672,7 +672,9 @@ def test_sweep_count_step_still_goes_through_double_reward():
     assert dialog["next"] == ["每日探索_按体力计算次数", "每日探索_按次数扫荡"]
     assert dialog["recognition"] == "OCR"
     assert dialog["expected"] == ["^扫荡$"]
-    assert dialog["roi"] == [188, 112, 130, 54]
+    # 实测命中框 [188,117,75,32] 左边界与 ROI 齐平（零余量），字符渲染偏移会裁掉「扫」，
+    # 故四周各留 12px；标题是固定 UI，扩大后仍只覆盖关卡页的空地图区域，不会误命中
+    assert dialog["roi"] == [176, 106, 154, 66]
 
     # 两个模式各自落到哪个算次数的节点
     assert potion["每日探索_按体力计算次数"]["next"] == ["开始战斗"]
