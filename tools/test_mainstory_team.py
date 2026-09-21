@@ -107,8 +107,11 @@ def test_dispatch_has_bounded_failure_fallback():
 def test_team_option_overrides_still_point_at_rows():
     """interface.json 的队伍选项仍要覆盖到各队伍行（容错不能把分派改坏）。"""
     interface = json.loads((ROOT / "assets" / "interface.json").read_text(encoding="utf-8-sig"))
-    option = next(o for o in interface["option"] if o["name"] == "主线刷取_队伍选择")
-    cases = [c["pipeline_override"]["主线刷取_队伍选择_分派"]["next"][0] for c in option["cases"]]
+    option = interface["option"]["主线刷取_队伍选择"]
+    cases = [
+        case["pipeline_override"]["主线刷取_队伍选择_分派"]["next"][0]
+        for case in option["cases"]
+    ]
     assert cases == [f"主线刷取_队伍行{i}" for i in range(1, 5)], cases
 
 
