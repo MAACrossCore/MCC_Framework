@@ -258,6 +258,10 @@
             "time": 1000,
             "threshold": 0.95
         },
+        "post_wait_freezes": {
+            "time": 800,
+            "threshold": 0.95
+        },
         "action": {
             "type": "Click"
         },
@@ -394,8 +398,7 @@
     "扫荡次数选择": {
         "enabled": true,
         "next": [
-            "每日探索_扫荡弹窗已打开",
-            "[JumpBack]重连网络"
+            "每日探索_扫荡弹窗已打开"
         ],
         "$__mpe_code": {
             "position": {
