@@ -18,8 +18,7 @@
     },
     "周本": {
         "next": [
-            "首页_出击",
-            "[JumpBack]子任务_进入首页"
+            "周本_次数初始化"
         ],
         "$__mpe_code": {
             "position": {
@@ -27,6 +26,14 @@
                 "y": 12
             }
         }
+    },
+    "周本_次数初始化": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "weekly_run_count",
+        "custom_action_param": { "operation": "init" },
+        "next": ["首页_出击", "[JumpBack]子任务_进入首页"],
+        "$__mpe_code": { "position": { "x": 420, "y": 12 } }
     },
     "活动探索": {
         "recognition": {
@@ -48,8 +55,8 @@
         },
         "post_delay": 2000,
         "next": [
-            "活动探索_碎星虚影",
-            "活动探索"
+            "周本_碎星虚影_应有位置",
+            "周本_碎星虚影_分派"
         ],
         "$__mpe_code": {
             "position": {
@@ -151,10 +158,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    86,
-                    623,
-                    152,
-                    40
+                    20,
+                    185,
+                    1240,
+                    100
                 ],
                 "expected": [
                     "600/600",
@@ -710,10 +717,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    450,
+                    20,
                     443,
-                    302,
-                    98
+                    860,
+                    100
                 ],
                 "expected": [
                     "碎星虚影",
@@ -725,17 +732,156 @@
             "type": "Click"
         },
         "post_delay": 3000,
-        "next": [
-            "活动探索_已存在",
-            "活动探索_戈里刻虚影",
-            "活动探索_碎星虚影"
-        ],
+        "next": ["周本_BOSS选择页_已进入"],
         "$__mpe_code": {
             "position": {
                 "x": 3852,
                 "y": 353
             }
         }
+    },
+    "周本_挑战完成_阿瑞斯": {
+        "recognition": "OCR",
+        "expected": ["虚影阿瑞斯"],
+        "roi": [653, 204, 180, 55],
+        "action": "Custom",
+        "custom_action": "weekly_run_count",
+        "custom_action_param": { "operation": "complete" },
+        "next": ["周本_次数分派"],
+        "$__mpe_code": { "position": { "x": 4200, "y": 900 } }
+    },
+    "周本_挑战完成_宙斯": {
+        "recognition": "OCR",
+        "expected": ["虚影宙斯"],
+        "roi": [682, 456, 180, 180],
+        "action": "Custom",
+        "custom_action": "weekly_run_count",
+        "custom_action_param": { "operation": "complete" },
+        "next": ["周本_次数分派"],
+        "$__mpe_code": { "position": { "x": 4200, "y": 1060 } }
+    },
+    "周本_次数分派": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["周本_次数已达", "活动探索_第五关"],
+        "$__mpe_code": { "position": { "x": 4480, "y": 980 } }
+    },
+    "周本_次数已达": {
+        "recognition": "Custom",
+        "custom_recognition": "weekly_run_reached",
+        "action": "DoNothing",
+        "next": ["通用-返回主页"],
+        "$__mpe_code": { "position": { "x": 4760, "y": 980 } }
+    },
+    "周本_碎星虚影_应有位置": {
+        "recognition": "OCR",
+        "expected": ["碎星虚影", "碎星虛影"],
+        "roi": [20, 445, 265, 95],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": ["周本_点击碎星虚影_领奖"],
+        "pre_wait_freezes": { "time": 800, "threshold": 0.95 },
+        "$__mpe_code": { "position": { "x": 4100, "y": 500 } }
+    },
+    "周本_碎星虚影_分派": {
+        "next": ["周本_领完即结束"],
+        "$__mpe_code": { "position": { "x": 4350, "y": 500 } }
+    },
+    "周本_领完即结束": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["通用-返回主页"],
+        "$__mpe_code": { "position": { "x": 4600, "y": 500 } }
+    },
+    "周本_BOSS选择页_已进入": {
+        "recognition": "OCR",
+        "expected": ["戈里刻虚影", "尼克罗虚影", "诺斯虚影"],
+        "roi": [100, 333, 800, 220],
+        "action": "DoNothing",
+        "next": ["活动探索_戈里刻虚影", "周本_BOSS选择页_找戈里刻"],
+        "$__mpe_code": { "position": { "x": 3970, "y": 620 } }
+    },
+    "周本_BOSS选择页_找戈里刻": {
+        "recognition": "DirectHit",
+        "action": "Swipe",
+        "begin": [620, 490, 40, 40],
+        "end": [[120, 490, 40, 40]],
+        "max_hit": 3,
+        "post_delay": 1000,
+        "next": ["活动探索_戈里刻虚影", "周本_BOSS选择页_找戈里刻"],
+        "$__mpe_code": { "position": { "x": 4220, "y": 740 } }
+    },
+    "周本_点击碎星虚影_领奖": {
+        "recognition": "OCR",
+        "expected": ["碎星虚影", "碎星虛影"],
+        "roi": [20, 445, 265, 95],
+        "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 3000,
+        "next": ["周本_奖励领取页_点外边缘"],
+        "$__mpe_code": { "position": { "x": 4230, "y": 560 } }
+    },
+    "周本_奖励领取页_点外边缘": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [1120, 360, 4, 4],
+        "post_delay": 1200,
+        "next": ["周本_领奖后_判定"],
+        "$__mpe_code": { "position": { "x": 4100, "y": 620 } }
+    },
+    "周本_领奖后_判定": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": [
+            "周本_BOSS选择页_已进入",
+            "周本_碎星虚影_原位置仍在",
+            "周本_碎星虚影_分派"
+        ],
+        "pre_wait_freezes": { "time": 800, "threshold": 0.95 },
+        "$__mpe_code": { "position": { "x": 4350, "y": 620 } }
+    },
+    "周本_碎星虚影_原位置仍在": {
+        "recognition": "OCR",
+        "expected": ["碎星虚影", "碎星虛影"],
+        "roi": [20, 445, 265, 95],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "max_hit": 2,
+        "next": ["活动探索_碎星虚影"],
+        "$__mpe_code": { "position": { "x": 4600, "y": 620 } }
+    },
+    "周本_左滑找碎星虚影": {
+        "recognition": "DirectHit",
+        "action": "Swipe",
+        "begin": [620, 490, 40, 40],
+        "end": [[120, 490, 40, 40]],
+        "max_hit": 3,
+        "post_delay": 1000,
+        "next": [
+            "周本_BOSS选择页_已进入",
+            "周本_碎星虚影_滑动后已找到",
+            "周本_左滑找碎星虚影"
+        ],
+        "$__mpe_code": { "position": { "x": 4350, "y": 740 } }
+    },
+    "周本_碎星虚影_滑动后已找到": {
+        "recognition": "OCR",
+        "expected": ["碎星虚影", "碎星虛影"],
+        "roi": [20, 443, 860, 100],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": ["周本_读取报酬"],
+        "$__mpe_code": { "position": { "x": 4600, "y": 740 } }
+    },
+    "周本_读取报酬": {
+        "recognition": "OCR",
+        "expected": ["600/600", "6007600", "6001600", "本周报酬"],
+        "roi": [20, 185, 1240, 100],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "next": ["活动探索_碎星虚影"],
+        "on_error": ["活动探索_碎星虚影"],
+        "$__mpe_code": { "position": { "x": 4850, "y": 740 } }
     },
     "活动探索_第五关": {
         "recognition": {

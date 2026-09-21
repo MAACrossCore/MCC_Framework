@@ -36,6 +36,7 @@ from jdc_select_character import JdcSelectCharacter
 from jdc_build_team import JdcBuildTeam
 from jdc_route_push import JdcRoutePush
 from jdc_reset_state import JdcResetState
+from weekly_run_counter import WeeklyRunCounterAction, WeeklyRunReached
 
 
 AgentServer.custom_action("arena_atomic")(ArenaPipelineAction)
@@ -57,6 +58,8 @@ AgentServer.custom_action("jdc_select_character")(JdcSelectCharacter)
 AgentServer.custom_action("jdc_build_team")(JdcBuildTeam)
 AgentServer.custom_action("jdc_route_push")(JdcRoutePush)
 AgentServer.custom_action("jdc_reset_state")(JdcResetState)
+AgentServer.custom_action("weekly_run_count")(WeeklyRunCounterAction)
+AgentServer.custom_recognition("weekly_run_reached")(WeeklyRunReached)
 
 print(
     "[agent] custom actions ready: "
