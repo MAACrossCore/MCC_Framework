@@ -9,6 +9,7 @@ from pathlib import Path
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from chip_filter_flow import instance_config_path as _shared_instance_config_path
 from navigation import BACK_BUTTON, main_control_point
 from stop_guard import ActionStopped, cancelled, ensure_running
 from viewport import REFERENCE_SIZE, image_size, scale_point, scale_roi
@@ -114,13 +115,12 @@ PERSISTED_SETTINGS = PROJECT_ROOT / "config" / "arena_settings.json"
 
 
 def instance_config_path():
-    configured = os.environ.get("MAA_INSTANCE_CONFIG")
-    candidates = [
-        Path(configured) if configured else None,
-        PROJECT_ROOT / "config" / "instances" / "default.json",
-        PROJECT_ROOT / "gui" / "config" / "instances" / "default.json",
-    ]
-    return next((path for path in candidates if path and path.exists()), candidates[1])
+    """复用 chip_filter_flow 的实现：先看 MAA_INSTANCE_CONFIG，再按 MFA_INSTANCE_ID 找 <实例ID>.json。
+
+    这里原先只找 `default.json`、还不含 `install` 根，实机（运行目录=install）必然抛
+    FileNotFoundError，导致竞技场选项全部回落到安全默认值（target=1，打一次就结束）。
+    """
+    return _shared_instance_config_path()
 
 def should_refresh_for_power(own, opponent, allowed_gap):
     """The gap only limits how much stronger the opponent may be.
@@ -238,8 +238,6 @@ class ArenaLoop(CustomAction):
             options = {item.get("name"): item for item in task.get("option", [])}
             repeat_item = options.get("重复挑战方式", {})
             repeat_index = int(repeat_item.get("index", 0))
-            sub = repeat_item.get("sub_options", [])
-            count_index = int(sub[0].get("index", 0)) if sub else 0
 
             max_power = self._parse_int_option(options, MAX_POWER_OPTION, MAX_POWER_DEFAULT)
             self._save_max_power(max_power)
@@ -251,7 +249,7 @@ class ArenaLoop(CustomAction):
 
             return {
                 "repeat": REPEAT_ZERO if repeat_index == 1 else REPEAT_CUSTOM,
-                "target": max(1, min(10, count_index + 1)),
+                "target": self._parse_custom_count(repeat_item),
                 "max_power": max_power,
                 "min_points": min_points,
                 "fallback_threshold": fallback_threshold,
@@ -264,6 +262,27 @@ class ArenaLoop(CustomAction):
                     "min_points": MIN_POINTS_DEFAULT,
                     "fallback_threshold": None,
                     "fallback_points": FALLBACK_POINTS_DEFAULT}
+
+    @staticmethod
+    def _parse_custom_count(repeat_item):
+        """「自定次数」模式的目标次数。
+
+        该数量在**嵌套 input 选项**里：`重复挑战方式.sub_options[] .data["自定次数"]` ——
+        不是子项的 index（子项 index 只是列表序号）。旧实现读 index，导致无论用户填几都算成 1。
+        """
+        sub = repeat_item.get("sub_options") or []
+        for item in sub:
+            data = item.get("data") or item.get("Data") or {}
+            if not isinstance(data, dict):
+                continue
+            text = str(data.get("自定次数") or "").strip()
+            if text.isdigit() and int(text) >= 1:
+                return max(1, min(10, int(text)))
+        # 兼容旧结构：没有 data 时退回子项 index（0 基）
+        try:
+            return max(1, min(10, int(sub[0].get("index", 0)) + 1))
+        except (TypeError, ValueError, IndexError):
+            return 1
 
     @staticmethod
     def _option_text(options, name):
