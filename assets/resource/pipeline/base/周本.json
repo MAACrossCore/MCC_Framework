@@ -880,8 +880,14 @@
         "threshold": 0.2,
         "action": "DoNothing",
         "next": ["活动探索_碎星虚影"],
-        "on_error": ["活动探索_碎星虚影"],
+        "on_error": ["周本_读不到报酬也去点碎星虚影"],
         "$__mpe_code": { "position": { "x": 4850, "y": 740 } }
+    },
+    "周本_读不到报酬也去点碎星虚影": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["活动探索_碎星虚影"],
+        "$__mpe_code": { "position": { "x": 5100, "y": 740 } }
     },
     "活动探索_第五关": {
         "recognition": {

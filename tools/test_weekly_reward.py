@@ -202,7 +202,9 @@ def test_swipe_is_leftward_bounded_and_then_reads_reward():
     assert found["roi"][2] >= 800, "找到判定用整条卡片带：找到就点，不要求先滑回应有位置"
     assert _next(found) == ["周本_读取报酬"]
     assert _next(weekly["周本_读取报酬"]) == ["活动探索_碎星虚影"]
-    assert weekly["周本_读取报酬"].get("on_error") == ["活动探索_碎星虚影"], "读不到报酬也不能把任务拖死"
+    relay = weekly["周本_读不到报酬也去点碎星虚影"]
+    assert weekly["周本_读取报酬"].get("on_error") == ["周本_读不到报酬也去点碎星虚影"]
+    assert _next(relay) == ["活动探索_碎星虚影"], "读不到报酬也不能把任务拖死"
 
 
 def test_reward_box_roi_covers_measured_position():
