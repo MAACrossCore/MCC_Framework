@@ -1,0 +1,531 @@
+{
+    "$__mpe_config_芯片制造": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1789922591898,
+            "isModifiedExternally": false,
+            "isDeleted": false,
+            "filePath": "C:\\Users\\thomas\\Desktop\\成品攀比\\MAAlocalhost\\resource\\pipeline\\base\\芯片制造.json",
+            "savedViewport": {
+                "x": 268,
+                "y": 176,
+                "zoom": 0.4
+            },
+            "filename": "芯片制造",
+            "version": "v1.10.1"
+        }
+    },
+    "$__mpe_external_子任务_进入首页_芯片制造": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1029,
+                "y": 1112
+            }
+        }
+    },
+    "任务结束": {
+        "next": [
+            "子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 621,
+                "y": 760
+            }
+        }
+    },
+    "开始制作流程": {
+        "timeout": 4000,
+        "next": [
+            "点击新增按钮",
+            "[JumpBack]滑动屏幕_芯片位置"
+        ],
+        "on_error": [
+            "任务结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 305,
+                "y": 317
+            }
+        }
+    },
+    "收菜": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "xinpian/收菜按钮.png"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "获得芯片",
+            "芯片满了"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -1057,
+                "y": 11
+            }
+        }
+    },
+    "改造": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "改造"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "改造_副本1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2715,
+                "y": -485
+            }
+        }
+    },
+    "改造_副本1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "开始改造"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "改造完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2982,
+                "y": 30
+            }
+        }
+    },
+    "改造完成": {
+        "next": [
+            "开始制作流程"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 932,
+                "y": 40
+            }
+        }
+    },
+    "暂无芯片": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "暂无芯片"
+                ]
+            }
+        },
+        "next": [
+            "任务结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2248,
+                "y": 565
+            }
+        }
+    },
+    "滑动屏幕": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    763,
+                    488,
+                    19,
+                    17
+                ],
+                "end": [
+                    [
+                        679,
+                        19,
+                        13,
+                        13
+                    ]
+                ],
+                "duration": [
+                    3000
+                ]
+            }
+        },
+        "next": [
+            "选择芯片（多选项）",
+            "[JumpBack]滑动屏幕_副本1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1327,
+                "y": -577
+            }
+        }
+    },
+    "滑动屏幕_副本1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    651,
+                    324,
+                    14,
+                    16
+                ],
+                "end": [
+                    [
+                        655,
+                        184,
+                        14,
+                        17
+                    ]
+                ],
+                "duration": [
+                    3000
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1594,
+                "y": -414
+            }
+        }
+    },
+    "滑动屏幕_芯片位置": {
+        "max_hit": 1,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    651,
+                    324,
+                    14,
+                    16
+                ],
+                "end": [
+                    [
+                        655,
+                        184,
+                        14,
+                        17
+                    ]
+                ],
+                "duration": [
+                    3000
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 886,
+                "y": 233
+            }
+        }
+    },
+    "点击建造按钮": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "xinpian/template_1789913607081.png"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "开始制作流程"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 14,
+                "y": -487
+            }
+        }
+    },
+    "点击新增按钮": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "xinpian/制造预备.png"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "筛选"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 553,
+                "y": -203
+            }
+        }
+    },
+    "点击芯片": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    138,
+                    151,
+                    54,
+                    57
+                ]
+            }
+        },
+        "next": [
+            "改造"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2413,
+                "y": -485
+            }
+        }
+    },
+    "确认芯片": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "确定"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "暂无芯片",
+            "点击芯片"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2016,
+                "y": -505
+            }
+        }
+    },
+    "筛选": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "筛选"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "选择等级（多选项）"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 802,
+                "y": -467
+            }
+        }
+    },
+    "芯片制作任务开始": {
+        "next": [
+            "进入基建",
+            "[JumpBack]子任务_进入首页"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -1856,
+                "y": -433
+            }
+        }
+    },
+    "芯片构建": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "研发中心"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "点击建造按钮"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -312,
+                "y": -469
+            }
+        }
+    },
+    "芯片满了": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "上限"
+                ]
+            }
+        },
+        "next": [
+            "点确定"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -815,
+                "y": 673
+            }
+        }
+    },
+    "获得芯片": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "获得物品"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "芯片构建"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -734,
+                "y": -156
+            }
+        }
+    },
+    "进入基建": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "基地"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "收菜",
+            "芯片构建"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -1369,
+                "y": -460
+            }
+        }
+    },
+    "选择等级（多选项）": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "R2"
+                ]
+            }
+        },
+        "pre_delay": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "滑动屏幕"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1072,
+                "y": -606
+            }
+        }
+    },
+    "选择芯片（多选项）": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "神威"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "确认芯片"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1591,
+                "y": -713
+            }
+        }
+    },
+    "点确定": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "确定"
+                ]
+            }
+        },
+        "pre_delay": 500,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "任务结束"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -386,
+                "y": 658
+            }
+        }
+    }
+}

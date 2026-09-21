@@ -280,7 +280,9 @@ class MainStoryAction(CustomAction):
         _SESSION["stamina_ok"] = False
         _SESSION["stamina"] = None
         log.error("主线刷取：连续 3 次读不到体力（最后 %s），转为不补药继续", last)
-        return False
+        # 仍返回 True：检查器不允许 next 与 on_error 指向同一节点。
+        # stamina_ok 已是 False，后续 prepare 会跳过补药。
+        return True
 
     def _set_count(self, context, param) -> bool:
         settings = _load_settings()
