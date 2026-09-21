@@ -595,8 +595,12 @@
         }
     },
     "主线刷取_队伍选择_分派": {
+        "timeout": 8000,
         "next": [
             "主线刷取_未设置队伍_跳过"
+        ],
+        "on_error": [
+            "主线刷取_队伍未识别_跳过"
         ],
         "$__mpe_code": {
             "position": {
@@ -605,14 +609,27 @@
             }
         }
     },
+    "主线刷取_队伍未识别_跳过": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_关闭队伍列表"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4650,
+                "y": 200
+            }
+        }
+    },
     "主线刷取_队伍行1": {
         "recognition": "OCR",
-        "expected": "01",
+        "expected": ["[0O][1lIi|\\]]", "第1战队"],
         "roi": [
-            275,
-            213,
-            150,
-            36
+            265,
+            208,
+            170,
+            46
         ],
         "threshold": 0.2,
         "action": "Click",
@@ -629,12 +646,12 @@
     },
     "主线刷取_队伍行2": {
         "recognition": "OCR",
-        "expected": "02",
+        "expected": ["[0O][2Zz]", "第2战队"],
         "roi": [
-            275,
-            267,
-            150,
-            36
+            265,
+            262,
+            170,
+            46
         ],
         "threshold": 0.2,
         "action": "Click",
@@ -651,12 +668,12 @@
     },
     "主线刷取_队伍行3": {
         "recognition": "OCR",
-        "expected": "03",
+        "expected": ["[0O]3", "第3战队"],
         "roi": [
-            275,
-            322,
-            150,
-            36
+            265,
+            317,
+            170,
+            46
         ],
         "threshold": 0.2,
         "action": "Click",
@@ -673,12 +690,12 @@
     },
     "主线刷取_队伍行4": {
         "recognition": "OCR",
-        "expected": "04",
+        "expected": ["[0O]4", "第4战队"],
         "roi": [
-            275,
-            376,
-            150,
-            36
+            265,
+            371,
+            170,
+            46
         ],
         "threshold": 0.2,
         "action": "Click",

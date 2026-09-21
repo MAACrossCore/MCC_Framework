@@ -20,7 +20,7 @@
   },
   "通用_队伍选择": {
     "recognition": "OCR",
-    "expected": ["01", "02", "03", "04"],
+    "expected": ["[0O][1-4lIiZz|\\]]", "第[1-4]战队"],
     "roi": [270, 220, 300, 290],
     "action": "Custom",
     "custom_action": "activity_atomic",
