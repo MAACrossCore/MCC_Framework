@@ -9,7 +9,7 @@ env:
   MAAFW_VERSION: "v5.12.3"
   # UI：https://github.com/MAACrossCore/MCCAvalonia（Release 附件名仍为 MFAAvalonia-*）
   # 空字符串 = 始终拉最新 Release；需要钉版本时写 tag，例如 "v0.1.2"
-  MFAA_VERSION: ""
+  MFAA_VERSION: "v0.1.3"
 
 on:
   # 练习/日常开发不自动打包，避免 artifact 配额被打满。
