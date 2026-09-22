@@ -41,13 +41,33 @@ def _next(node):
 
 
 def test_task_option_exists_and_overrides_dispatch():
-    """任务设置里要有「领奖后」下拉，两个 case 分别覆盖分派节点的 next。"""
+    """任务设置里要有「领奖后」下拉，两个 case 都要「找回卡片再继续」。
+
+    2026-09-22 用户要求：「领取完奖励就结束」改名并升级为
+    「领取完奖励就结束（若未满则继续刷取直到领完）」——领完仍没满就补满；
+    唯一的差别是它没有自选次数，且读到 600/600 时直接收工（`周本_按进度分派`）。
+    """
     interface = _load(ROOT / "assets" / "interface.json")
     option = interface["option"]["周本_领奖后处理"]
     assert option["type"] == "select"
-    cases = {c["name"]: c["pipeline_override"]["周本_碎星虚影_分派"]["next"] for c in option["cases"]}
-    assert cases["领取完奖励就结束"] == ["周本_领完即结束"], cases
-    assert cases["领取完奖励依然进行挑战"] == ["周本_左滑找碎星虚影"], cases
+    claim_case = "领取完奖励就结束（若未满则继续刷取直到领完）"
+    continue_case = "领取完奖励依然进行挑战"
+    assert option["default_case"] == claim_case, option["default_case"]
+
+    cases = {c["name"]: c for c in option["cases"]}
+    assert set(cases) == {claim_case, continue_case}, list(cases)
+    for name in (claim_case, continue_case):
+        patch = cases[name]["pipeline_override"]
+        assert patch["周本_碎星虚影_分派"]["next"] == [
+            "周本_左滑找碎星虚影",
+            "周本_找不到碎星虚影_收尾",
+        ], patch
+        # 都要跳过旧的「读到有进度就提前结束」节点，否则补刷/加练都进不去
+        assert patch["活动探索_第五关"]["next"] == ["活动探索_第五关开始"], patch
+        assert patch["活动探索_虚影阿瑞斯"]["next"] == ["活动探索_开始"], patch
+    # 只有「领完即结束」多一条：读到 600/600 就收工，不再刷
+    assert cases[claim_case]["pipeline_override"]["周本_按进度分派"]["next"] == ["周本_领完即结束"], cases[claim_case]
+    assert "周本_按进度分派" not in cases[continue_case]["pipeline_override"], cases[continue_case]
 
     task = next(t for t in interface["task"] if t["name"] == "周本")
     assert "周本_领奖后处理" in task["option"], task["option"]
@@ -59,7 +79,9 @@ def test_entry_checks_position_before_clicking():
     assert _next(weekly["活动探索"]) == ["周本_碎星虚影_应有位置", "周本_碎星虚影_分派"]
     assert weekly["周本_碎星虚影_应有位置"]["roi"] == EXPECTED_POSITION_ROI
     # 未领取这条路：点卡片 → 处理领奖弹窗（用专用点击节点，见 test_reward_popup_only_on_unclaimed_path）
-    assert _next(weekly["周本_碎星虚影_应有位置"]) == ["周本_点击碎星虚影_领奖"]
+    # 未领取这条路：先读本周报酬进度定目标（2026-09-22 次数改造），再点卡片领奖
+    assert _next(weekly["周本_碎星虚影_应有位置"]) == ["周本_读进度_未满"]
+    assert _next(weekly["周本_读进度_未满"]) == ["周本_点击碎星虚影_领奖"]
     assert _next(weekly["周本_点击碎星虚影_领奖"]) == ["周本_奖励领取页_点外边缘"]
     # 继续挑战这条路用的点击节点只管进 BOSS 选择页，不碰领奖弹窗
     assert _next(weekly["活动探索_碎星虚影"]) == ["周本_BOSS选择页_已进入"]
@@ -165,6 +187,36 @@ def test_boss_page_clicks_golike_text_before_reward_edge():
     assert _next(weekly["周本_BOSS选择页_找戈里刻"])[0] == "活动探索_戈里刻虚影"
 
 
+def test_swipe_exhaustion_has_bounded_exit():
+    """左滑 3 次仍找不到卡片时必须干净收尾，不能让整个任务以 Node.NextList.Failed 收场。
+
+    依据（2026-09-22 主线芯片仓满同类问题）：`max_hit` 用尽后该条目在 next 扫描里是**被跳过**，
+    于是列表里没有可跑的条目 → `Node.NextList.Failed` → 任务失败并中断后续排队任务。
+    所以兜底必须挂在 `周本_左滑找碎星虚影` 自己的 next 末尾（自指之后），
+    让「滑不动了」变成「找不到卡片 → 回主页」。
+    """
+    weekly = _load(WEEKLY)
+    relay = weekly["周本_找不到碎星虚影_收尾"]
+    assert relay["recognition"] == "DirectHit", "兜底必须是 DirectHit：max_hit 用尽时靠它接住"
+    assert relay["action"] == "DoNothing", relay["action"]
+    assert _next(relay) == ["周本_领完即结束"], relay["next"]
+    assert _next(weekly["周本_领完即结束"]) == ["通用-返回主页"], "兜底最终必须能回到主页"
+
+    swipe_next = _next(weekly["周本_左滑找碎星虚影"])
+    assert swipe_next[-1] == "周本_找不到碎星虚影_收尾", swipe_next
+    assert swipe_next.index("周本_左滑找碎星虚影") < swipe_next.index("周本_找不到碎星虚影_收尾"), (
+        "兜底排在自指前面会提前收工：还能滑的时候必须继续滑"
+    )
+
+    # 分派节点的默认 next 也要留兜底（选项覆盖是整体替换，所以两边都要有）
+    dispatch_next = _next(weekly["周本_碎星虚影_分派"])
+    assert dispatch_next[-1] == "周本_找不到碎星虚影_收尾", dispatch_next
+    interface = _load(ROOT / "assets" / "interface.json")
+    for case in interface["option"]["周本_领奖后处理"]["cases"]:
+        patch = case["pipeline_override"]["周本_碎星虚影_分派"]["next"]
+        assert patch[-1] == "周本_找不到碎星虚影_收尾", (case["name"], patch)
+
+
 def test_post_claim_branches_cover_three_states():
     """领奖回来后三种状态都要有出路：已在周本选择页 / 卡片仍在原位 / 卡片挪走。"""
     weekly = _load(WEEKLY)
@@ -194,14 +246,22 @@ def test_swipe_is_leftward_bounded_and_then_reads_reward():
         "周本_BOSS选择页_已进入",
         "周本_碎星虚影_滑动后已找到",
         "周本_左滑找碎星虚影",
-    ], "在 BOSS 选择页滑出戈里刻虚影后应直接接续挑战"
+        "周本_找不到碎星虚影_收尾",
+    ], "在 BOSS 选择页滑出戈里刻虚影后应直接接续挑战；滑不动了要有兜底收尾"
 
     found = weekly["周本_碎星虚影_滑动后已找到"]
     # 到位判定必须用「应有位置」ROI：用整条卡片带的宽 ROI 的话，卡片还在最右也算「找到」，
     # 于是滑一半就停（2026-09-21 日志：拖了 1~2 次、卡片 x=519/786 就判成功）
     assert found["roi"][2] >= 800, "找到判定用整条卡片带：找到就点，不要求先滑回应有位置"
     assert _next(found) == ["周本_读取报酬"]
-    assert _next(weekly["周本_读取报酬"]) == ["活动探索_碎星虚影"]
+    # 找回后先读进度定目标，再由「按进度分派」决定继续刷还是收工（2026-09-22 次数改造）
+    assert _next(weekly["周本_读取报酬"]) == ["周本_读进度_已满"]
+    assert _next(weekly["周本_读进度_已满"]) == ["周本_按进度分派"]
+    # 默认（=「依然进行挑战」）：满进度也继续挑战
+    assert _next(weekly["周本_按进度分派"]) == ["活动探索_碎星虚影"]
+    # 未满 → 中继 → 继续挑战
+    assert weekly["周本_按进度分派"]["on_error"] == ["周本_进度未满_继续刷"]
+    assert _next(weekly["周本_进度未满_继续刷"]) == ["活动探索_碎星虚影"]
     relay = weekly["周本_读不到报酬也去点碎星虚影"]
     assert weekly["周本_读取报酬"].get("on_error") == ["周本_读不到报酬也去点碎星虚影"]
     assert _next(relay) == ["活动探索_碎星虚影"], "读不到报酬也不能把任务拖死"

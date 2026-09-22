@@ -165,6 +165,7 @@
                 ],
                 "expected": [
                     "600/600",
+                    "\\d+/600",
                     "6007600",
                     "6001600"
                 ]
@@ -779,12 +780,23 @@
         "roi": [20, 445, 265, 95],
         "threshold": 0.2,
         "action": "DoNothing",
-        "next": ["周本_点击碎星虚影_领奖"],
+        "next": ["周本_读进度_未满"],
         "pre_wait_freezes": { "time": 800, "threshold": 0.95 },
         "$__mpe_code": { "position": { "x": 4100, "y": 500 } }
     },
+    "周本_读进度_未满": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "weekly_run_count",
+        "custom_action_param": { "operation": "read_progress" },
+        "next": ["周本_点击碎星虚影_领奖"],
+        "$__mpe_code": { "position": { "x": 4350, "y": 560 } }
+    },
     "周本_碎星虚影_分派": {
-        "next": ["周本_领完即结束"],
+        "next": [
+            "周本_领完即结束",
+            "周本_找不到碎星虚影_收尾"
+        ],
         "$__mpe_code": { "position": { "x": 4350, "y": 500 } }
     },
     "周本_领完即结束": {
@@ -860,9 +872,16 @@
         "next": [
             "周本_BOSS选择页_已进入",
             "周本_碎星虚影_滑动后已找到",
-            "周本_左滑找碎星虚影"
+            "周本_左滑找碎星虚影",
+            "周本_找不到碎星虚影_收尾"
         ],
         "$__mpe_code": { "position": { "x": 4350, "y": 740 } }
+    },
+    "周本_找不到碎星虚影_收尾": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["周本_领完即结束"],
+        "$__mpe_code": { "position": { "x": 6500, "y": 740 } }
     },
     "周本_碎星虚影_滑动后已找到": {
         "recognition": "OCR",
@@ -875,13 +894,38 @@
     },
     "周本_读取报酬": {
         "recognition": "OCR",
-        "expected": ["600/600", "6007600", "6001600", "本周报酬"],
+        "expected": ["600/600", "\\d+/600", "6007600", "6001600", "本周报酬"],
         "roi": [20, 185, 1240, 100],
         "threshold": 0.2,
         "action": "DoNothing",
-        "next": ["活动探索_碎星虚影"],
+        "next": ["周本_读进度_已满"],
         "on_error": ["周本_读不到报酬也去点碎星虚影"],
         "$__mpe_code": { "position": { "x": 4850, "y": 740 } }
+    },
+    "周本_读进度_已满": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "weekly_run_count",
+        "custom_action_param": { "operation": "read_progress" },
+        "next": ["周本_按进度分派"],
+        "$__mpe_code": { "position": { "x": 5720, "y": 740 } }
+    },
+    "周本_按进度分派": {
+        "recognition": "OCR",
+        "expected": ["600/600", "6007600", "6001600"],
+        "roi": [20, 185, 1240, 100],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "timeout": 1500,
+        "next": ["活动探索_碎星虚影"],
+        "on_error": ["周本_进度未满_继续刷"],
+        "$__mpe_code": { "position": { "x": 5980, "y": 740 } }
+    },
+    "周本_进度未满_继续刷": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["活动探索_碎星虚影"],
+        "$__mpe_code": { "position": { "x": 6240, "y": 740 } }
     },
     "周本_读不到报酬也去点碎星虚影": {
         "recognition": "DirectHit",
