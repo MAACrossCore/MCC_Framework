@@ -917,7 +917,11 @@
     },
     "主线刷取_扫荡中": {
         "recognition": "OCR",
-        "expected": "扫荡",
+        "expected": [
+            "扫荡成功",
+            "荡成功",
+            "扫荡成"
+        ],
         "roi": [
             5,
             2,
@@ -932,8 +936,8 @@
         "action": "Click",
         "post_delay": 1000,
         "next": [
-            "主线刷取_扫荡结算检查",
-            "[JumpBack]主线刷取_意外_芯片仓满"
+            "[JumpBack]主线刷取_意外_芯片仓满",
+            "主线刷取_扫荡结算检查"
         ],
         "$__mpe_code": {
             "position": {
@@ -947,7 +951,11 @@
     },
     "主线刷取_扫荡结算检查": {
         "recognition": "OCR",
-        "expected": "扫荡",
+        "expected": [
+            "扫荡成功",
+            "荡成功",
+            "扫荡成"
+        ],
         "roi": [
             5,
             2,
@@ -961,11 +969,14 @@
         },
         "action": "Click",
         "post_delay": 900,
-        "max_hit": 3,
+        "max_hit": 10,
         "next": [
-            "主线刷取_扫荡结算检查",
             "[JumpBack]主线刷取_意外_芯片仓满",
+            "主线刷取_扫荡结算检查",
             "主线刷取_回到关卡详情"
+        ],
+        "on_error": [
+            "主线刷取_结算收尾_兜底"
         ],
         "$__mpe_code": {
             "position": {
@@ -987,6 +998,9 @@
         "action": "DoNothing",
         "next": [
             "主线刷取_记账完成"
+        ],
+        "on_error": [
+            "主线刷取_结算收尾_兜底"
         ],
         "$__mpe_code": {
             "position": {
@@ -1460,6 +1474,19 @@
             "position": {
                 "x": 6800,
                 "y": -60
+            }
+        }
+    },
+    "主线刷取_结算收尾_兜底": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": [
+            "主线刷取_刷取完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6900,
+                "y": -260
             }
         }
     },
