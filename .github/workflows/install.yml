@@ -43,7 +43,7 @@ jobs:
             if curl -fsS \
               -H "Authorization: Bearer $GH_TOKEN" \
               "https://api.github.com/repos/MAACrossCore/MCCAvalonia/releases/tags/${MFAA_VERSION}" \
-              | jq -e '(.draft == false) and ([.assets[].name | select(test("^MFAAvalonia-.*-(win|osx|linux)-(x64|arm64)\\.zip$"))] | unique | length >= 6)' >/dev/null; then
+              | jq -e '(.draft == false) and ([.assets[].name | select(test("^MFAAvalonia-.*-(win|osx|linux)-(x64|arm64)\\.(zip|tar\\.gz)$"))] | unique | length >= 6)' >/dev/null; then
               echo "Pinned UI release ${MFAA_VERSION} is ready."
               exit 0
             fi
@@ -234,10 +234,11 @@ jobs:
           files: assets/*
           tag_name: ${{ needs.meta.outputs.tag }}
           body: ${{ needs.changelog.outputs.release_body }}
-          draft: false
+          draft: true
           prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
 
       - name: Trigger MirrorChyanUploading
+        if: false
         shell: bash
         run: |
           gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release.yml -f tag=${{ needs.meta.outputs.tag }}
