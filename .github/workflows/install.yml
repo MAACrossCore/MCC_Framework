@@ -30,6 +30,28 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Wait for the pinned UI release
+        if: env.MFAA_VERSION != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # UI and resource tags may be published together; start packaging only
+          # after all six desktop UI archives are available.
+          for attempt in $(seq 1 120); do
+            if curl -fsS \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              "https://api.github.com/repos/MAACrossCore/MCCAvalonia/releases/tags/${MFAA_VERSION}" \
+              | jq -e '(.draft == false) and ([.assets[].name | select(test("^MFAAvalonia-.*-(win|osx|linux)-(x64|arm64)\\.zip$"))] | unique | length >= 6)' >/dev/null; then
+              echo "Pinned UI release ${MFAA_VERSION} is ready."
+              exit 0
+            fi
+            echo "Waiting for UI ${MFAA_VERSION}: ${attempt}/120"
+            sleep 30
+          done
+          echo "UI release was not ready within one hour." >&2
+          exit 1
       - id: set_tag
         run: |
           # 检查标签格式
