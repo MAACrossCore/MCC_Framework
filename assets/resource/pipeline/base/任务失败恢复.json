@@ -1,0 +1,48 @@
+{
+    "任务失败_返回主页": {
+        "recognition": "DirectHit",
+        "next": ["任务失败_主页已到", "任务失败_点击主页", "任务失败_点击返回", "任务失败_关闭奖励"],
+        "timeout": 3000,
+        "$__mpe_code": { "position": { "x": 0, "y": 0 } }
+    },
+    "任务失败_主页已到": {
+        "recognition": "OCR",
+        "expected": ["基地", "任务", "编队"],
+        "roi": [560, 570, 440, 145],
+        "threshold": 0.2,
+        "action": "DoNothing",
+        "$__mpe_code": { "position": { "x": 360, "y": -180 } }
+    },
+    "任务失败_点击主页": {
+        "recognition": "TemplateMatch",
+        "template": ["StartUp/HomeButton.png", "StartUp/HomeButton1.png"],
+        "roi": [180, 10, 100, 70],
+        "action": "Click",
+        "post_delay": 1500,
+        "max_hit": 3,
+        "next": ["任务失败_返回主页"],
+        "$__mpe_code": { "position": { "x": 360, "y": 0 } }
+    },
+    "任务失败_点击返回": {
+        "recognition": "TemplateMatch",
+        "template": "StartUp/BackButton.png",
+        "roi": [14, 10, 126, 72],
+        "action": "Click",
+        "post_delay": 1000,
+        "max_hit": 3,
+        "next": ["任务失败_返回主页"],
+        "$__mpe_code": { "position": { "x": 360, "y": 180 } }
+    },
+    "任务失败_关闭奖励": {
+        "recognition": "OCR",
+        "expected": ["获得物品", "合成成功", "点击空白处继续"],
+        "roi": [280, 90, 760, 570],
+        "threshold": 0.2,
+        "action": "Click",
+        "target": [1100, 150, 4, 4],
+        "post_delay": 1000,
+        "max_hit": 2,
+        "next": ["任务失败_返回主页"],
+        "$__mpe_code": { "position": { "x": 360, "y": 360 } }
+    }
+}

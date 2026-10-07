@@ -713,6 +713,12 @@
         "action": {
             "type": "Click"
         },
+        "post_delay": 1800,
+        "post_wait_freezes": {
+            "time": 800,
+            "threshold": 0.98,
+            "target": [290, 100, 890, 575]
+        },
         "$__mpe_code": {
             "position": {
                 "x": 12239,
@@ -796,10 +802,11 @@
     },
     "基建_拜访好友结束": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "好友交付记录.png",
-                "threshold": 0.9
+                "roi": [390, 10, 310, 65],
+                "expected": ["^[0-9]+级订单库"],
+                "threshold": 0.5
             }
         },
         "post_delay": 1000,

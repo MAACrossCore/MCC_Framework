@@ -3,6 +3,7 @@
 
 import os
 import sys
+from unittest.mock import Mock, patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -90,6 +91,20 @@ def main():
     arena = _RecognitionContext({"ArenaPageTitle": True, "ArenaDeployButton": True})
     partial = _RecognitionContext({"ArenaPageTitle": True, "ArenaDeployButton": False})
     loop = ArenaLoop()
+    # A BOM-prefixed MFA config must preserve repeat-until-zero; a failed read
+    # must not silently turn the task into one custom challenge.
+    config = Mock()
+    config.read_text.return_value = '{"TaskItems":[{"entry":"ArenaTask","option":[{"name":"重复挑战方式","index":1}]}]}'
+    with patch("arena_loop.instance_config_path", return_value=config), patch.object(loop, "_save_max_power"):
+        assert loop._saved_options()["repeat"] == REPEAT_ZERO
+        config.read_text.assert_called_with(encoding="utf-8-sig")
+        config.read_text.side_effect = FileNotFoundError("missing instance config")
+        try:
+            loop._saved_options()
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Missing config must not default to one challenge")
     assert loop._is_arena_list(arena, object()) is True
     counter_only = _RecognitionContext({"ArenaReadRefresh": True})
     assert loop._is_arena_list(counter_only, object()) is False

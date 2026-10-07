@@ -108,6 +108,45 @@ BASE = {"mode": "消耗完体力", "cost": 35, "final_stamina": 105, "use_potion
 # （次数游戏不显示，判据是 扫荡后 == 现在 - 次数 × 单次消耗）
 
 
+def test_consume_all_runs_multiple_batches_and_stops_after_last():
+    for total in (10, 11, 20, 23, 28):
+        stamina = total * 35 + 7
+        steps, summary = plan_consume_all(0, 35, stamina)
+        batches = [step["count"] for step in steps if step["action"] == "sweep"]
+        session = dict(BASE, use_potion=False, final_stamina=stamina,
+                       batches=batches, batch_index=0, plan_summary=summary)
+        completed = 0
+        for index, batch in enumerate(batches):
+            ok, recorder, session = _run(
+                "set_sweep_count_by_stamina", session,
+                [stamina, stamina - batch * 35],
+            )
+            assert ok and session["sweep_runs"] == batch
+            assert len(recorder.clicks) == batch - 1
+            completed += batch
+            pipeline._SESSION.clear()
+            pipeline._SESSION.update(session)
+            state = pipeline.DailyStaminaRecognition().analyze(
+                None, SimpleNamespace(custom_recognition_param=json.dumps({"expected": "batch:next"})),
+            )
+            assert bool(state) == (index + 1 < len(batches))
+            pipeline._SESSION.clear()
+            if index + 1 < len(batches):
+                ok, _, session = _run("advance_batch", session, [])
+                assert ok and session["batch_index"] == index + 1
+                stamina -= batch * 35
+                assert session["final_stamina"] == stamina
+        assert completed == total
+
+
+def test_each_next_batch_reopens_the_sweep_dialog():
+    interface = json.loads((ROOT / "assets/interface.json").read_text(encoding="utf-8-sig"))
+    for case in interface["option"]["体力消耗方式"]["cases"]:
+        assert case["pipeline_override"]["每日探索_下一批"]["enabled"] is True
+    nodes = _load_pipeline("每日探索-体力药.json")
+    assert nodes["每日探索_下一批"]["next"] == ["扫荡"]
+
+
 def test_runs_are_stamina_divided_by_cost():
     # 体力 105、单次 35 -> 3 次；弹窗从 1 起，只需再按 2 下
     ok, recorder, session = _run(

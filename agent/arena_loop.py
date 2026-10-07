@@ -230,13 +230,13 @@ class ArenaLoop(CustomAction):
     def _saved_options(self):
         """Read MFA's persisted selection; MFA does not export PI options as env vars."""
         try:
-            data = json.loads(instance_config_path().read_text(encoding="utf-8"))
+            data = json.loads(instance_config_path().read_text(encoding="utf-8-sig"))
             task = next(
                 item for item in data.get("TaskItems", [])
                 if item.get("entry") == "ArenaTask"
             )
             options = {item.get("name"): item for item in task.get("option", [])}
-            repeat_item = options.get("重复挑战方式", {})
+            repeat_item = options["重复挑战方式"]
             repeat_index = int(repeat_item.get("index", 0))
 
             max_power = self._parse_int_option(options, MAX_POWER_OPTION, MAX_POWER_DEFAULT)
@@ -256,12 +256,7 @@ class ArenaLoop(CustomAction):
                 "fallback_points": fallback_points,
             }
         except Exception as e:
-            log.warning("读取MFA竞技场选项失败，使用安全默认值：%s", e)
-            return {"repeat": REPEAT_CUSTOM, "target": 1,
-                    "max_power": self._persisted_max_power(),
-                    "min_points": MIN_POINTS_DEFAULT,
-                    "fallback_threshold": None,
-                    "fallback_points": FALLBACK_POINTS_DEFAULT}
+            raise ValueError(f"读取MFA竞技场选项失败，不能确定挑战方式：{e}") from e
 
     @staticmethod
     def _parse_custom_count(repeat_item):

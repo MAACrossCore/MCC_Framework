@@ -484,7 +484,8 @@
                         462
                     ],
                     "post_character_delay": 500,
-                    "swipe_duration": 600
+                    "swipe_duration": 600,
+                    "max_team_attempts": 3
                 }
             }
         },

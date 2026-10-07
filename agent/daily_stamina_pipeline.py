@@ -687,7 +687,13 @@ class DailyStaminaAction(CustomAction):
 
             if operation == "advance_batch":
                 batches = _SESSION.get("batches") or []
-                index = int(_SESSION.get("batch_index") or 0) + 1
+                current = int(_SESSION.get("batch_index") or 0)
+                index = current + 1
+                if current < len(batches) and _SESSION.get("mode") == "消耗完体力":
+                    consumed = int(batches[current]) * int(_SESSION.get("cost") or 0)
+                    _SESSION["final_stamina"] = max(
+                        0, int(_SESSION.get("final_stamina") or 0) - consumed,
+                    )
                 _SESSION["batch_index"] = index
                 if index < len(batches):
                     log.info("继续第%d批扫荡，剩余次数=%s", index + 1,
@@ -769,8 +775,8 @@ class DailyStaminaRecognition(CustomRecognition):
         if expected == "batch:next":
             batches = _SESSION.get("batches") or []
             index = int(_SESSION.get("batch_index") or 0)
-            if index < len(batches):
-                return _hit({"remaining": len(batches) - index})
+            if index + 1 < len(batches):
+                return _hit({"remaining": len(batches) - index - 1})
             return None
 
         return None

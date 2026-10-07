@@ -61,7 +61,7 @@
         "threshold": 0.2,
         "action": "DoNothing",
         "next": [
-            "主线刷取_入口识别_第一次"
+            "主线刷取_点击出击"
         ],
         "$__mpe_code": {
             "position": {
@@ -74,142 +74,115 @@
             "threshold": 0.95
         }
     },
-    "主线刷取_入口识别_第一次": {
-        "next": [
-            "主线刷取_点击虚拟场域_第一次",
-            "主线刷取_入口等待_第二次"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 650,
-                "y": -80
-            }
-        }
-    },
-    "主线刷取_点击虚拟场域_第一次": {
-        "recognition": "OCR",
-        "expected": [
-            "虚拟场域",
-            "琥拟场域",
-            "拟场域"
-        ],
+    "主线刷取_点击出击": {
+        "recognition": "TemplateMatch",
+        "template": "StartUp/chuji.png",
         "roi": [
-            1060,
-            445,
-            220,
-            90
+            1094,
+            539,
+            176,
+            175
         ],
-        "threshold": 0.2,
         "action": "Click",
-        "post_delay": 2000,
+        "post_delay": 1200,
         "next": [
-            "主线刷取_主线页已到",
-            "主线刷取_主线页_主脉链路",
-            "主线刷取_主线页_世界树之巅",
-            "主线刷取_主线页_困难可见"
+            "主线刷取_点击主线剧情"
         ],
-        "$__mpe_code": {
-            "position": {
-                "x": 900,
-                "y": -140
-            }
-        }
-    },
-    "主线刷取_入口等待_第二次": {
-        "recognition": "DirectHit",
-        "action": "DoNothing",
-        "post_delay": 1500,
-        "next": [
-            "主线刷取_入口识别_第二次"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 900,
-                "y": 0
-            }
-        }
-    },
-    "主线刷取_入口识别_第二次": {
-        "next": [
-            "主线刷取_点击虚拟场域_第二次",
-            "主线刷取_入口等待_第三次"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 1150,
-                "y": -80
-            }
-        }
-    },
-    "主线刷取_点击虚拟场域_第二次": {
-        "recognition": "OCR",
-        "expected": [
-            "虚拟场域",
-            "琥拟场域",
-            "拟场域"
-        ],
-        "roi": [
-            1060,
-            445,
-            220,
-            90
-        ],
-        "threshold": 0.2,
-        "action": "Click",
-        "post_delay": 2000,
-        "next": [
-            "主线刷取_主线页已到",
-            "主线刷取_主线页_主脉链路",
-            "主线刷取_主线页_世界树之巅",
-            "主线刷取_主线页_困难可见"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 1400,
-                "y": -140
-            }
-        }
-    },
-    "主线刷取_入口等待_第三次": {
-        "recognition": "DirectHit",
-        "action": "DoNothing",
-        "post_delay": 1500,
-        "next": [
-            "主线刷取_入口识别_第三次"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 1400,
-                "y": 0
-            }
-        }
-    },
-    "主线刷取_入口识别_第三次": {
-        "next": [
-            "主线刷取_点击虚拟场域_第三次",
+        "on_error": [
             "主线刷取_未找到入口_正常完成"
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1650,
-                "y": -80
+                "x": 650,
+                "y": 0
             }
         }
     },
-    "主线刷取_点击虚拟场域_第三次": {
+    "主线刷取_点击主线剧情": {
         "recognition": "OCR",
         "expected": [
-            "虚拟场域",
-            "琥拟场域",
-            "拟场域"
+            "主线剧情"
         ],
         "roi": [
-            1060,
-            445,
-            220,
-            90
+            0,
+            360,
+            1280,
+            360
         ],
         "threshold": 0.2,
+        "action": "Click",
+        "post_delay": 1200,
+        "next": [
+            "主线刷取_章节查找"
+        ],
+        "on_error": [
+            "主线刷取_未找到入口_正常完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 910,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_章节查找": {
+        "next": [
+            "主线刷取_点击07虚拟场域",
+            "主线刷取_章节左划",
+            "主线刷取_未找到入口_正常完成"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1170,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_点击07虚拟场域": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "chapter_number",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "expected": [
+                                    "^07$"
+                                ],
+                                "roi": [
+                                    0,
+                                    80,
+                                    1280,
+                                    620
+                                ],
+                                "threshold": 0.2
+                            }
+                        }
+                    },
+                    {
+                        "sub_name": "chapter_title",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "expected": [
+                                    "虚拟场域"
+                                ],
+                                "roi": [
+                                    0,
+                                    80,
+                                    1280,
+                                    620
+                                ],
+                                "threshold": 0.2
+                            }
+                        }
+                    }
+                ],
+                "box_index": 1
+            }
+        },
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -220,21 +193,45 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1900,
-                "y": -140
+                "x": 1430,
+                "y": 0
+            }
+        }
+    },
+    "主线刷取_章节左划": {
+        "recognition": "DirectHit",
+        "action": "Swipe",
+        "begin": [
+            1100,
+            480
+        ],
+        "end": [
+            280,
+            480
+        ],
+        "duration": 1000,
+        "post_delay": 800,
+        "max_hit": 8,
+        "next": [
+            "主线刷取_章节查找"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1690,
+                "y": 160
             }
         }
     },
     "主线刷取_未找到入口_正常完成": {
         "recognition": "DirectHit",
         "action": "DoNothing",
-        "focus": "连续3次未识别到「虚拟场域」入口，当前主线可能未开放，任务正常结束",
+        "focus": "未找到主线剧情或07虚拟场域，跳过本次主线刷取并继续下一个任务",
         "next": [
             "主线刷取_结束"
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1900,
+                "x": 1950,
                 "y": 0
             }
         }

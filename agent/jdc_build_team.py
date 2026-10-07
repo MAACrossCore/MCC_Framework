@@ -18,8 +18,8 @@ JDC_CHARACTER_NAME_BAND_START = 0.62
 
 JDC_CHARACTER_NAME_BAND_HEIGHT = 0.36
 
-# 0 = 无限重编
-JDC_BUILD_MAX_RETRY = 0
+# Includes the first placement; retries only place characters still on the right.
+JDC_BUILD_MAX_RETRY = 3
 
 # ============================================================
 # 特殊组队规避
@@ -1183,6 +1183,16 @@ def clear_team(
     )
 
 
+def classify_team_result(final_names, remaining, visible_names):
+    """Disappearance is valid only when the expected remaining cards were read."""
+    still_visible = set(final_names) & set(visible_names)
+    if still_visible:
+        return "retry", still_visible
+    if not set(remaining).issubset(visible_names):
+        return "unclear", set()
+    return "success", set()
+
+
 # ============================================================
 # Action
 # ============================================================
@@ -1457,8 +1467,13 @@ class JdcBuildTeam(
             # =================================================
 
             retry = 0
+            retry_names = set(final_names)
+            max_attempts = max(1, int(param.get("max_team_attempts", JDC_BUILD_MAX_RETRY)))
 
-            while True:
+            while retry < max_attempts:
+
+                if context.tasker.stopping:
+                    return False
 
                 retry += 1
 
@@ -1467,24 +1482,15 @@ class JdcBuildTeam(
                     f"第{retry}次编队"
                 )
 
-                if retry > 1:
-
-                    clear_team(
-                        context,
-                        clear_roi
-                    )
-
-                failed = False
-
                 # 初始只显示前6个角色，第7/8个可能被挡在后面。
                 # 每拖走一个角色，右侧列表会补位，所以这里动态挑选
                 # “当前可见且尚未上阵”的目标角色，而不是死按固定顺序。
-                pending = {
-                    c["name"]
-                    for c in final_team
-                }
+                pending = set(retry_names)
 
                 while pending:
+
+                    if context.tasker.stopping:
+                        return False
 
                     visible = (
                         scan_character_list(
@@ -1526,7 +1532,6 @@ class JdcBuildTeam(
                             )
                         )
 
-                        failed = True
                         break
 
                     name = chosen[
@@ -1571,10 +1576,6 @@ class JdcBuildTeam(
                         delay
                     )
 
-                if failed:
-
-                    continue
-
                 # 最终验证
                 final_visible = (
                     scan_character_list(
@@ -1593,28 +1594,16 @@ class JdcBuildTeam(
                     if name in owned_names
                 }
 
-                success = False
+                result, retry_names = classify_team_result(final_names, remaining, visible_owned)
+                if result == "unclear":
+                    # Only recheck the final list, never each individual placement.
+                    time.sleep(0.3)
+                    if context.tasker.stopping:
+                        return False
+                    checked = scan_character_list(context, screencap(context), list_roi)
+                    result, retry_names = classify_team_result(final_names, remaining, set(checked) & owned_names)
 
-                # 6选5
-                if len(remaining) == 1:
-
-                    success = (
-                        visible_owned
-                        ==
-                        remaining
-                    )
-
-                else:
-
-                    success = (
-                        not (
-                            final_names
-                            &
-                            visible_owned
-                        )
-                    )
-
-                if success:
+                if result == "success":
 
                     print(
                         "[角斗场] 编队成功"
@@ -1622,19 +1611,15 @@ class JdcBuildTeam(
 
                     break
 
-                print(
-                    "[角斗场] "
-                    "编队不符合，清空重来"
-                )
-
-                if (
-                    JDC_BUILD_MAX_RETRY > 0
-                    and
-                    retry >=
-                    JDC_BUILD_MAX_RETRY
-                ):
-
+                if result == "unclear":
+                    print("[角斗场] 结束复核未读清右侧剩余角色，保留队伍并结束任务，不清空重编")
                     return False
+
+                print("[角斗场] 结束复核仍在右侧的目标角色：" + str(sorted(retry_names)))
+                if retry >= max_attempts:
+                    print(f"[角斗场] 达到{max_attempts}轮编队上限，保留队伍并结束任务")
+                    return False
+                print("[角斗场] 保留已成功角色，仅补拖右侧剩余的目标角色")
 
             # =================================================
             # TAG

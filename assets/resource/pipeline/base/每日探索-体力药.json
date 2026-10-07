@@ -197,7 +197,7 @@
         "custom_action": "daily_stamina",
         "custom_action_param": { "operation": "advance_batch" },
         "post_delay": 800,
-        "next": ["每日探索_按次数扫荡"],
+        "next": ["扫荡"],
         "on_error": ["通用-返回主页"],
         "$__mpe_code": { "position": { "x": 2700, "y": 100 } }
     }
