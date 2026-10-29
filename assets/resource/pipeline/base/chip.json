@@ -5,7 +5,10 @@
   "芯片_阶段清理": { "recognition": "Custom", "custom_recognition": "chip_state", "custom_recognition_param": { "expected": "phase:cleanup" }, "action": "DoNothing", "next": "芯片_寻路", "$__mpe_code": { "position": { "x": 680, "y": -100 } } },
   "芯片_阶段筛选": { "recognition": "Custom", "custom_recognition": "chip_state", "custom_recognition_param": { "expected": "phase:filter" }, "action": "DoNothing", "next": "芯片_寻路", "$__mpe_code": { "position": { "x": 680, "y": 100 } } },
   "芯片_阶段筛选初始化": { "recognition": "Custom", "custom_recognition": "chip_state", "custom_recognition_param": { "expected": "phase:filter_initialize" }, "action": "DoNothing", "next": "芯片_寻路", "$__mpe_code": { "position": { "x": 680, "y": 260 } } },
-  "芯片_阶段完成": { "recognition": "Custom", "custom_recognition": "chip_state", "custom_recognition_param": { "expected": "phase:done" }, "action": "Custom", "custom_action": "chip_atomic", "custom_action_param": { "operation": "finish" }, "$__mpe_code": { "position": { "x": 680, "y": 440 } } },
+  "芯片_阶段完成": { "recognition": "Custom", "custom_recognition": "chip_state", "custom_recognition_param": { "expected": "phase:done" }, "action": "DoNothing", "next": ["芯片_筛选完成回主页", "芯片_正常结束"], "$__mpe_code": { "position": { "x": 680, "y": 440 } } },
+  "芯片_筛选完成回主页": { "recognition": "Custom", "custom_recognition": "chip_state", "custom_recognition_param": { "expected": "filter:completed" }, "action": "Click", "target": [202, 30, 34, 34], "post_delay": 1800, "next": "芯片_结束主页确认", "$__mpe_code": { "position": { "x": 980, "y": 440 } } },
+  "芯片_结束主页确认": { "recognition": "Custom", "custom_recognition": "chip_state", "custom_recognition_param": { "expected": "page:main" }, "action": "DoNothing", "next": "芯片_正常结束", "$__mpe_code": { "position": { "x": 1280, "y": 440 } } },
+  "芯片_正常结束": { "recognition": "DirectHit", "action": "Custom", "custom_action": "chip_atomic", "custom_action_param": { "operation": "finish" }, "$__mpe_code": { "position": { "x": 1580, "y": 440 } } },
   "芯片_阶段每日探索返回": { "recognition": "Custom", "custom_recognition": "chip_state", "custom_recognition_param": { "expected": "phase:daily_return" }, "action": "DoNothing", "next": "每日探索_芯片仓满清理返回", "$__mpe_code": { "position": { "x": 680, "y": 350 } } },
 
   "芯片_寻路": { "next": ["芯片_寻路已到", "芯片_主界面进仓库", "芯片_仓库进芯片", "芯片_寻路点主页"], "$__mpe_code": { "position": { "x": 980, "y": 20 } } },

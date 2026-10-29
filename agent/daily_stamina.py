@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 import re
+from sweep_limits import SWEEP_BATCH_LIMIT
 
 # 单次扫荡消耗的燃料，键为关卡族，值为 {层数: 燃料}
 FUEL_COST = {
@@ -37,8 +38,8 @@ STAGE_FAMILIES = (
 # 层数下拉里表示“交给游戏默认（打最高层）”的选项
 DEFAULT_LAYER_CASE = "不选择-默认打最高"
 
-# 单次扫荡的批次上限，游戏扫荡弹窗最多选到 10 次
-BATCH_LIMIT = 10
+# 单次扫荡的批次上限
+BATCH_LIMIT = SWEEP_BATCH_LIMIT
 
 # 体力上限：补药后的体力不得超过它，否则游戏会报错
 STAMINA_CAP = 999

@@ -25,12 +25,13 @@ from maa.custom_recognition import CustomRecognition
 
 from chip_filter_flow import instance_config_path
 from stop_guard import ensure_running
+from sweep_limits import SWEEP_BATCH_LIMIT
 
 log = logging.getLogger("laa.mainstory")
 
 COST_PER_RUN = 24
 COUNT_MIN = 1
-COUNT_MAX = 10
+COUNT_MAX = SWEEP_BATCH_LIMIT
 
 ROI_STAMINA_NOW = [710, 498, 150, 40]
 ROI_STAMINA_AFTER = [700, 545, 130, 35]
@@ -215,7 +216,7 @@ def _load_settings():
 def plan_batch(mode: str, remaining: int, stamina: int) -> int:
     """本批该扫几次；返回 0 表示没有下一批、正常结束。
 
-    消耗完体力：按当前体力算，一批最多 10 次；不够一次就结束（返回 0）。
+    消耗完体力：按当前体力算，一批最多 30 次；不够一次就结束（返回 0）。
     指定次数：  按剩余待扫次数算；体力不足时不裁剪 —— 让「开始战斗」跳到
                 燃料选择页去补，这正是用户要的行为。
     """
@@ -331,7 +332,7 @@ class MainStoryAction(CustomAction):
             # 所以两种解释都试：
             #   减号保留 -> |现在 - 扫荡后|
             #   减号丢失 ->  现在 + 扫荡后
-            # 取那个能整除 24、且次数落在 1..10 的解释。
+            # 取那个能整除 24、且次数落在单批上限内的解释。
             delta, current = None, None
             best_err = 99
             for cand in (abs(now - after), abs(now + after)):

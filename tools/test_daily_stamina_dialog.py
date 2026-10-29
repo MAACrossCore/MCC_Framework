@@ -122,7 +122,7 @@ def test_consume_all_runs_multiple_batches_and_stops_after_last():
                 [stamina, stamina - batch * 35],
             )
             assert ok and session["sweep_runs"] == batch
-            assert len(recorder.clicks) == batch - 1
+            assert recorder.clicks == []
             completed += batch
             pipeline._SESSION.clear()
             pipeline._SESSION.update(session)
@@ -154,7 +154,7 @@ def test_runs_are_stamina_divided_by_cost():
     )
     assert ok is True
     assert session["sweep_runs"] == 3
-    assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 2
+    assert recorder.clicks == []
 
 
 def test_target_at_ten_uses_the_dialog_maximum():
@@ -164,7 +164,7 @@ def test_target_at_ten_uses_the_dialog_maximum():
     )
     assert ok is True
     assert session["sweep_runs"] == 10
-    assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 9
+    assert recorder.clicks == []
 
 
 def test_count_correction_uses_the_required_click_sequence():
@@ -174,8 +174,7 @@ def test_count_correction_uses_the_required_click_sequence():
         "set_sweep_count_by_stamina", dict(BASE, final_stamina=105), [105, 70, 0]
     )
     assert ok is True
-    assert recorder.clicks == ([pipeline.SWEEP_PLUS_POINT] * 2
-                               + [pipeline.SWEEP_MINUS_POINT] * 2)
+    assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 2
 
 
 def test_potion_recovery_is_included_in_the_stamina():
@@ -191,7 +190,7 @@ def test_potion_recovery_is_included_in_the_stamina():
     )
     assert ok is True
     assert session["sweep_runs"] == expected
-    assert len(recorder.clicks) == expected - 1
+    assert recorder.clicks == []
 
 
 def test_potion_recovery_raises_the_count_when_it_matters():
@@ -213,20 +212,20 @@ def test_potion_recovery_raises_the_count_when_it_matters():
     )
     assert without[0] is True
     assert without[2]["sweep_runs"] == 6       # 100 // 15
-    assert without[1].clicks == [pipeline.SWEEP_PLUS_POINT] * 5
+    assert without[1].clicks == []
     assert with_potion[0] is True
     assert with_potion[2]["sweep_runs"] == 8   # 120 // 15，药量确实算进去了
-    assert with_potion[1].clicks == [pipeline.SWEEP_PLUS_POINT] * 7
+    assert with_potion[1].clicks == []
 
 
-def test_target_above_ten_is_capped_at_ten_for_the_dialog():
+def test_target_above_thirty_is_capped_for_the_dialog():
     # 体力 5000、单次 35：算出 142 次，弹窗上限 10 -> 按 9 下加号
     ok, recorder, session = _run(
-        "set_sweep_count_by_stamina", dict(BASE, final_stamina=5000), [5000, 5000 - 10 * 35]
+        "set_sweep_count_by_stamina", dict(BASE, final_stamina=999, cost=24), [999, 279]
     )
     assert ok is True
-    assert session["sweep_runs"] == 10
-    assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 9
+    assert session["sweep_runs"] == 30
+    assert recorder.clicks == []
 
 
 def test_count_correction_keeps_the_planned_sweep_runs():
@@ -235,8 +234,7 @@ def test_count_correction_keeps_the_planned_sweep_runs():
         "set_sweep_count_by_stamina", dict(BASE, final_stamina=105), [105, 70, 0]
     )
     assert ok is True
-    assert recorder.clicks == ([pipeline.SWEEP_PLUS_POINT] * 2
-                               + [pipeline.SWEEP_MINUS_POINT] * 2)
+    assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 2
     assert session["sweep_runs"] == 3
 
 
@@ -262,7 +260,7 @@ def test_custom_runs_mode_defers_to_the_batch_plan():
     )
     assert ok is True
     assert out["sweep_runs"] == 8          # 8 次，不是 9999 // 35
-    assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 7
+    assert recorder.clicks == []
     assert out["batch_index"] == 0         # 没动批次指针
 
 
@@ -659,7 +657,7 @@ def test_after_not_lower_than_before_is_rejected():
         "set_sweep_count_by_stamina", dict(BASE), [105, 200, 200, 200]
     )
     assert ok is False
-    assert recorder.clicks == [pipeline.SWEEP_PLUS_POINT] * 2   # 只点了补点那两下
+    assert recorder.clicks == []
 
 
 def test_stuck_reading_after_a_correction_stops():
@@ -668,7 +666,7 @@ def test_stuck_reading_after_a_correction_stops():
         "set_sweep_count_by_stamina", dict(BASE), [105, 70, 70, 70]
     )
     assert ok is False
-    assert len(recorder.clicks) == 4       # 补点 2 下 + 一轮校正 2 下，之后不再继续
+    assert len(recorder.clicks) == 2       # 仅一轮差值校正，之后不再继续
 
 
 def test_potion_operation_still_works():

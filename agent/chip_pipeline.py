@@ -19,6 +19,7 @@ from chip_filter_flow import (
     ChipFilterFlow,
 )
 from stop_guard import ActionStopped, ensure_running
+from navigation import is_main_ui, is_idle_main_ui
 
 
 log = logging.getLogger("laa.chip_pipeline")
@@ -140,7 +141,7 @@ class ChipPipelineAction(CustomAction):
                     "summary": _new_summary(),
                     "total_rows": total_rows,
                     "row": 0,
-                    "slots": engine._row_slots(1, count, CHIP_ROWS[0]),
+                    "slots": engine._located_row_slots(context, 1, count, refresh=True) if count else [],
                     "tail_mode": False,
                     "status": "filter_process" if scan_capacity else "filter_done",
                 })
@@ -159,7 +160,12 @@ class ChipPipelineAction(CustomAction):
                 engine._process_slot(
                     context, slot, _SESSION["plan"], _SESSION["results"],
                     _SESSION["summary"], _SESSION["dry_run"],
+                    stop_at_four_star=True,
                 )
+                if _SESSION['summary'].get('rarity_cutoff') == 4:
+                    _SESSION['slots'] = []
+                    _SESSION['status'] = 'filter_done'
+                    return True
                 if slots:
                     _SESSION["status"] = "filter_process"
                 elif _SESSION.get("tail_mode") or _SESSION["row"] >= _SESSION["total_rows"] - 1:
@@ -175,7 +181,7 @@ class ChipPipelineAction(CustomAction):
                     _SESSION["row"] = row
                     start = row * len(CHIP_COLUMNS) + 1
                     count = min(len(CHIP_COLUMNS), _SESSION["scan_capacity"] - start + 1)
-                    _SESSION["slots"] = engine._row_slots(start, count, CHIP_ROWS[0])
+                    _SESSION["slots"] = engine._located_row_slots(context, start, count)
                     _SESSION["status"] = "filter_process"
                     return True
 
@@ -192,7 +198,7 @@ class ChipPipelineAction(CustomAction):
                     start = tail_row * len(CHIP_COLUMNS) + 1
                     count = min(len(CHIP_COLUMNS), _SESSION["scan_capacity"] - start + 1)
                     tail_slots.extend(
-                        engine._row_slots(start, count, SCROLLED_CHIP_ROWS[tail_offset])
+                        engine._located_row_slots(context, start, count, row=tail_offset)
                     )
                 _SESSION["slots"] = tail_slots
                 _SESSION["tail_mode"] = True
@@ -206,7 +212,7 @@ class ChipPipelineAction(CustomAction):
                 on_chip_page = engine._is_chip_selection_page(context, engine._shot(context))
                 engine._save_results(_SESSION["results"], capacity, summary)
                 completed = (
-                    summary["attempted"] == scan_capacity
+                    (summary["attempted"] == scan_capacity or summary.get('rarity_cutoff') == 4)
                     and on_chip_page
                     and all(summary[key] == 0 for key in (
                         "failed", "lock_state_failed", "unlock_guard_failed",
@@ -250,6 +256,10 @@ class ChipPipelineRecognition(CustomRecognition):
             return _hit({"phase": _SESSION.get("phase")}) if _SESSION.get("phase") == expected[6:] else None
         if expected.startswith("status:"):
             return _hit({"status": _SESSION.get("status")}) if _SESSION.get("status") == expected[7:] else None
+        if expected == 'filter:completed':
+            return _hit() if _SESSION.get('filter_done') else None
+        if expected == 'page:main':
+            return _hit() if is_main_ui(context, argv.image) or is_idle_main_ui(context, argv.image) else None
         if engine is None:
             return None
         image = argv.image

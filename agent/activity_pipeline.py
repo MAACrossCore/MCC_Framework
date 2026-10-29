@@ -23,11 +23,12 @@ from maa.custom_action import CustomAction
 from maa.custom_recognition import CustomRecognition
 
 from stop_guard import ActionStopped, ensure_running
+from sweep_limits import SWEEP_BATCH_LIMIT
 
 log = logging.getLogger("activity.pipeline")
 _SESSION = {}
 
-DEFAULT_SWEEP_LIMIT = 10
+DEFAULT_SWEEP_LIMIT = SWEEP_BATCH_LIMIT
 TICKET_COST_PER_RUN = 2
 DEFAULT_STAMINA_COST_PER_TICKET = 15
 POTION_RECOVERY = {"小药": 10, "大药": 120}
@@ -535,6 +536,8 @@ class ActivityPipelineAction(CustomAction):
                 runs = usable_tickets // ticket_cost
                 if _SESSION.get("exchange_mode") == "自定次数":
                     requested_runs = max(1, int(_SESSION.get("custom_runs") or 1))
+                    if _SESSION.get("remaining_runs") is not None:
+                        requested_runs = min(requested_runs, int(_SESSION["remaining_runs"]))
                     actual_runs = min(requested_runs, runs)
                     if actual_runs < requested_runs:
                         log.warning(
@@ -561,11 +564,7 @@ class ActivityPipelineAction(CustomAction):
                 current_tickets = int(_SESSION.get("current_tickets") or 0)
                 ticket_cost = max(1, int(_SESSION.get("ticket_cost_per_run") or TICKET_COST_PER_RUN))
                 expected_after = current_tickets - target * ticket_cost
-                for _ in range(max(0, target - 1)):
-                    _click(context, *SWEEP_PLUS_POINT)
-                    time.sleep(COUNT_CLICK_DELAY)
-
-                for attempt in range(3):
+                for attempt in range(4):
                     time.sleep(0.5)
                     image = context.tasker.controller.post_screencap().wait().get()
                     actual_after = _ocr_digits(
@@ -585,6 +584,13 @@ class ActivityPipelineAction(CustomAction):
                         log.warning("活动任务第%d次未读到‘扫荡后’数量", attempt + 1)
                         continue
 
+                    if (not 0 <= actual_after < current_tickets
+                            or (current_tickets - actual_after) % ticket_cost
+                            or not 1 <= (current_tickets - actual_after) // ticket_cost <= DEFAULT_SWEEP_LIMIT):
+                        log.error("活动任务扫荡后票数无效：%s", actual_after)
+                        return False
+                    if attempt == 3:
+                        break
                     delta_runs = abs(actual_after - expected_after) // ticket_cost
                     point = SWEEP_PLUS_POINT if actual_after > expected_after else SWEEP_MINUS_POINT
                     log.warning(

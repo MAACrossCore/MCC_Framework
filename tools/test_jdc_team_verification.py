@@ -17,6 +17,12 @@ assert check({"A", "B"}, {"C"}, {"A"}) == ("retry", {"A"})
 assert check({"A", "B"}, {"C", "D", "E"}, {"C", "D", "E"}) == ("success", set())
 action = next(node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == "JdcBuildTeam")
 calls = [node for node in ast.walk(action) if isinstance(node, ast.Call)]
-assert not any(isinstance(call.func, ast.Name) and call.func.id == "clear_team" for call in calls)
+clears = [call for call in calls if isinstance(call.func, ast.Name) and call.func.id == "clear_team"]
+assert len(clears) == 0  # Pipeline performs the single initial clear.
+retry_loop = next(node for node in ast.walk(action) if isinstance(node, ast.While)
+                  and isinstance(node.test, ast.Compare)
+                  and isinstance(node.test.left, ast.Name) and node.test.left.id == "retry")
+assert not any(isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+               and node.func.id == "clear_team" for node in ast.walk(retry_loop))
 assert any(isinstance(node, ast.Attribute) and node.attr == "stopping" for node in ast.walk(action))
-print("JDC_TEAM_VERIFICATION_OK: 7 cases; no automatic full clear; cancellation checks present")
+print("JDC_TEAM_VERIFICATION_OK: 7 cases; clear owned by Pipeline; cancellation checks present")

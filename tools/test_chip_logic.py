@@ -515,6 +515,20 @@ def test_detail_lock_visual_distinguishes_closed_and_open_shackle():
     assert ChipFilterFlow._read_detail_lock_visual(opened, point) is False
 
 
+def test_detail_lock_visual_handles_offset_and_scaled_viewport():
+    point = (1207, 166)
+    for locked in (False, True):
+        image = np.zeros((1080, 1920, 3), dtype=np.uint8)
+        image[181:196, 1193:1222] = 255
+        if locked:
+            image[171:181, 1210:1217] = 255
+        assert ChipFilterFlow._read_detail_lock_visual(image, point) is locked
+        ys = (np.arange(720) * 1080 / 720).astype(int)
+        xs = (np.arange(1280) * 1920 / 1280).astype(int)
+        small = image[ys[:, None], xs[None, :]]
+        assert ChipFilterFlow._read_detail_lock_visual(small, point) is locked
+
+
 if __name__ == "__main__":
     tests = [value for name, value in globals().items() if name.startswith("test_")]
     for test in tests:

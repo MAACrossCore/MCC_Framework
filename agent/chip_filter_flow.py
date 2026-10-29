@@ -26,6 +26,7 @@ from chip_domain import (
     validate_filter_plan,
 )
 from chip_plan_service import PROJECT_ROOT, load_filter_plan
+from chip_grid import locate_rows, row_slots
 from chip_recognition import (
     confirms_same_unlock,
     evaluate_chip,
@@ -460,6 +461,8 @@ class ChipFilterFlow(CustomAction):
         return float(np.abs(before - after).mean()) >= 5.0
 
     def _scroll_next_row_to_first(self, context, row):
+        previous_rows = getattr(self, '_grid_rows', [])
+        distance = getattr(self, '_row_scroll_distance', CHIP_ROW_SCROLL_START_Y - CHIP_ROW_SCROLL_END_Y)
         before = self._inventory_fingerprint(self._shot(context))
         self._swipe(
             context,
@@ -467,18 +470,33 @@ class ChipFilterFlow(CustomAction):
                 CHIP_ROW_SCROLL_X,
                 CHIP_ROW_SCROLL_START_Y,
                 CHIP_ROW_SCROLL_X,
-                CHIP_ROW_SCROLL_END_Y,
+                CHIP_ROW_SCROLL_START_Y - round(distance),
                 CHIP_ROW_SCROLL_DURATION,
             ),
             "固定上滑一排芯片至第一排",
         )
         self._sleep(context, 0.8)
-        after = self._inventory_fingerprint(self._shot(context))
+        image = self._shot(context)
+        self._grid_rows = locate_rows(image)
+        after = self._inventory_fingerprint(image)
         if self._inventory_changed(before, after):
+            if len(previous_rows) >= 2 and self._grid_rows:
+                pitch = previous_rows[1][0][1] - previous_rows[0][0][1]
+                drift = previous_rows[0][0][1] - self._grid_rows[0][0][1]
+                if abs(drift) < pitch / 2:
+                    self._row_scroll_distance = max(120, min(220, distance * pitch / (pitch + drift)))
             log.info("第%d排芯片已固定上滑至第一排，画面变化校验通过", row + 1)
             return True
         log.info("固定上滑后画面未变化，已到列表底部或滑动未生效")
         return False
+
+    def _located_row_slots(self, context, start_index, count, row=0, refresh=False):
+        if refresh or not hasattr(self, '_grid_rows'):
+            self._grid_rows = locate_rows(self._shot(context))
+            self._row_scroll_distance = CHIP_ROW_SCROLL_START_Y - CHIP_ROW_SCROLL_END_Y
+        slots = row_slots(self._grid_rows, start_index, count, row)
+        log.info('芯片格子定位：行%d，中心y=%d，栏位%d', row + 1, slots[0]['point'][1] if slots else 0, count)
+        return slots
 
     @staticmethod
     def _row_slots(start_index, count, y):
@@ -634,7 +652,9 @@ class ChipFilterFlow(CustomAction):
         scale_x = image_width / REFERENCE_SIZE[0]
         scale_y = image_height / REFERENCE_SIZE[1]
         radius_x = max(5, round(14 * scale_x))
-        search_y = max(4, round(10 * scale_y))
+        # OCR anchors the skill label, not the lock body; its vertical offset
+        # varies enough that a 10px window can miss an open lock at 720p.
+        search_y = max(4, round(24 * scale_y))
         gray = np.asarray(image)[..., :3].astype(np.float32).mean(axis=2)
         bright = gray >= 160
 
@@ -651,7 +671,9 @@ class ChipFilterFlow(CustomAction):
 
         connector_x1 = max(0, center_x + round(3 * scale_x))
         connector_x2 = min(image_width, center_x + round(9 * scale_x) + 1)
-        connector_y1 = max(0, body_top - max(4, round(10 * scale_y)))
+        # Inspect the connection immediately above the body, not the curved
+        # free tip of an open shackle (antialiasing made that tip ambiguous).
+        connector_y1 = max(0, body_top - max(3, round(6 * scale_y)))
         connector = bright[connector_y1:body_top, connector_x1:connector_x2]
         if connector.size == 0:
             return None
@@ -768,7 +790,7 @@ class ChipFilterFlow(CustomAction):
             encoding="utf-8",
         )
 
-    def _process_slot(self, context, slot, plan, results, summary, dry_run=False):
+    def _process_slot(self, context, slot, plan, results, summary, dry_run=False, stop_at_four_star=False):
         started = time.perf_counter()
         summary["attempted"] += 1
         self._click(context, slot["point"], "第%d个芯片栏位" % slot["index"])
@@ -779,6 +801,15 @@ class ChipFilterFlow(CustomAction):
             return
 
         self._sleep(context, 0.25)
+
+        if stop_at_four_star:
+            title = normalize_ocr(self._page_text(context, self._shot(context), [870, 140, 320, 80]))
+            if re.search(r'R\s*4', title, re.IGNORECASE):
+                summary['rarity_cutoff'] = 4
+                log.info('检测到四星芯片（%s），不修改其锁定状态，结束仓库筛选', title)
+                self._click(context, DETAIL_CLOSE_BLANK, '四星截止，关闭芯片详情')
+                self._sleep(context, 0.22)
+                return 'rarity_cutoff'
 
         detail = self._read_detail(context)
         if not detail:
@@ -926,8 +957,12 @@ class ChipFilterFlow(CustomAction):
         while row < total_rows:
             start_index = row * len(CHIP_COLUMNS) + 1
             count = min(len(CHIP_COLUMNS), scan_capacity - start_index + 1)
-            for slot in self._row_slots(start_index, count, CHIP_ROWS[0]):
-                self._process_slot(context, slot, plan, results, summary, dry_run)
+            for slot in self._located_row_slots(context, start_index, count, refresh=row == 0):
+                self._process_slot(context, slot, plan, results, summary, dry_run, stop_at_four_star=True)
+                if summary.get('rarity_cutoff'):
+                    break
+            if summary.get('rarity_cutoff'):
+                break
             if row == total_rows - 1:
                 break
 
@@ -948,13 +983,16 @@ class ChipFilterFlow(CustomAction):
                 tail_row = row + tail_offset
                 start_index = tail_row * len(CHIP_COLUMNS) + 1
                 count = min(len(CHIP_COLUMNS), scan_capacity - start_index + 1)
-                y = SCROLLED_CHIP_ROWS[tail_offset]
-                for slot in self._row_slots(start_index, count, y):
-                    self._process_slot(context, slot, plan, results, summary, dry_run)
+                for slot in self._located_row_slots(context, start_index, count, row=tail_offset):
+                    self._process_slot(context, slot, plan, results, summary, dry_run, stop_at_four_star=True)
+                    if summary.get('rarity_cutoff'):
+                        break
+                if summary.get('rarity_cutoff'):
+                    break
             row = total_rows
 
         on_chip_page = self._is_chip_selection_page(context, self._shot(context))
-        all_slots_attempted = summary["attempted"] == scan_capacity
+        all_slots_attempted = summary["attempted"] == scan_capacity or summary.get('rarity_cutoff') == 4
         self._save_results(results, capacity, summary)
         log.info(
             "锁定/解锁子任务完成检查：容量%d，计划处理%d，实际处理%d，读取%d，上锁%d，解锁%d，无需变更%d，读取失败%d，锁状态失败%d，解锁保护拦截%d，复核失败%d，仍在芯片页=%s，结果=%s",

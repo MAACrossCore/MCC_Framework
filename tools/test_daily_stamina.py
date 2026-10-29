@@ -109,13 +109,13 @@ def test_potions_for_rounds_up_and_handles_both_sizes():
 
 # ---------- 指定次数 ----------
 
-def test_plan_splits_into_batches_of_ten():
-    steps, summary = plan_actions(25, 10, 300)
-    assert counts(steps, "sweep") == [10, 10, 5]
+def test_plan_splits_into_batches_of_thirty():
+    steps, summary = plan_actions(65, 10, 700)
+    assert counts(steps, "sweep") == [30, 30, 5]
     assert kinds(steps) == ["sweep", "sweep", "sweep"]
-    assert summary["planned"] == 25 and summary["shortfall"] == 0
+    assert summary["planned"] == 65 and summary["shortfall"] == 0
     assert summary["potions"] == 0
-    assert summary["stamina_cost"] == 250
+    assert summary["stamina_cost"] == 650
 
 
 def test_plan_tops_up_missing_stamina_with_potions():
@@ -156,7 +156,7 @@ def test_plan_reports_when_nothing_is_affordable():
 def test_plan_handles_zero_and_invalid_inputs():
     assert plan_actions(0, 10, 300)[1]["reason"] == "次数为 0"
     assert plan_actions(5, 0, 300)[1]["reason"] == "缺少关卡消耗"
-    assert BATCH_LIMIT == 10
+    assert BATCH_LIMIT == 30
     assert counts(plan_actions(7, 10, 300, sweep_limit=3)[0], "sweep") == [3, 3, 1]
 
 

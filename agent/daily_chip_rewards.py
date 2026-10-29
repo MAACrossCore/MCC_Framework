@@ -29,6 +29,7 @@ from chip_plan_service import PROJECT_ROOT, load_filter_plan
 from chip_recognition import evaluate_chip
 from navigation import HOME_BUTTON, is_main_ui
 from stop_guard import ActionStopped, ensure_running
+from sweep_limits import SWEEP_BATCH_LIMIT
 from viewport import REFERENCE_SIZE, image_size, scale_roi
 
 
@@ -81,7 +82,7 @@ def parse_sweep_count(text):
     values = [
         int(value)
         for value in re.findall(r"\d+\s*[/／]\s*(\d+)", str(text or ""))
-        if 1 <= int(value) <= 10
+        if 1 <= int(value) <= SWEEP_BATCH_LIMIT
     ]
     if not values:
         return None
@@ -100,8 +101,10 @@ def parse_double_remaining(text):
 def parse_sweep_selector_count(text):
     """Read the standalone sweep-count value without accepting costs/fractions."""
     normalized = re.sub(r"\s+", "", str(text or ""))
-    match = re.fullmatch(r"10|[1-9]", normalized)
-    return int(match.group(0)) if match else None
+    if not re.fullmatch(r"[1-9]\d?", normalized):
+        return None
+    value = int(normalized)
+    return value if value <= SWEEP_BATCH_LIMIT else None
 
 
 def is_capacity_overflow_text(text):
@@ -168,7 +171,7 @@ def parse_sweep_row_markers(items, image):
         if not match:
             continue
         row, total = int(match.group(1)), int(match.group(2))
-        if 1 <= row <= total <= 10:
+        if 1 <= row <= total <= SWEEP_BATCH_LIMIT:
             rows[row] = {
                 "row": row, "total": total,
                 "count_y": reference_y,
@@ -493,9 +496,9 @@ class DailyChipRewardAction(CustomAction):
 
             if operation == "set_sweep_count":
                 engine = DailyChipRewardFlow()
-                target = max(1, min(10, int(_param(argv.custom_action_param).get("target", 1))))
+                target = max(1, min(SWEEP_BATCH_LIMIT, int(_param(argv.custom_action_param).get("target", 1))))
                 unchanged = 0
-                for attempt in range(1, 16):
+                for attempt in range(1, SWEEP_BATCH_LIMIT + 4):
                     image = engine._shot(context)
                     page_text = " ".join(engine._ocr_results(
                         context, image, "ChipPageText", SWEEP_SELECTOR_PAGE_ROI
@@ -706,7 +709,7 @@ class DailyChipRewardAction(CustomAction):
                 total = expected_gold_count(sweep_count, double_remaining, use_double)
                 capacity_overflow = bool(_SESSION.get("capacity_overflow", False))
                 # Normalize to the top and verify with the actual 1/total label;
-                # the prior page may have been left anywhere from rows 1 to 10.
+                # the prior page may have been left anywhere in the settlement.
                 at_top = False
                 for attempt in range(1, 5):
                     current = engine._shot(context)

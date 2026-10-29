@@ -1183,6 +1183,11 @@ def clear_team(
     )
 
 
+def team_drag_order(team):
+    """Place larger footprints first, preserving team priority within a size."""
+    return sorted(team, key=lambda character: -len(offsets(character, 2)))
+
+
 def classify_team_result(final_names, remaining, visible_names):
     """Disappearance is valid only when the expected remaining cards were read."""
     still_visible = set(final_names) & set(visible_names)
@@ -1466,6 +1471,7 @@ class JdcBuildTeam(
             # 重编循环
             # =================================================
 
+            drag_order = team_drag_order(final_team)
             retry = 0
             retry_names = set(final_names)
             max_attempts = max(1, int(param.get("max_team_attempts", JDC_BUILD_MAX_RETRY)))
@@ -1504,7 +1510,7 @@ class JdcBuildTeam(
 
                     chosen = None
 
-                    for c in final_team:
+                    for c in drag_order:
 
                         name = c[
                             "name"

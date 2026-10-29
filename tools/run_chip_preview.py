@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import logging
 from pathlib import Path
 import sys
 
@@ -38,6 +39,7 @@ def main() -> int:
     parser.add_argument("--address", default="127.0.0.1:16416")
     parser.add_argument("--apply", action="store_true", help="Actually correct lock states")
     parser.add_argument("--mode", choices=("filter", "cleanup", "both"), default="filter")
+    parser.add_argument('--from-current', action='store_true', help='Debug only: skip inventory top reset')
     args = parser.parse_args()
 
     os.environ["LAA_CHIP_TASK_MODE"] = args.mode
@@ -51,6 +53,8 @@ def main() -> int:
     )
     temp_dir = Path(os.environ["TEMP"])
     temp_dir.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s %(message)s',
+                        handlers=[logging.FileHandler(temp_dir / 'chip-debug.log', encoding='utf-8'), logging.StreamHandler(sys.stdout)])
     Tasker.set_log_dir(temp_dir / "maa-log")
 
     resource = Resource()
@@ -73,7 +77,11 @@ def main() -> int:
     if not tasker.bind(resource, controller) or not tasker.inited:
         raise RuntimeError("Failed to initialize Maa tasker")
     tasker.add_context_sink(DiagnosticSink())
-    job = tasker.post_task("ChipDetailReadTask").wait()
+    override = {
+        'ChipDetailReadTask': {'next': ['芯片_开始筛选复位']},
+        '芯片_开始筛选复位': {'next': ['芯片_初始化筛选']},
+    } if args.from_current else {}
+    job = tasker.post_task("ChipDetailReadTask", override).wait()
     print(
         "CHIP_PREVIEW_STATUS",
         f"succeeded={job.succeeded}",

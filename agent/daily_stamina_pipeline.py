@@ -412,11 +412,8 @@ class DailyStaminaAction(CustomAction):
                       target, target * cost, before)
             return False
 
-        # 次数从 1 起：补点到 target 只需再按 target-1 下（与活动一致）
-        cls._click_count(context, SWEEP_PLUS_POINT, target - 1)
-
         previous = None
-        for attempt in range(3):
+        for attempt in range(4):
             time.sleep(0.5)
             image = context.tasker.controller.post_screencap().wait().get()
             actual = _ocr_digits(context, "每日探索_读取扫荡后体力", image, ROI_SWEEP_AFTER)
@@ -432,6 +429,9 @@ class DailyStaminaAction(CustomAction):
                 log.error("‘扫荡后’=%d 不小于‘现在’=%d，读数不可信，停止以免扫错次数",
                           actual, before)
                 return False
+            if actual < 0 or (before - actual) % cost or not 1 <= (before - actual) // cost <= BATCH_LIMIT:
+                log.error("‘扫荡后’=%d 无法对应有效扫荡次数", actual)
+                return False
             if previous is not None and actual == previous:
                 log.error("扫荡次数校正后‘扫荡后’仍为 %d，按键未生效，停止操作", actual)
                 return False
@@ -440,7 +440,9 @@ class DailyStaminaAction(CustomAction):
                 log.error("‘扫荡后’=%d 与预期=%d 差不足一次扫荡，停止以免误点",
                           actual, expected_after)
                 return False
-            point = SWEEP_MINUS_POINT if actual > expected_after else SWEEP_PLUS_POINT
+            if attempt == 3:
+                break
+            point = SWEEP_PLUS_POINT if actual > expected_after else SWEEP_MINUS_POINT
             log.warning("扫荡次数未到目标：预期扫荡后=%d，实际=%d，校正%d下",
                         expected_after, actual, delta_runs)
             cls._click_count(context, point, delta_runs)

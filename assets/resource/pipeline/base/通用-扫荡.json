@@ -341,7 +341,7 @@
                     530,
                     155
                 ],
-                "expected": "扫荡"
+                "expected": "扫荡成功"
             }
         },
         "pre_wait_freezes": {
@@ -373,7 +373,7 @@
                     530,
                     155
                 ],
-                "expected": "扫荡"
+                "expected": "扫荡成功"
             }
         },
         "pre_wait_freezes": {

@@ -35,7 +35,7 @@ from mainstory_pipeline import MainStoryAction, MainStoryRecognition
 from jdc_select_character import JdcSelectCharacter
 from jdc_build_team import JdcBuildTeam
 from jdc_route_push import JdcRoutePush
-from jdc_reset_state import JdcResetState
+from jdc_reset_state import JdcFormationView, JdcLoadState, JdcResetState, JdcTeamReady
 from weekly_run_counter import WeeklyRunCounterAction, WeeklyRunReached
 
 
@@ -58,6 +58,9 @@ AgentServer.custom_action("jdc_select_character")(JdcSelectCharacter)
 AgentServer.custom_action("jdc_build_team")(JdcBuildTeam)
 AgentServer.custom_action("jdc_route_push")(JdcRoutePush)
 AgentServer.custom_action("jdc_reset_state")(JdcResetState)
+AgentServer.custom_action("jdc_load_state")(JdcLoadState)
+AgentServer.custom_recognition("jdc_team_ready")(JdcTeamReady)
+AgentServer.custom_recognition("jdc_formation_view")(JdcFormationView)
 AgentServer.custom_action("weekly_run_count")(WeeklyRunCounterAction)
 AgentServer.custom_recognition("weekly_run_reached")(WeeklyRunReached)
 

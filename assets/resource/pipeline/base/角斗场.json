@@ -111,6 +111,8 @@
                 "expected": "入场确认"
             }
         },
+        "action": "Custom",
+        "custom_action": "jdc_reset_state",
         "next": [
             "模拟军演_角斗场_可免费入场次数大于0",
             "模拟军演_角斗场_可免费入场次数为0"
@@ -398,20 +400,11 @@
         }
     },
     "模拟军演_角斗场_编队_已是平面": {
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    671,
-                    339,
-                    45,
-                    125
-                ],
-                "expected": "此面向敌"
-            }
-        },
+        "recognition": "Custom",
+        "custom_recognition": "jdc_formation_view",
+        "custom_recognition_param": { "expected": "flat" },
         "next": [
-            "模拟军演_角斗场_编队_清空队伍"
+            "模拟军演_角斗场_编队_执行"
         ],
         "$__mpe_code": {
             "position": {
@@ -421,24 +414,16 @@
         }
     },
     "模拟军演_角斗场_编队_平面": {
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    492,
-                    652,
-                    105,
-                    29
-                ],
-                "expected": "平面"
-            }
-        },
+        "recognition": "Custom",
+        "custom_recognition": "jdc_formation_view",
+        "custom_recognition_param": { "expected": "perspective" },
         "action": {
-            "type": "Click"
+            "type": "Click",
+            "param": { "target": [492, 652, 105, 29] }
         },
         "post_delay": 2000,
         "next": [
-            "模拟军演_角斗场_编队_清空队伍"
+            "模拟军演_角斗场_编队_已是平面"
         ],
         "$__mpe_code": {
             "position": {
@@ -452,12 +437,12 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    670,
-                    325,
-                    70,
-                    150
+                    47,
+                    544,
+                    87,
+                    80
                 ],
-                "expected": "此面向敌"
+                "expected": "清空队伍"
             }
         },
         "action": {
@@ -502,8 +487,7 @@
     },
     "模拟军演_角斗场_编队_检测平面": {
         "next": [
-            "模拟军演_角斗场_编队_已是平面",
-            "模拟军演_角斗场_编队_平面"
+            "模拟军演_角斗场_编队_清空队伍"
         ],
         "$__mpe_code": {
             "position": {
@@ -538,7 +522,8 @@
         },
         "post_delay": 2000,
         "next": [
-            "模拟军演_角斗场_编队_执行"
+            "模拟军演_角斗场_编队_已是平面",
+            "模拟军演_角斗场_编队_平面"
         ],
         "$__mpe_code": {
             "position": {
@@ -636,7 +621,10 @@
         },
         "post_delay": 2000,
         "next": [
-            "模拟军演_角斗场_入场确认"
+            "模拟军演_角斗场_入场确认",
+            "模拟军演_角斗场_随机模式_选角色",
+            "模拟军演_角斗场_编队入口",
+            "模拟军演_角斗场_全部领取"
         ],
         "$__mpe_code": {
             "position": {
@@ -751,12 +739,42 @@
     "模拟军演_角斗场_初始化": {
         "recognition": "DirectHit",
         "action": "Custom",
-        "custom_action": "jdc_reset_state",
+        "custom_action": "jdc_load_state",
         "post_delay": 500,
         "next": [
+            "模拟军演_角斗场_全部领取",
+            "模拟军演_角斗场_战斗胜利",
+            "模拟军演_角斗场_战斗失败",
+            "模拟军演_角斗场_接续编队页",
+            "模拟军演_角斗场_随机模式_选角色",
+            "模拟军演_角斗场_接续关卡页",
+            "模拟军演_角斗场_入场确认",
+            "模拟军演_角斗场_随机模式",
+            "模拟军演_角斗场_测试版",
             "首页_出击",
             "[JumpBack]子任务_进入首页"
-        ]
+        ],
+        "$__mpe_code": { "position": { "x": 1949, "y": 300 } }
+    },
+    "模拟军演_角斗场_接续编队页": {
+        "recognition": "OCR",
+        "expected": "清空队伍",
+        "roi": [47, 544, 87, 80],
+        "next": ["模拟军演_角斗场_编队_检测平面"],
+        "$__mpe_code": { "position": { "x": 1949, "y": 520 } }
+    },
+    "模拟军演_角斗场_接续关卡页": {
+        "recognition": "OCR",
+        "expected": "当前编队",
+        "roi": [9, 611, 129, 47],
+        "next": ["模拟军演_角斗场_接续已编队", "模拟军演_角斗场_编队入口"],
+        "$__mpe_code": { "position": { "x": 2250, "y": 520 } }
+    },
+    "模拟军演_角斗场_接续已编队": {
+        "recognition": "Custom",
+        "custom_recognition": "jdc_team_ready",
+        "next": ["模拟军演_角斗场_推关"],
+        "$__mpe_code": { "position": { "x": 2550, "y": 520 } }
     },
     "$__mpe_external_通用-返回主页_角斗场": {
         "$__mpe_code": {
