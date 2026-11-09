@@ -257,6 +257,9 @@ def test_swipe_is_leftward_bounded_and_then_reads_reward():
     # 找回后先读进度定目标，再由「按进度分派」决定继续刷还是收工（2026-09-22 次数改造）
     assert _next(weekly["周本_读取报酬"]) == ["周本_读进度_已满"]
     assert _next(weekly["周本_读进度_已满"]) == ["周本_按进度分派"]
+    # 「按进度分派」是 next 目标，识别失败时它自己的 on_error 不生效，
+    # 兜底必须挂在父节点「读进度_已满」上（否则 0/600 时死循环超时）
+    assert weekly["周本_读进度_已满"].get("on_error") == ["周本_进度未满_继续刷"]
     # 默认（=「依然进行挑战」）：满进度也继续挑战
     assert _next(weekly["周本_按进度分派"]) == ["活动探索_碎星虚影"]
     # 未满 → 中继 → 继续挑战
