@@ -908,6 +908,7 @@
         "custom_action": "weekly_run_count",
         "custom_action_param": { "operation": "read_progress" },
         "next": ["周本_按进度分派"],
+        "on_error": ["周本_进度未满_继续刷"],
         "$__mpe_code": { "position": { "x": 5720, "y": 740 } }
     },
     "周本_按进度分派": {
